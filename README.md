@@ -27,10 +27,9 @@ Python / Node.js / Laravel / .NET
  PostgreSQL / MySQL / MongoDB
  MinIO / Elasticsearch / AWS S3
 
----
+
 
 ## 🚀 البدء السريع (Getting Started)
 
-### المتطلبات المسبقة:
-```bash
-# اذكر المتطلبات مثل Node.js أو Docker أو Python
+
+
