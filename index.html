@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="base-uri 'self'; form-action 'self'" />
   <meta name="referrer" content="no-referrer" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v8." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v9." />
   <meta name="keywords" content="أرشيف الكمالي برو, Alkamaly Pro, أرشفة إلكترونية, OCR عربي, مسح ضوئي, أرشيف رقمي, سندات مالية, كاميرا الجوال, Google Sites" />
   <meta name="author" content="م. سمير الكمالي" />
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Alkamaly Pro Archive" />
-  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v8" />
+  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v9" />
   <meta property="og:description" content="منصة الأرشفة الذكية، التصوير المباشر بكاميرا الجوال، واستخراج النصوص OCR العربي" />
   <meta property="og:url" content="https://sites.google.com/view/alkamalypro/full-page-embed" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -21,16 +21,16 @@
   <meta name="theme-color" content="#070d1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v8</title>
+  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v9</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
       --bg-primary: #070d1b;
@@ -277,6 +277,16 @@
 
     @keyframes mcFlashOk { 0% { background-color: rgba(22, 163, 74, 0.25); } 100% { background-color: transparent; } }
     .mc-flash { animation: mcFlashOk 0.45s ease; }
+
+    /* ===== v9: تكيّف الجوال/الكمبيوتر وأداء القوائم الكبيرة ===== */
+    html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+    body{min-height:100vh;min-height:100dvh}
+    [data-doc-card]{content-visibility:auto;contain-intrinsic-size:auto 320px}
+    .v9-more{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:1rem;font-size:.8rem;color:var(--text-secondary)}
+    @media (pointer:coarse){button,select,.luxe-input,.btn-luxe-gold,.btn-luxe-outline{min-height:44px}input[type=checkbox]{width:22px;height:22px}}
+    @media (max-width:767px){body{padding-bottom:env(safe-area-inset-bottom)}.luxe-input{font-size:16px}#toastContainer{max-width:calc(100vw - 24px)}}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    @media print{#sidebar,#toastContainer,.v9-more{display:none!important}}
   </style>
 </head>
 <body class="antialiased selection:bg-amber-500/30 pb-16 sm:pb-0">
@@ -1870,11 +1880,12 @@
         async readText(dir, name) { try { return await (await (await dir.getFileHandle(name)).getFile()).text(); } catch (_) { return null; } },
         boot() { Store.injectUI(); if (Store.booted) return Store.paint(); Store.booted = true; Store.restore(); },
         async connect() {
-          if (!Store.supported) return showToast('المتصفح لا يدعم الحفظ على مجلد جهازك. استخدم Chrome أو Edge على الكمبيوتر.', 'warning');
+          if (!Store.supported && V9.opfsOK) return V9.connectOpfs(); if (!Store.supported) return showToast('المتصفح لا يدعم الحفظ على مجلد جهازك. استخدم Chrome أو Edge على الكمبيوتر.', 'warning');
           try { const h = await window.showDirectoryPicker({ mode: 'readwrite', id: 'alkamaly-archive' }); await Store.kvSet('dir', h); await Store.open(h); }
           catch (e) { if (!e || e.name !== 'AbortError') showToast('تعذر فتح المجلد: ' + (e && e.message), 'error'); }
         },
         async restore() {
+          await V9.ready; if (!Store.supported && V9.opfsOK && safeGetStorage('alka_opfs', 0)) return V9.connectOpfs(true);
           try {
             const h = Store.supported && await Store.kvGet('dir');
             if (h) { if ((await h.queryPermission({ mode: 'readwrite' })) === 'granted') return Store.open(h); Store.pending = h; }
@@ -1906,7 +1917,7 @@
           await Store.flush();
           showToast(`تم ربط مجلد الأرشيف «${h.name}» (${documents.length} مستند)`, 'success');
           clearInterval(Store.watch); Store.watch = setInterval(() => Store.poll(), 4000);
-          Store.hydrate();
+          V9.onStoreOpen();
         },
         async hydrate() {
           let n = 0;
@@ -1981,8 +1992,8 @@
         },
         paint() {
           const el = document.getElementById('storeStatus'), dot = document.getElementById('folderStatusDot'); if (!el) return;
-          el.innerHTML = !Store.supported ? '<div class="text-amber-400">⚠️ هذا المتصفح لا يدعم الحفظ على مجلد جهازك. استخدم Chrome أو Edge على الكمبيوتر، والحفظ الآن داخل المتصفح فقط.</div>'
-            : Store.ready ? `<div class="text-emerald-400 font-semibold">💾 قاعدة الأرشيف على جهازك: ${escapeHtml(Store.dir.name)}</div>
+          el.innerHTML = (!Store.supported && !Store.ready && V9.opfsOK) ? '<div class="text-amber-400">📱 الحفظ الآن داخل المتصفح فقط.</div><button id="storeActionBtn" class="btn-luxe-gold w-full !py-1.5 !text-[11px]">📱 تفعيل التخزين الذكي على هذا الجهاز</button>' : !Store.supported ? '<div class="text-amber-400">⚠️ هذا المتصفح لا يدعم الحفظ على مجلد جهازك. استخدم Chrome أو Edge على الكمبيوتر، والحفظ الآن داخل المتصفح فقط.</div>'
+            : Store.ready ? `<div class="text-emerald-400 font-semibold">💾 قاعدة الأرشيف على جهازك: ${escapeHtml(Store.dir.name || 'التخزين الذكي للجهاز')}</div>
               <div class="flex items-center justify-between gap-1"><span style="color:var(--text-secondary)">📠 مجلد الماسح: <b class="font-mono-code">scan_inbox</b></span><button id="inboxToggleBtn" class="btn-luxe-outline !py-0.5 !px-2 !text-[10px]">${Store.inboxOn ? 'المراقبة: تعمل' : 'المراقبة: متوقفة'}</button></div>
               <button id="inboxNowBtn" class="btn-luxe-outline w-full !py-1 !text-[11px]">📥 استيراد من الماسح الآن (${Store.scanned})</button>`
             : Store.pending ? `<button id="storeActionBtn" class="btn-luxe-gold w-full !py-1.5 !text-[11px]">🔓 إعادة ربط مجلد الأرشيف «${escapeHtml(Store.pending.name)}»</button>`
@@ -2427,7 +2438,8 @@
         return foundAny ? total : null;
       }
 
-      function extractSmartEntities(text) {
+      function extractSmartEntities(text) { return V9.ent(text); }
+      function extractSmartEntitiesRaw(text) {
         const clean = toWesternDigits(text || '');
         const numMatch = clean.match(/(?:رقم\s*السند|رقم\s*الحوالة|رقم\s*الفاتورة|رقم\s*العقد|رقم\s*التقرير|رقم\s*المرجع|رقم|سند|مرجع|فاتورة|عقد|No\.?|Ref|#)\s*[:：\-]?\s*([A-Z0-9\-\/]{2,20})/i);
         const remMatch = clean.match(/(?:حوالة\s*رقم|رقم\s*الحوالة|إشعار\s*حوالة|Remittance)\s*[:：\-|#]?\s*(\d{6,15})/i);
@@ -3007,6 +3019,9 @@
 
       // ==================== OCR ====================
       async function runOcrOnDocument(docId, showProgress = true) {
+        await V9.need(documents.find(d => d.id === docId)); return runOcrOnDocumentRaw(docId, showProgress);
+      }
+      async function runOcrOnDocumentRaw(docId, showProgress = true) {
         const doc = documents.find(d => d.id === docId); if (!doc) return false;
         const imagePages = (doc.pages || []).filter(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
         if (!imagePages.length) { if (showProgress) showToast('هذا المستند لا يحتوي على صور قابلة للمسح الضوئي (OCR)', 'warning'); return false; }
@@ -3015,10 +3030,10 @@
         const progressCard = document.getElementById('ocrProgressCard'), progressLabel = document.getElementById('ocrProgressLabel'), progressPct = document.getElementById('ocrProgressPct'), progressBar = document.getElementById('ocrProgressBar');
         if (showProgress && progressCard) { progressCard.classList.remove('hidden'); progressLabel.textContent = `جارٍ استخراج النص من: ${doc.title}...`; progressPct.textContent = '5%'; progressBar.style.width = '5%'; }
         try {
-          const worker = await Tesseract.createWorker(lang, 1, { logger: m => { if (showProgress && m.status === 'recognizing text' && progressBar) { const pct = Math.max(10, Math.round((m.progress || 0) * 100)); progressPct.textContent = pct + '%'; progressBar.style.width = pct + '%'; } } });
+          const worker = await V9.worker(lang, { logger: m => { if (showProgress && m.status === 'recognizing text' && progressBar) { const pct = Math.max(10, Math.round((m.progress || 0) * 100)); progressPct.textContent = pct + '%'; progressBar.style.width = pct + '%'; } } });
           const extractedParts = [];
           for (let i = 0; i < imagePages.length; i++) { const ret = await worker.recognize(imagePages[i].dataUrl); const pageText = (ret && ret.data && ret.data.text) ? ret.data.text.trim() : ''; if (imagePages.length > 1) extractedParts.push(`=== الصفحة ${i + 1} ===\n${pageText}`); else extractedParts.push(pageText); }
-          await worker.terminate();
+          /* v9: العامل مشترك ويُغلق تلقائياً عند الخمول */
           doc.ocrText = extractedParts.join('\n\n').trim();
           const entities = extractSmartEntities(doc.ocrText);
           if (!doc.docNumber && entities.voucherNumber !== '—') doc.docNumber = entities.voucherNumber;
@@ -3030,7 +3045,8 @@
           return true;
         } catch (err) { if (showProgress && progressCard) progressCard.classList.add('hidden'); showToast('تعذر إتمام OCR على هذا الملف', 'error'); return false; }
       }
-      async function runBatchOcr(targetIds = null) {
+      async function runBatchOcr(targetIds = null) { return V9.batchOcr(targetIds); }
+      async function runBatchOcrRaw(targetIds = null) {
         const candidates = documents.filter(d => { if (targetIds && !targetIds.includes(d.id)) return false; const hasImg = (d.pages || []).some(p => p.dataUrl && p.dataUrl.startsWith('data:image')); return hasImg && (!d.ocrText || d.ocrText.trim().length < 5); });
         if (!candidates.length) { showToast('جميع المستندات المصورة معالجة مسبقاً بـ OCR ✔', 'info'); return; }
         showToast(`بدء معالجة OCR لعدد ${candidates.length} مستند...`, 'info');
@@ -3053,15 +3069,16 @@
           if (statusF === 'dual' && (!doc.pages || doc.pages.length < 2)) return false;
           if (statusF === 'camera' && doc.source !== 'camera') return false;
           if (statusF === 'verified' || statusF === 'needs-review' || statusF === 'duplicate') { const ent = extractSmartEntities(doc.ocrText || ''); const isDup = isDocumentDuplicate(doc, ent); if (statusF === 'duplicate' && !isDup) return false; if (statusF === 'needs-review' && (ent.amountsMatch && ent.confidence >= 75 && !isDup)) return false; if (statusF === 'verified' && (!ent.amountsMatch || ent.confidence < 75 || isDup)) return false; }
-          if (query) { const hay = `${doc.title} ${doc.docNumber || ''} ${doc.category} ${doc.folder || ''} ${doc.ocrText || ''}`.toLowerCase(); if (!V8.matches(hay, query)) return false; }
+          if (query) { if (!V9.match(doc, query)) return false; }
           return true;
         });
         filtered.sort((a, b) => { if (sortBy === 'oldest') return (a.date || '').localeCompare(b.date || ''); if (sortBy === 'title') return (a.title || '').localeCompare(b.title || '', 'ar'); if (sortBy === 'size') return (b.size || 0) - (a.size || 0); return (b.date || '').localeCompare(a.date || ''); });
         return filtered;
       }
 
-      function renderDocuments() {
-        const list = getFilteredDocuments();
+      function renderDocuments() { V9.render(); }
+      function renderDocumentsRaw() {
+        const list = V9.slice();
         const tbody = document.getElementById('documentsTableBody'), grid = document.getElementById('documentsGridWrapper'), emptyBox = document.getElementById('emptyStateBox'), tableWrap = document.getElementById('documentsTableWrapper');
         if (!list.length) { tbody.innerHTML = ''; grid.innerHTML = ''; emptyBox.classList.remove('hidden'); tableWrap.classList.add('hidden'); grid.classList.add('hidden'); updateBulkBar(); return; }
         emptyBox.classList.add('hidden');
@@ -3184,6 +3201,10 @@
 
       // ==================== DOC VIEWER ====================
       function openDocumentViewer(docId) {
+        const d = documents.find(x => x.id === docId);
+        if (d && Store.ready && (d.pages || []).some(p => p.file && !p.dataUrl)) V9.need(d).then(() => openDocumentViewerRaw(docId)); else openDocumentViewerRaw(docId);
+      }
+      function openDocumentViewerRaw(docId) {
         const doc = documents.find(d => d.id === docId); if (!doc) return;
         currentViewerDocId = docId; currentViewerPageIdx = 0; viewerZoom = 1; viewerRotation = 0; viewerScanBoost = false;
         document.getElementById('viewerDocTitle').textContent = doc.title;
@@ -3271,7 +3292,7 @@
         } catch (_) { showToast('تعذر إنشاء ملف ZIP', 'error'); }
       }
       function exportBackupJson() {
-        const payload = { app: 'Alkamaly Pro Archive Luxe v8', exportedAt: new Date().toISOString(), folderName: activeFolderName, categories, documents };
+        const payload = { app: 'Alkamaly Pro Archive Luxe v9', exportedAt: new Date().toISOString(), folderName: activeFolderName, categories, documents };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a');
         a.href = url; a.download = `AlkamalyPro_Archive_${new Date().toISOString().slice(0, 10)}.json`;
         document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
@@ -3302,7 +3323,7 @@
         if (e1.voucherNumber === '—' && !doc.docNumber) return false;
         const targetNum = (doc.docNumber || e1.voucherNumber || '').trim();
         if (!targetNum || targetNum === '—') return false;
-        return documents.some(other => { if (other.id === doc.id) return false; const e2 = extractSmartEntities(other.ocrText || ''); const otherNum = (other.docNumber || e2.voucherNumber || '').trim(); return otherNum && otherNum === targetNum; });
+        return V9.dups(targetNum) > 1;
       }
 
       function renderAuditView() {
@@ -4022,7 +4043,7 @@
         document.getElementById('importJsonInput').addEventListener('change', async e => { const file = e.target.files && e.target.files[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()); if (Array.isArray(parsed.documents)) { documents = parsed.documents; if (Array.isArray(parsed.categories) && parsed.categories.length) categories = parsed.categories; if (parsed.folderName) activeFolderName = parsed.folderName; safeSetStorage(STORAGE_DOCS_KEY, documents); safeSetStorage(STORAGE_CATS_KEY, categories); updateFolderBannerUI(); refreshAllUI(); showToast(`تم استيراد ${documents.length} مستند من النسخة الاحتياطية`, 'success'); } else showToast('صيغة ملف النسخة الاحتياطية غير صالحة', 'error'); } catch (_) { showToast('تعذر قراءة ملف JSON', 'error'); } });
         document.getElementById('settingsClearAllBtn').addEventListener('click', async () => { const ok = await showConfirmDialog('مسح بيانات الأرشيف', 'هل تريد مسح جميع المستندات المفهرسة من المتصفح؟'); if (!ok) return; documents = []; selectedDocIds.clear(); activeDirectoryHandle = null; activeFolderName = 'أرشيف الكمالي برو المحلي'; safeSetStorage(STORAGE_DOCS_KEY, documents); updateFolderBannerUI(); refreshAllUI(); showToast('تم تصفير الأرشيف المحلي', 'info'); });
 
-        ['searchInput', 'filterFolder', 'filterCategory', 'filterStatus', 'sortOrder', 'filterDateFrom', 'filterDateTo'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener(el.tagName === 'INPUT' && el.type === 'text' ? 'input' : 'change', renderDocuments); });
+        ['searchInput', 'filterFolder', 'filterCategory', 'filterStatus', 'sortOrder', 'filterDateFrom', 'filterDateTo'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener(el.tagName === 'INPUT' && el.type === 'text' ? 'input' : 'change', el.tagName === 'INPUT' && el.type === 'text' ? V9.deb(renderDocuments, 220) : renderDocuments); });
         document.getElementById('resetFiltersBtn').addEventListener('click', () => { document.getElementById('searchInput').value = ''; document.getElementById('filterFolder').value = ''; document.getElementById('filterCategory').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterDateFrom').value = ''; document.getElementById('filterDateTo').value = ''; renderDocuments(); });
         document.getElementById('ocrGlobalSearch').addEventListener('input', renderOcrStudio);
 
@@ -4293,7 +4314,151 @@
         return { norm, matches, save, boot, legacy, mount, panel, seal, verify, errors, lastBad: [] };
       })();
 
+
+      // ==================== V9: طبقة الأداء والتكيّف ====================
+      // ترقيم تدريجي • تحميل كسول للصور مع إخلاء من الذاكرة • فهرس بحث مخزّن • عامل OCR مشترك • استيراد على دفعات • OPFS للجوال
+      const V9 = (() => {
+        const COARSE = matchMedia('(pointer: coarse)').matches, STEP = COARSE ? 40 : 60, HOT_MAX = COARSE ? 40 : 140;
+        const hot = new Map(), nc = new WeakMap(), ec = new Map();
+        let limit = STEP, sig = '', full = [], tk = 0, io = null, opfs = false;
+        const deb = (f, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => f(...a), ms); }; };
+        const ready = (async () => { try {
+          if (!(navigator.storage && navigator.storage.getDirectory)) return;
+          const r = await navigator.storage.getDirectory(), w = await (await r.getFileHandle('.probe', { create: true })).createWritable();
+          await w.write('ok'); await w.close(); await r.removeEntry('.probe'); opfs = true;
+        } catch (_) {} })();
+
+        // ---- بحث وكيانات مخزّنة (بدل إعادة الحساب لكل مستند عند كل ضغطة) ----
+        const match = (d, q) => {
+          const oc = d.ocrText || '', k = `${d.title}|${d.docNumber || ''}|${d.category}|${d.folder || ''}|${oc.length}|${oc.slice(0, 24)}`;
+          let c = nc.get(d);
+          if (!c || c.k !== k) { c = { k, h: V8.norm(`${d.title} ${d.docNumber || ''} ${d.category} ${d.folder || ''} ${oc}`) }; nc.set(d, c); }
+          return V8.norm(q).split(/\s+/).filter(Boolean).every(w => c.h.includes(w));
+        };
+        const ent = x => { x = x || ''; let e = ec.get(x); if (!e) { e = extractSmartEntitiesRaw(x); if (ec.size > 4000) ec.clear(); ec.set(x, e); } return e; };
+        let di = null, dt = 0, dref = null, dlen = -1;
+        const dups = num => {
+          if (!di || dref !== documents || dlen !== documents.length || Date.now() - dt > 3000) {
+            di = new Map(); documents.forEach(d => { const n = String(d.docNumber || ent(d.ocrText).voucherNumber || '').trim(); if (n && n !== '—') di.set(n, (di.get(n) || 0) + 1); });
+            dref = documents; dlen = documents.length; dt = Date.now();
+          }
+          return di.get(num) || 0;
+        };
+
+        // ---- تحميل كسول للصور من القرص + إخلاء الأقدم من الذاكرة ----
+        const need = async (d, first) => {
+          if (!d || !Store.ready) return;
+          hot.set(d.id, Date.now());
+          for (const [i, p] of (d.pages || []).entries()) {
+            if (first && i) break;
+            if (p.file && !p.dataUrl) { try { const s = p.file.split('/'), dd = await Store.sub('files/' + s.slice(0, -1).join('/'), false); p.dataUrl = await readFileAsDataUrl(await (await dd.getFileHandle(s[s.length - 1])).getFile()); } catch (_) {} }
+          }
+        };
+        const trim = (keep = HOT_MAX) => {
+          if (!Store.ready || hot.size <= keep) return;
+          const open = new Set([currentViewerDocId, ...selectedDocIds]);
+          for (const [id] of [...hot.entries()].sort((a, b) => a[1] - b[1])) {
+            if (hot.size <= keep) break; if (open.has(id)) continue;
+            hot.delete(id); const d = documents.find(x => x.id === id);
+            if (d) (d.pages || []).forEach(p => { if (p.file) p.dataUrl = ''; });
+          }
+        };
+        const miss = d => { const p = (d.pages || [])[0]; return p && p.file && !p.dataUrl; };
+        const thumbs = async vis => {
+          const my = ++tk; let n = 0;
+          for (const d of vis) { if (my !== tk) return; await need(d, true); if (++n % 6 === 0) { renderDocumentsRaw(); more(); } }
+          if (my === tk) { renderDocumentsRaw(); more(); trim(); }
+        };
+
+        // ---- عرض تدريجي ----
+        const next = () => { if (limit < full.length) { limit += STEP; render(); } };
+        const more = () => {
+          let el = document.getElementById('v9More');
+          if (!el) { el = document.createElement('div'); el.id = 'v9More'; el.className = 'v9-more'; document.getElementById('documentsGridWrapper').after(el); io = new IntersectionObserver(e => { if (e[0].isIntersecting) next(); }, { rootMargin: '400px' }); io.observe(el); }
+          const total = full.length, shown = Math.min(limit, total), f = n => n.toLocaleString('ar-EG');
+          el.innerHTML = total ? `<span>عرض ${f(shown)} من ${f(total)}</span>` + (shown < total ? '<button type="button" id="v9MoreBtn" class="btn-luxe-outline !py-1 text-xs">تحميل المزيد</button>' : '') : '';
+          if (io && shown < total) { io.unobserve(el); io.observe(el); }
+        };
+        const render = () => {
+          const s = ['searchInput', 'filterFolder', 'filterCategory', 'filterStatus', 'sortOrder', 'filterDateFrom', 'filterDateTo'].map(i => (document.getElementById(i) || {}).value || '').join('\u0001');
+          if (s !== sig) { sig = s; limit = STEP; }
+          full = getFilteredDocuments(); renderDocumentsRaw(); more();
+          if (Store.ready) { const vis = full.slice(0, limit).filter(miss); if (vis.length) thumbs(vis); }
+        };
+        const slice = () => full.slice(0, limit);
+        document.addEventListener('click', e => { if (e.target && e.target.id === 'v9MoreBtn') next(); });
+        document.addEventListener('visibilitychange', () => { if (document.hidden && Store.ready) Store.flush(); });
+
+        // ---- OCR: عامل مشترك + معالجة دفعية بدون تجميد الواجهة ----
+        let wk = null, wl = '', wlog = null, wt = null;
+        const worker = async (lang, o) => {
+          wlog = o && o.logger;
+          const arm = () => { clearTimeout(wt); wt = setTimeout(() => { const w = wk; wk = null; if (w) w.terminate().catch(() => {}); }, 180000); };
+          if (!wk || wl !== lang) { if (wk) { try { await wk.terminate(); } catch (_) {} } wk = await Tesseract.createWorker(lang, 1, { logger: m => { arm(); if (wlog) wlog(m); } }); wl = lang; }
+          arm(); return wk;
+        };
+        const batchOcr = async ids => {
+          const isImg = p => (p.dataUrl && p.dataUrl.startsWith('data:image')) || (p.file && /\.(jpe?g|png|webp|bmp)$/i.test(p.file));
+          const todo = documents.filter(d => (!ids || ids.includes(d.id)) && (d.pages || []).some(isImg) && (!d.ocrText || d.ocrText.trim().length < 5));
+          if (!todo.length) return showToast('جميع المستندات المصورة معالجة مسبقاً بـ OCR ✔', 'info');
+          showToast(`بدء معالجة OCR لعدد ${todo.length} مستند...`, 'info');
+          let ok = 0;
+          for (const d of todo) { if (await runOcrOnDocument(d.id, true)) ok++; trim(); await new Promise(r => setTimeout(r, 0)); }
+          showToast(`اكتمل OCR بنجاح لعدد ${ok} من ${todo.length} مستند`, 'success');
+        };
+
+        // ---- استيراد الكميات الكبيرة على دفعات (بحدود المجلدات حتى لا تتجزأ المستندات متعددة الصفحات) ----
+        const _ing = ingestScannedFiles;
+        ingestScannedFiles = async (entries, root, opt = {}) => {
+          const mode = opt.groupingMode || (document.getElementById('batchGroupingMode') || {}).value || 'smart-folder';
+          if (!entries || entries.length <= 60 || mode === 'all-in-one' || mode === 'pairs-dual') return _ing(entries, root, opt);
+          if (!Store.ready && entries.length > 300) showToast('كمية كبيرة: اربط مجلداً على جهازك أو فعّل التخزين الذكي لتجنّب امتلاء الذاكرة', 'warning');
+          const byF = new Map(); entries.forEach(e => { const k = e.folderPath || ''; if (!byF.has(k)) byF.set(k, []); byF.get(k).push(e); });
+          const chunks = []; let cur = [];
+          for (const g of byF.values()) { cur.push(...g); if (cur.length >= 40) { chunks.push(cur); cur = []; } }
+          if (cur.length) chunks.push(cur);
+          for (let i = 0; i < chunks.length; i++) {
+            await _ing(chunks[i], root, i ? { ...opt, append: true } : opt);
+            if (Store.ready) { await Store.flush(); documents.forEach(d => { if ((d.pages || []).some(p => p.dataUrl)) hot.set(d.id, hot.get(d.id) || Date.now()); }); trim(0); }
+            showToast(`تقدّم الاستيراد: ${i + 1} / ${chunks.length} دفعة`, 'info');
+          }
+        };
+
+        // ---- التصدير الشامل يحتاج كل الصور: نحمّلها أولاً ثم نُخلي الذاكرة ----
+        const wrapAll = fn => async (...a) => {
+          if (Store.ready) { showToast('جارٍ تجهيز كل الملفات للتصدير…', 'info'); for (const d of documents) await need(d); }
+          try { return await fn(...a); } finally { trim(); }
+        };
+        exportBackupJson = wrapAll(exportBackupJson); exportEncryptedBackup = wrapAll(exportEncryptedBackup); exportArchiveAsZipFolder = wrapAll(exportArchiveAsZipFolder);
+        const bp = document.getElementById('bulkPdfExportBtn');
+        if (bp) bp.addEventListener('click', async e => {
+          if (bp.dataset.v9ok) { delete bp.dataset.v9ok; return; }
+          if (!Store.ready) return;
+          e.stopImmediatePropagation(); showToast('جارٍ تجهيز الملفات المحددة…', 'info');
+          for (const d of documents) if (selectedDocIds.has(d.id)) await need(d);
+          bp.dataset.v9ok = '1'; bp.click();
+        }, true);
+
+        // ---- التخزين الذكي على الجوال (OPFS) ----
+        const connectOpfs = async auto => {
+          try {
+            const h = await navigator.storage.getDirectory(); safeSetStorage('alka_opfs', 1);
+            try { navigator.storage.persist && navigator.storage.persist(); } catch (_) {}
+            await Store.open(h); activeFolderName = 'أرشيف هذا الجهاز'; updateFolderBannerUI(); Store.paint();
+          } catch (e) { if (!auto) showToast('تعذر تفعيل التخزين الذكي: ' + (e && e.message), 'error'); }
+        };
+
+        // ---- التكيّف مع حجم الشاشة ----
+        const adapt = () => {
+          const m = matchMedia('(max-width: 767px)');
+          if (m.matches && !safeGetStorage('alka_view_chosen', 0)) { const b = document.getElementById('viewModeGridBtn'); if (b) b.click(); }
+          const tb = document.getElementById('viewModeTableBtn'); if (tb) tb.addEventListener('click', e => { if (e.isTrusted) safeSetStorage('alka_view_chosen', 1); });
+        };
+        return { deb, render, slice, ent, dups, match, need, trim, worker, batchOcr, ready, connectOpfs, adapt, onStoreOpen: render, get opfsOK() { return opfs; } };
+      })();
+
       window.addEventListener('DOMContentLoaded', initApp);
+      window.addEventListener('DOMContentLoaded', () => setTimeout(V9.adapt, 50));
     })();
   </script>
 </body>
