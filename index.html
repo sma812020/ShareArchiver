@@ -287,6 +287,33 @@
     @media (max-width:767px){body{padding-bottom:env(safe-area-inset-bottom)}.luxe-input{font-size:16px}#toastContainer{max-width:calc(100vw - 24px)}}
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @media print{#sidebar,#toastContainer,.v9-more{display:none!important}}
+    /* ===== v9.1: إصلاح تكيّف الجوال (تمرير الشريط الجانبي، القص السفلي، تداخل الترويسة، النوافذ) ===== */
+    #appShell{min-height:100vh;min-height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+    .min-h-screen{min-height:100dvh!important}
+    main{min-width:0}main .grid>*{min-width:0}
+    img,canvas,video,svg{max-width:100%}
+    #documentsTableWrapper{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+    /* الشريط الجانبي: تمرير داخلي + ارتفاع يطابق الشاشة المرئية + مراعاة الحواف */
+    #sidebar{height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-top:calc(1rem + env(safe-area-inset-top))!important;padding-bottom:calc(1rem + env(safe-area-inset-bottom))!important}
+    #sidebar>*{flex-shrink:0}
+    @media (min-width:1024px){#sidebar{position:sticky!important;top:0;align-self:flex-start}}
+    /* النوافذ المنبثقة: تنزلق للأعلى وتتمرر بدل أن تُقص، وتحترم الارتفاع الفعلي للشاشة */
+    .max-h-\[98vh\]{max-height:98dvh!important}.max-h-\[94vh\]{max-height:94dvh!important}.max-h-\[92vh\]{max-height:92dvh!important}.max-h-\[90vh\]{max-height:90dvh!important}.h-\[92vh\]{height:92dvh!important}
+    .fixed.inset-0.items-center.justify-center{align-items:flex-start!important;overflow-y:auto;overscroll-behavior:contain}
+    .fixed.inset-0.items-center.justify-center>*{margin-top:auto;margin-bottom:auto}
+    #scannerModal,#mobileTransmitterOverlay{height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
+    @media (max-width:1023px){
+      header.sticky{padding-top:calc(.75rem + env(safe-area-inset-top))!important;padding-bottom:.5rem!important}
+      header.sticky>div:last-child{flex-wrap:nowrap!important;overflow-x:auto;width:100%;padding-bottom:.25rem;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+      header.sticky>div:last-child::-webkit-scrollbar{display:none}
+      header.sticky>div:last-child>*{flex:0 0 auto}
+    }
+    @media (max-width:639px){
+      #viewSubtitle{display:none}
+      main{padding-bottom:calc(6.5rem + env(safe-area-inset-bottom))!important}
+      .sm\:hidden.fixed.bottom-0{padding-bottom:calc(.5rem + env(safe-area-inset-bottom))!important}
+      #toastContainer{bottom:calc(5.5rem + env(safe-area-inset-bottom))!important;left:12px!important}
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-amber-500/30 pb-16 sm:pb-0">
