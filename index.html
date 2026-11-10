@@ -2,14 +2,16 @@
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v7." />
+  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v8." />
   <meta name="keywords" content="أرشيف الكمالي برو, Alkamaly Pro, أرشفة إلكترونية, OCR عربي, مسح ضوئي, أرشيف رقمي, سندات مالية, كاميرا الجوال, Google Sites" />
   <meta name="author" content="م. سمير الكمالي" />
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Alkamaly Pro Archive" />
-  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v7" />
+  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v8" />
   <meta property="og:description" content="منصة الأرشفة الذكية، التصوير المباشر بكاميرا الجوال، واستخراج النصوص OCR العربي" />
   <meta property="og:url" content="https://sites.google.com/view/alkamalypro/full-page-embed" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -19,7 +21,7 @@
   <meta name="theme-color" content="#070d1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v7</title>
+  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v8</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -1691,6 +1693,7 @@
 
       function safeSetStorage(key, value) {
         if (Store.ready && (key === STORAGE_DOCS_KEY || key === STORAGE_CATS_KEY)) { Store.schedule(); return; }
+        if (key === STORAGE_DOCS_KEY || key === STORAGE_CATS_KEY) { V8.save(); return; }
         try {
           localStorage.setItem(key, JSON.stringify(value));
         } catch (e) {
@@ -1719,7 +1722,7 @@
         const db = await dbf();
         return new Promise((res, rej) => { const t = db.transaction(store, mode), q = fn(t.objectStore(store)); t.oncomplete = () => res(q && q.result); t.onerror = t.onabort = () => rej(t.error); });
       };
-      const b64 = u8 => btoa(String.fromCharCode(...u8));
+      const b64 = u8 => { const a = u8 instanceof Uint8Array ? u8 : new Uint8Array(u8); let s = ''; for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000)); return btoa(s); };
       const unb64 = x => Uint8Array.from(atob(x), c => c.charCodeAt(0));
       async function pbkdf2(pw, salt, iter) {
         const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
@@ -1891,8 +1894,8 @@
           if (!db) { try { const bk = await Store.readText(dbDir, 'alkamaly_archive.bak.json'); db = bk && JSON.parse(bk); if (db) showToast('تمت الاستعادة من النسخة الاحتياطية لقاعدة البيانات', 'warning'); } catch (_) {} }
           if (!db) {
             db = { documents: [], categories: defaultCategories };
-            const legacy = safeGetStorage(STORAGE_DOCS_KEY, []);
-            if (Array.isArray(legacy) && legacy.length && await showConfirmDialog('نقل الأرشيف القديم', `وُجد ${legacy.length} مستند في ذاكرة المتصفح. هل تنقلها إلى قاعدة البيانات على جهازك؟`)) { db.documents = legacy; db.categories = safeGetStorage(STORAGE_CATS_KEY, defaultCategories); }
+            const legacy = await V8.legacy();
+            if (Array.isArray(legacy) && legacy.length && await showConfirmDialog('نقل الأرشيف القديم', `وُجد ${legacy.length} مستند في ذاكرة المتصفح. هل تنقلها إلى قاعدة البيانات على جهازك؟`)) { db.documents = legacy; db.categories = categories.slice(); }
           }
           categories = db.categories && db.categories.length ? db.categories : [...defaultCategories];
           documents = db.documents || [];
@@ -3050,7 +3053,7 @@
           if (statusF === 'dual' && (!doc.pages || doc.pages.length < 2)) return false;
           if (statusF === 'camera' && doc.source !== 'camera') return false;
           if (statusF === 'verified' || statusF === 'needs-review' || statusF === 'duplicate') { const ent = extractSmartEntities(doc.ocrText || ''); const isDup = isDocumentDuplicate(doc, ent); if (statusF === 'duplicate' && !isDup) return false; if (statusF === 'needs-review' && (ent.amountsMatch && ent.confidence >= 75 && !isDup)) return false; if (statusF === 'verified' && (!ent.amountsMatch || ent.confidence < 75 || isDup)) return false; }
-          if (query) { const hay = `${doc.title} ${doc.docNumber || ''} ${doc.category} ${doc.folder || ''} ${doc.ocrText || ''}`.toLowerCase(); if (!hay.includes(query)) return false; }
+          if (query) { const hay = `${doc.title} ${doc.docNumber || ''} ${doc.category} ${doc.folder || ''} ${doc.ocrText || ''}`.toLowerCase(); if (!V8.matches(hay, query)) return false; }
           return true;
         });
         filtered.sort((a, b) => { if (sortBy === 'oldest') return (a.date || '').localeCompare(b.date || ''); if (sortBy === 'title') return (a.title || '').localeCompare(b.title || '', 'ar'); if (sortBy === 'size') return (b.size || 0) - (a.size || 0); return (b.date || '').localeCompare(a.date || ''); });
@@ -3152,7 +3155,7 @@
       // ==================== OCR STUDIO ====================
       function renderOcrStudio() {
         const container = document.getElementById('ocrResultsList'), q = (document.getElementById('ocrGlobalSearch')?.value || '').trim().toLowerCase();
-        const matches = documents.filter(d => { if (!q) return true; return `${d.title} ${d.docNumber || ''} ${d.ocrText || ''}`.toLowerCase().includes(q); });
+        const matches = documents.filter(d => { if (!q) return true; return V8.matches(`${d.title} ${d.docNumber || ''} ${d.ocrText || ''}`, q); });
         if (!matches.length) { container.innerHTML = `<div class="col-span-full luxe-card p-10 text-center text-xs" style="color: var(--text-secondary);">لا توجد نتائج مطابقة في نصوص OCR.</div>`; return; }
         container.innerHTML = matches.map(doc => {
           const text = doc.ocrText || '', entities = extractSmartEntities(text);
@@ -3268,7 +3271,7 @@
         } catch (_) { showToast('تعذر إنشاء ملف ZIP', 'error'); }
       }
       function exportBackupJson() {
-        const payload = { app: 'Alkamaly Pro Archive Luxe v7', exportedAt: new Date().toISOString(), folderName: activeFolderName, categories, documents };
+        const payload = { app: 'Alkamaly Pro Archive Luxe v8', exportedAt: new Date().toISOString(), folderName: activeFolderName, categories, documents };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a');
         a.href = url; a.download = `AlkamalyPro_Archive_${new Date().toISOString().slice(0, 10)}.json`;
         document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
@@ -3475,7 +3478,7 @@
           { icon: '🖨️', title: 'تحميل تقرير الأرشيف الرسمي للطباعة (HTML)', sub: 'تقارير', run: () => downloadPrintableHtmlReport() }
         ];
         const docItems = documents.map(d => ({ icon: '📄', title: d.title, sub: `#${d.docNumber || '—'} • ${d.category} • ${d.date || ''}`, run: () => openDocumentViewer(d.id) }));
-        const all = [...actions, ...extraCmdActions(), ...docItems].filter(item => { if (!q) return true; return `${item.title} ${item.sub}`.toLowerCase().includes(q); }).slice(0, 12);
+        const all = [...actions, ...extraCmdActions(), ...docItems].filter(item => { if (!q) return true; return V8.matches(`${item.title} ${item.sub}`, q); }).slice(0, 12);
         listEl.innerHTML = all.map((item, idx) => `<div class="p-2.5 rounded-xl flex items-center justify-between gap-3 cursor-pointer hover:bg-amber-500/15 cmd-item" data-idx="${idx}"><div class="flex items-center gap-2.5 min-w-0"><span class="text-lg">${item.icon}</span><span class="text-xs font-bold truncate">${escapeHtml(item.title)}</span></div><span class="text-[11px] font-mono-code shrink-0" style="color: var(--text-secondary);">${escapeHtml(item.sub)}</span></div>`).join('');
         listEl.querySelectorAll('.cmd-item').forEach(el => el.addEventListener('click', () => { const idx = Number(el.getAttribute('data-idx')); closeCommandPalette(); if (all[idx]) all[idx].run(); }));
       }
@@ -3801,7 +3804,7 @@
           const pEntry = partyMap.get(partyName); pEntry.docsCount += 1; if (amt > 0 && pEntry[cur] !== undefined) pEntry[cur] += amt; if ((doc.date || '') > pEntry.lastDate) pEntry.lastDate = doc.date || '';
           if (curFilter !== 'ALL' && cur !== curFilter) return;
           if (selectedLedgerParty && partyName !== selectedLedgerParty) return;
-          if (q) { const hay = `${partyName} ${doc.title} ${doc.docNumber || ''} ${ent.sender} ${ent.receiver} ${ent.voucherNumber}`.toLowerCase(); if (!hay.includes(q)) return; }
+          if (q) { const hay = `${partyName} ${doc.title} ${doc.docNumber || ''} ${ent.sender} ${ent.receiver} ${ent.voucherNumber}`.toLowerCase(); if (!V8.matches(hay, q)) return; }
           rows.push({ doc, ent, partyName, amt, cur });
         });
         return { rows, totals, parties: Array.from(partyMap.values()) };
@@ -4130,9 +4133,165 @@
 
         window.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); } else if (e.key === 'Escape') closeCommandPalette(); });
 
-        if (!documents.length) loadDemoArchiveData();
-        else { updateFolderBannerUI(); refreshAllUI(); }
+        V8.mount(); V8.boot();
       }
+
+      // ==================== V8: HARDENING & ADVANCED ====================
+      const V8 = (() => {
+        const LS_BK = 'alka_v8_last_backup', errors = [];
+        let timer = null, busy = false, again = false, verified = false, sealing = false, reminded = false, bootP = null;
+        const sleep = () => new Promise(r => setTimeout(r, 0));
+        const note = (type, msg) => { errors.unshift({ t: Date.now(), type, msg: String(msg || '').slice(0, 300) }); errors.length = Math.min(errors.length, 50); };
+
+        // 1) Arabic-aware search: يوحّد الألف/الياء/التاء المربوطة، يحذف التشكيل، ويحوّل الأرقام الهندية، وكل الكلمات يجب أن تتطابق
+        const AMAP = { '\u0623': '\u0627', '\u0625': '\u0627', '\u0622': '\u0627', '\u0671': '\u0627', '\u0649': '\u064A', '\u0629': '\u0647', '\u0624': '\u0648', '\u0626': '\u064A' };
+        const norm = s => String(s == null ? '' : s).replace(/[\u064B-\u065F\u0670\u0640\u0623\u0625\u0622\u0671\u0649\u0629\u0624\u0626\u0660-\u0669\u06F0-\u06F9]/g, c => {
+          const k = c.charCodeAt(0);
+          return k >= 0x660 && k <= 0x669 ? String(k - 0x660) : k >= 0x6F0 && k <= 0x6F9 ? String(k - 0x6F0) : (AMAP[c] || '');
+        }).toLowerCase();
+        const matches = (hay, q) => { const h = norm(hay); return norm(q).split(/\s+/).filter(Boolean).every(t => h.includes(t)); };
+
+        // 2) Durable browser persistence (IndexedDB) بدل localStorage الذي كان يحذف الصور الكبيرة بصمت
+        const run = async () => {
+          if (Store.ready) return;
+          if (busy) { again = true; return; }
+          busy = true;
+          try {
+            const snap = { v: 8, t: Date.now(), categories, documents: documents.map(d => { const { dirHandle, fileHandle, ...r } = d; return r; }) };
+            await Store.kvSet('docs_full', snap);
+            if (!verified) {
+              const back = await Store.kvGet('docs_full');
+              if (back && back.documents && back.documents.length === snap.documents.length) {
+                verified = true;
+                try { localStorage.removeItem(STORAGE_DOCS_KEY); localStorage.removeItem(STORAGE_CATS_KEY); } catch (_) {}
+              }
+            }
+          } catch (e) { note('storage', e && e.message); showToast('تعذّر الحفظ داخل المتصفح — خذ نسخة احتياطية الآن أو اربط مجلداً على جهازك', 'error'); }
+          busy = false;
+          if (again) { again = false; run(); }
+        };
+        const save = () => { clearTimeout(timer); timer = setTimeout(run, 600); };
+        window.addEventListener('pagehide', () => { if (timer) { clearTimeout(timer); timer = null; run(); } });
+        const boot = () => (bootP = (async () => {
+          let r = null;
+          try { r = await Store.kvGet('docs_full'); } catch (e) { note('idb', e && e.message); }
+          if (Store.ready || Store.dir) return;
+          if (r && Array.isArray(r.documents) && (r.documents.length || !documents.length)) {
+            documents = r.documents;
+            if (Array.isArray(r.categories) && r.categories.length) categories = r.categories;
+          } else if (documents.length) save();
+          if (!documents.length) loadDemoArchiveData(); else { updateFolderBannerUI(); refreshAllUI(); }
+          try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (_) {}
+        })());
+        const legacy = async () => { await bootP; return documents.slice(); };
+
+        // 3) Error boundary + diagnostics log
+        let lastToast = 0;
+        const onErr = (type, msg) => {
+          if (/ResizeObserver/i.test(msg || '')) return;
+          note(type, msg);
+          if (Date.now() - lastToast > 15000) { lastToast = Date.now(); showToast('حدث خطأ غير متوقع وتم تسجيله — التفاصيل في لوحة 🛡️', 'warning'); }
+        };
+        window.addEventListener('error', e => onErr('error', e.message));
+        window.addEventListener('unhandledrejection', e => onErr('promise', (e.reason && e.reason.message) || e.reason));
+
+        // 4) Backup tracking + reminders + storage quota
+        const wrapBackup = fn => function (...a) { const r = fn.apply(this, a); Promise.resolve(r).then(() => safeSetStorage(LS_BK, Date.now()), () => {}); return r; };
+        exportBackupJson = wrapBackup(exportBackupJson);
+        exportEncryptedBackup = wrapBackup(exportEncryptedBackup);
+        const est = async () => { try { const e = await navigator.storage.estimate(); return { used: e.usage || 0, quota: e.quota || 0 }; } catch (_) { return { used: 0, quota: 0 }; } };
+        const persisted = async () => { try { return !!(navigator.storage && navigator.storage.persisted && await navigator.storage.persisted()); } catch (_) { return false; } };
+        setInterval(async () => {
+          if (reminded || !Auth.user || !documents.length) return;
+          reminded = true;
+          const bk = Number(safeGetStorage(LS_BK, 0)), days = bk ? Math.floor((Date.now() - bk) / 864e5) : null;
+          if (days === null || days >= 7) showToast(days === null ? '💾 لم تأخذ نسخة احتياطية بعد — افتح 🛡️ لأخذ نسخة الآن' : `💾 مضى ${days} يوم على آخر نسخة احتياطية`, 'warning');
+          const e = await est(); if (e.quota && e.used / e.quota > 0.8) showToast('⚠️ مساحة التخزين في المتصفح شارفت على الامتلاء — اربط مجلداً على جهازك', 'warning');
+        }, 5000);
+
+        // 5) Integrity seal (SHA-256 لصفحات كل مستند) لكشف التلف أو التعديل غير المقصود
+        const sha = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))), x => x.toString(16).padStart(2, '0')).join('');
+        const sealOf = d => sha((d.pages || []).map(p => p.dataUrl || '').join('|'));
+        const hydrated = d => (d.pages || []).length && d.pages.every(p => p.dataUrl);
+        async function seal(force) {
+          if (sealing) return 0; sealing = true; let n = 0;
+          try { for (const d of documents) { if (!hydrated(d) || (d.seal && !force)) continue; d.seal = { h: await sealOf(d), t: Date.now() }; if (++n % 5 === 0) await sleep(); } } catch (e) { note('seal', e && e.message); }
+          sealing = false; if (n) safeSetStorage(STORAGE_DOCS_KEY, documents); return n;
+        }
+        async function verify() {
+          const r = { ok: 0, bad: [], none: 0, skipped: 0 }; let i = 0;
+          for (const d of documents) {
+            if (!hydrated(d)) { r.skipped++; continue; }
+            if (!d.seal) { r.none++; continue; }
+            (await sealOf(d)) === d.seal.h ? r.ok++ : r.bad.push(d);
+            if (++i % 5 === 0) await sleep();
+          }
+          return r;
+        }
+        setInterval(() => { if (Auth.user && can('write')) seal(false); }, 30000);
+        const _stamp = applyOfficialStampToCurrentPage;
+        applyOfficialStampToCurrentPage = async function (...a) { const r = await _stamp.apply(this, a); const d = documents.find(x => x.id === currentViewerDocId); if (d) delete d.seal; return r; };
+
+        // 6) Health & security panel
+        const fmtD = t => t ? new Date(t).toLocaleString('ar-YE') : '—';
+        const box = (k, v) => `<div class="p-3 text-xs" style="border:1px solid var(--border-subtle);border-radius:10px;background:var(--bg-card)"><div style="color:var(--text-muted)">${k}</div><div class="font-bold mt-1">${v}</div></div>`;
+        const modal = () => {
+          let m = document.getElementById('v8Modal'); if (m) return m;
+          m = document.createElement('div'); m.id = 'v8Modal'; m.className = 'fixed inset-0 z-[6500] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm';
+          m.innerHTML = '<div class="luxe-card-gold w-full max-w-lg p-5 max-h-[92vh] overflow-y-auto space-y-3"></div>';
+          m.addEventListener('click', onClick); document.body.appendChild(m); return m;
+        };
+        async function panel() {
+          const m = modal(), [e, pers] = await Promise.all([est(), persisted()]), bk = Number(safeGetStorage(LS_BK, 0));
+          const pct = e.quota ? Math.min(100, e.used / e.quota * 100) : 0, sealed = documents.filter(d => d.seal).length;
+          m.firstElementChild.innerHTML = `
+            <div class="flex items-center justify-between"><h3 class="text-base font-extrabold">🛡️ الصحة والأمان وسلامة الأرشيف</h3><button data-act="close" class="btn-luxe-outline !py-1 !px-2 text-xs">✕</button></div>
+            <div class="grid grid-cols-2 gap-2">
+              ${box('مكان الحفظ', Store.ready ? '📁 ' + escapeHtml(Store.dir.name) : '🌐 داخل المتصفح (IndexedDB)')}
+              ${box('التخزين الدائم', pers ? '✅ مفعّل' : '⚠️ غير مضمون')}
+              ${box('المستندات', documents.length)}
+              ${box('مستندات مختومة', `${sealed} / ${documents.length}`)}
+              ${box('آخر نسخة احتياطية', fmtD(bk))}
+              ${box('أخطاء مسجّلة', errors.length)}
+            </div>
+            <div class="text-xs"><div class="flex justify-between mb-1" style="color:var(--text-secondary)"><span>مساحة المتصفح</span><span>${formatBytes(e.used)} / ${formatBytes(e.quota)}</span></div>
+              <div style="height:6px;border-radius:6px;background:var(--bg-input)"><div style="height:6px;border-radius:6px;width:${pct.toFixed(1)}%;background:${pct > 80 ? '#fb7185' : 'var(--gold)'}"></div></div></div>
+            <div class="flex flex-wrap gap-2">
+              <button data-act="backup" class="btn-luxe-gold !py-1.5 text-xs">💾 نسخة احتياطية الآن</button>
+              <button data-act="verify" class="btn-luxe-outline !py-1.5 text-xs">🔏 فحص سلامة الملفات</button>
+              ${pers ? '' : '<button data-act="persist" class="btn-luxe-outline !py-1.5 text-xs">🔐 طلب تخزين دائم</button>'}
+            </div>
+            <div id="v8Out" class="text-xs space-y-1" style="color:var(--text-secondary)"></div>
+            ${errors.length ? `<details class="text-[11px]" style="color:var(--text-muted)"><summary class="cursor-pointer">آخر الأخطاء</summary>${errors.slice(0, 5).map(x => `<div class="font-mono-code mt-1">${escapeHtml(fmtD(x.t))} — ${escapeHtml(x.type)}: ${escapeHtml(x.msg)}</div>`).join('')}</details>` : ''}`;
+          m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        async function onClick(ev) {
+          const m = document.getElementById('v8Modal'), act = ev.target.closest('[data-act]'), out = document.getElementById('v8Out');
+          if (ev.target === m || (act && act.dataset.act === 'close')) { m.classList.add('hidden'); m.classList.remove('flex'); return; }
+          if (!act) return;
+          if (act.dataset.act === 'backup') { exportBackupJson(); setTimeout(panel, 800); }
+          else if (act.dataset.act === 'persist') { const ok = navigator.storage && navigator.storage.persist && await navigator.storage.persist(); showToast(ok ? 'تم تفعيل التخزين الدائم' : 'لم يمنح المتصفح التخزين الدائم', ok ? 'success' : 'warning'); panel(); }
+          else if (act.dataset.act === 'verify') {
+            out.textContent = 'جارٍ الفحص…'; await seal(false); const r = await verify();
+            out.innerHTML = `<div>✅ سليمة: <b>${r.ok}</b> • ⏳ غير مكتملة التحميل: <b>${r.skipped}</b> • ❌ متغيّرة: <b>${r.bad.length}</b></div>` +
+              r.bad.slice(0, 8).map(d => `<div class="text-rose-400">• ${escapeHtml(d.title || d.docNumber || d.id)}</div>`).join('') +
+              (r.bad.length ? '<div style="color:var(--text-muted)">التغيّر قد يكون بسبب تعديل مقصود (ختم/تدوير) أو تلف في الملف.</div>' + (can('write') ? '<button data-act="reseal" class="btn-luxe-outline !py-1 text-xs mt-1">اعتماد الحالة الحالية</button>' : '') : '');
+            V8.lastBad = r.bad;
+          } else if (act.dataset.act === 'reseal' && can('write')) {
+            for (const d of V8.lastBad || []) d.seal = { h: await sealOf(d), t: Date.now() };
+            safeSetStorage(STORAGE_DOCS_KEY, documents); showToast('تم اعتماد الحالة الحالية', 'success'); panel();
+          }
+        }
+        const mount = () => {
+          const t = document.getElementById('themeToggleBtn'); if (!t || document.getElementById('v8Btn')) return;
+          const b = document.createElement('button'); b.id = 'v8Btn'; b.type = 'button'; b.title = 'الصحة والأمان'; b.className = t.className; b.textContent = '🛡️';
+          b.addEventListener('click', panel); t.parentNode.insertBefore(b, t);
+        };
+        const _cmds = extraCmdActions;
+        extraCmdActions = () => [..._cmds(), { icon: '🛡️', title: 'لوحة الصحة والأمان وسلامة الأرشيف', sub: 'v8', run: panel }, { icon: '💾', title: 'نسخة احتياطية JSON الآن', sub: 'v8', run: () => exportBackupJson() }];
+
+        return { norm, matches, save, boot, legacy, mount, panel, seal, verify, errors, lastBad: [] };
+      })();
 
       window.addEventListener('DOMContentLoaded', initApp);
     })();
