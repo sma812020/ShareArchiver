@@ -299,6 +299,32 @@
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
+    /* عزل ألوان استوديو التدفق الذكي للسندات ليبقى واضحاً في الوضعين الليلي والنهاري */
+    #ssModal .luxe-input, #ssModal select, #ssModal input[type="text"], #ssModal input[type="number"] {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: rgba(212, 175, 55, 0.32) !important;
+    }
+    #ssModal #ssSerialInput {
+      color: #fcd34d !important;
+      background-color: #090f1f !important;
+      border-color: rgba(251, 191, 36, 0.55) !important;
+    }
+    #ssModal .btn-luxe-outline {
+      background-color: #131f3a !important;
+      color: #f1f5f9 !important;
+      border-color: rgba(255, 255, 255, 0.16) !important;
+    }
+    #ssModal .btn-luxe-outline:hover {
+      border-color: #d4af37 !important;
+      color: #f0d377 !important;
+      background-color: rgba(212, 175, 55, 0.15) !important;
+    }
+    @media (pointer:coarse) {
+      #ssModal button, #ssModal select, #ssModal .luxe-input, #ssModal .btn-luxe-gold, #ssModal .btn-luxe-outline {
+        min-height: 36px;
+      }
+    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media (pointer:coarse){
@@ -2077,19 +2103,26 @@
       let _slc = startLiveCamera;
       startLiveCamera = async function (...a) { await _slc.apply(this, a); refreshCamDevices(); };
 
-      // ==================== SMART STREAM ====================
+      // ==================== SMART STREAM (PRO SEQUENTIAL STUDIO) ====================
       const SS = {
         on: false, stream: null, video: null, tick: null, prev: null, ref: null, still: 0, armed: true, away: false, busy: false, auto: true,
-        mode: 'single', awaitingImmediateBack: null, pass: 1, order: 'reverse', serial: 1005, stepDir: 'asc', cropMode: 'auto',
+        mode: 'single', awaitingImmediateBack: null, targetAttachBackDoc: null, pass: 1, order: 'reverse', serial: 1005, stepDir: 'asc', cropMode: 'auto',
         manualQuadNorm: [{ x: 0.07, y: 0.08 }, { x: 0.93, y: 0.08 }, { x: 0.93, y: 0.92 }, { x: 0.07, y: 0.92 }],
         dragCornerIdx: -1, prefix: 'سند مالي', category: 'سندات مالية', priority: 'normal', subFolder: '', directDiskSave: true,
-        autoOcrOnClose: true, voiceRead: true, filter: 'color', docs: [], ptr: 0, log: [], torch: false
+        autoOcrOnClose: true, voiceRead: true, filter: 'color', docs: [], ptr: 0, log: [], torch: false,
+        camSource: 'environment', resolution: 'fhd', zoom: 1, rotation: 0, flipH: false, brightness: 100, contrast: 105,
+        stillThreshold: 4, countdownSec: 0, countdownTimer: null, settingsCollapsed: false
       };
 
       const ssEl = id => document.getElementById(id);
       const ssDiff = (a, b) => { let t = 0; for (let i = 0; i < a.length; i++) t += Math.abs(a[i] - b[i]); return t / a.length; };
       function ssStepDelta() { return SS.stepDir === 'desc' ? -1 : 1; }
-      function ssAdvanceSerial(dir = 1) { SS.serial = Math.max(1, SS.serial + dir * ssStepDelta()); if (ssEl('ssSerialInput')) ssEl('ssSerialInput').value = SS.serial; if (ssEl('camNextSerial')) ssEl('camNextSerial').value = SS.serial; }
+      function ssAdvanceSerial(dir = 1) {
+        SS.serial = Math.max(1, SS.serial + dir * ssStepDelta());
+        if (ssEl('ssSerialInput')) ssEl('ssSerialInput').value = SS.serial;
+        if (ssEl('camNextSerial')) ssEl('camNextSerial').value = SS.serial;
+        if (ssEl('ssBannerSerialNum')) ssEl('ssBannerSerialNum').textContent = `#${SS.serial}`;
+      }
       function ssBlank(cv) {
         const w = 160, h = Math.max(8, Math.round(160 * cv.height / cv.width)), s = document.createElement('canvas'); s.width = w; s.height = h;
         const x = s.getContext('2d', { willReadFrequently: true }); x.drawImage(cv, 0, 0, w, h);
@@ -2101,24 +2134,237 @@
       function ssUpdateFolderPill() {
         const pill = ssEl('ssFolderStatusPill');
         if (!pill) return;
-        if (Store.ready && Store.dir) { pill.textContent = `💾 حفظ مباشر: ${Store.dir.name}`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold'; }
-        else if (activeDirectoryHandle) { pill.textContent = `📂 مجلد متصل: ${activeDirectoryHandle.name}`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold'; }
-        else { pill.textContent = `📁 حفظ في: ${activeFolderName} (اضغط لربط مجلد جهازك)`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold'; }
+        if (Store.ready && Store.dir) { pill.textContent = `💾 حفظ مباشر: ${Store.dir.name}`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold cursor-pointer'; }
+        else if (activeDirectoryHandle) { pill.textContent = `📂 مجلد متصل: ${activeDirectoryHandle.name}`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold cursor-pointer'; }
+        else { pill.textContent = `📁 حفظ في: ${activeFolderName}`; pill.className = 'text-[11px] px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold cursor-pointer'; }
       }
+      function ssApplyVideoTransform() {
+        const v = ssEl('ssVideo');
+        if (!v) return;
+        const scaleX = (SS.flipH ? -1 : 1) * SS.zoom;
+        const scaleY = SS.zoom;
+        v.style.transform = `scale(${scaleX}, ${scaleY}) rotate(${SS.rotation}deg)`;
+        v.style.filter = `brightness(${SS.brightness}%) contrast(${SS.contrast}%)`;
+      }
+      async function ssPopulateCameraDevices() {
+        const sel = ssEl('ssCameraSelect');
+        if (!sel) return;
+        const prevVal = sel.value || SS.camSource || 'environment';
+        let opts = [
+          `<option value="environment">📷 الكاميرا الخلفية (الأساسية - Environment)</option>`,
+          `<option value="user">🤳 الكاميرا الأمامية (User)</option>`,
+          `<option value="native_mobile">📱 كاميرا الجوال الأصلية (التقاط HDR مباشر)</option>`
+        ];
+        if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+          try {
+            const devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+            devs.forEach((d, idx) => {
+              if (!d.deviceId) return;
+              const lbl = d.label || `كاميرا متصلة #${idx + 1}`;
+              const isVirtual = /phone link|virtual|droidcam|iriun|obs/i.test(lbl);
+              const icon = isVirtual ? '💻' : '🎥';
+              opts.push(`<option value="dev:${escapeHtml(d.deviceId)}">${icon} ${escapeHtml(lbl)}</option>`);
+            });
+          } catch (_) {}
+        }
+        sel.innerHTML = opts.join('');
+        const activeTrack = SS.stream && SS.stream.getVideoTracks && SS.stream.getVideoTracks()[0];
+        const activeDevId = activeTrack && activeTrack.getSettings && activeTrack.getSettings().deviceId;
+        if (SS.camSource === 'native_mobile') {
+          sel.value = 'native_mobile';
+        } else if (prevVal && Array.from(sel.options).some(o => o.value === prevVal)) {
+          sel.value = prevVal;
+        } else if (activeDevId && Array.from(sel.options).some(o => o.value === 'dev:' + activeDevId)) {
+          sel.value = 'dev:' + activeDevId;
+        } else {
+          sel.value = 'environment';
+        }
+      }
+      async function ssStartCameraStream(sourceOverride) {
+        if (sourceOverride !== undefined) SS.camSource = sourceOverride;
+        try { if (SS.stream) SS.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+        SS.stream = null;
+        const v = ssEl('ssVideo');
+        const noStreamBox = ssEl('ssNoStreamOverlay');
+        if (SS.camSource === 'native_mobile') {
+          if (v) { v.srcObject = null; v.classList.add('hidden'); }
+          if (noStreamBox) {
+            noStreamBox.classList.remove('hidden');
+            noStreamBox.classList.add('flex');
+            ssEl('ssNoStreamTitle').textContent = '📱 وضع كاميرا الجوال الأصلية (HDR) مفعّل';
+            ssEl('ssNoStreamDesc').textContent = 'اضغط على زر «📸 التقاط وحفظ السند الآن» لفتح كاميرا هاتفك الأصلية بأعلى دقة وحفظ السند مباشرة بالرقم التسلسلي.';
+          }
+          ssHud('📱 وضع كاميرا الجوال الأصلية جاهز — اضغط 📸 للتصوير المتسلسل');
+          return;
+        }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          if (noStreamBox) { noStreamBox.classList.remove('hidden'); noStreamBox.classList.add('flex'); }
+          showToast('البث الحي غير متاح في هذا المتصفح — يمكنك التصوير عبر زر كاميرا الجوال / ملف', 'info');
+          return;
+        }
+        const resMap = {
+          hd: { w: 1280, h: 720 },
+          fhd: { w: 1920, h: 1080 },
+          uhd: { w: 2560, h: 1440 }
+        };
+        const targetRes = resMap[SS.resolution] || resMap.fhd;
+        const isDeviceId = String(SS.camSource || '').startsWith('dev:');
+        const rawDevId = isDeviceId ? SS.camSource.slice(4) : '';
+        const attempts = [];
+        if (isDeviceId && rawDevId) {
+          attempts.push({ audio: false, video: { deviceId: { exact: rawDevId }, width: { ideal: targetRes.w }, height: { ideal: targetRes.h } } });
+          attempts.push({ audio: false, video: { deviceId: { ideal: rawDevId } } });
+        } else {
+          const facing = SS.camSource === 'user' ? 'user' : 'environment';
+          attempts.push({ audio: false, video: { facingMode: { exact: facing }, width: { ideal: targetRes.w }, height: { ideal: targetRes.h } } });
+          attempts.push({ audio: false, video: { facingMode: { ideal: facing }, width: { ideal: targetRes.w }, height: { ideal: targetRes.h } } });
+        }
+        attempts.push({ audio: false, video: { width: { ideal: targetRes.w }, height: { ideal: targetRes.h } } });
+        attempts.push({ audio: false, video: true });
+
+        let connected = null;
+        for (const c of attempts) {
+          try {
+            connected = await navigator.mediaDevices.getUserMedia(c);
+            if (connected) break;
+          } catch (_) {}
+        }
+        if (!connected) {
+          if (v) v.classList.add('hidden');
+          if (noStreamBox) {
+            noStreamBox.classList.remove('hidden');
+            noStreamBox.classList.add('flex');
+            ssEl('ssNoStreamTitle').textContent = '⚠️ لم يتم العثور على بث كاميرا نشط';
+            ssEl('ssNoStreamDesc').textContent = 'اختر كاميرا أخرى من قائمة «🎥 الكاميرا» أعلاه، أو اضغط «📱 كاميرا الجوال / ملف» للتصوير المباشر.';
+          }
+          ssHud('⚠️ تعذر فتح الكاميرا المحددة — اختر كاميرا أخرى أو استخدم كاميرا الجوال', 'text-amber-300');
+          return;
+        }
+        // إذا التقط المتصفح كاميرا افتراضية مقفلة (مثل Phone Link) وكان هناك كاميرا حقيقية أخرى متاحة ولم يخترها المستخدم يدوياً:
+        if (!isDeviceId && navigator.mediaDevices.enumerateDevices) {
+          try {
+            const track = connected.getVideoTracks()[0];
+            const label = (track && track.label) || '';
+            if (/phone link|virtual|링크/i.test(label)) {
+              const allDevs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+              const altReal = allDevs.find(d => d.deviceId && !/phone link|virtual/i.test(d.label || ''));
+              if (altReal) {
+                try {
+                  const altStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { deviceId: { exact: altReal.deviceId }, width: { ideal: targetRes.w }, height: { ideal: targetRes.h } } });
+                  if (altStream) {
+                    connected.getTracks().forEach(t => t.stop());
+                    connected = altStream;
+                    SS.camSource = 'dev:' + altReal.deviceId;
+                  }
+                } catch (_) {}
+              }
+            }
+          } catch (_) {}
+        }
+
+        SS.stream = connected;
+        const track = connected.getVideoTracks()[0];
+        try { await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (_) {}
+        if (v) {
+          v.srcObject = connected;
+          v.classList.remove('hidden');
+          try { await v.play(); } catch (_) {}
+        }
+        if (noStreamBox) { noStreamBox.classList.add('hidden'); noStreamBox.classList.remove('flex'); }
+        SS.video = v;
+        ssApplyVideoTransform();
+        await ssPopulateCameraDevices();
+        const activeLabel = (track && track.label) ? track.label : (SS.camSource === 'user' ? 'الكاميرا الأمامية' : 'الكاميرا الخلفية');
+        ssHud(`🟢 الكاميرا نشطة (${activeLabel}) — ضع السند داخل الإطار`);
+      }
+
       function ssHud(msg, cls) {
         if (!ssEl('ssTitle')) return;
-        const dirBadge = SS.stepDir === 'desc' ? '↓ تنازلي' : '↑ تصاعدي';
-        if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) ssEl('ssTitle').textContent = `ظهر السند رقم ${SS.awaitingImmediateBack.docNumber} · (اقلب السند الآن)`;
-        else if (SS.pass === 1) { const sideLabel = SS.mode === 'single' ? 'وجه واحد' : 'الوجه الأمامي'; ssEl('ssTitle').textContent = `${SS.prefix} رقم ${SS.serial} · (${sideLabel} | ${dirBadge})`; }
-        else { const tgt = SS.docs[SS.order === 'reverse' ? SS.docs.length - 1 - SS.ptr : SS.ptr]; ssEl('ssTitle').textContent = tgt ? `ظهر السند رقم ${tgt.docNumber} · (${SS.ptr + 1}/${SS.docs.length})` : 'اكتملت الأظهر'; }
-        ssEl('ssMsg').textContent = msg;
-        ssEl('ssMsg').className = 'text-xs sm:text-sm font-bold ' + (cls || 'text-amber-300');
+        const dirBadge = SS.stepDir === 'desc' ? '↓ تنازلي (-1)' : '↑ تصاعدي (+1)';
+        const sidePill = ssEl('ssCurrentSidePill');
+        const bannerNum = ssEl('ssBannerSerialNum');
+        const shotBtn = ssEl('ssShotBtn');
+
+        if (SS.targetAttachBackDoc) {
+          const tNum = SS.targetAttachBackDoc.docNumber;
+          ssEl('ssTitle').textContent = `إضافة الوجه الخلفي للسند رقم #${tNum}`;
+          if (bannerNum) bannerNum.textContent = `#${tNum}`;
+          if (sidePill) {
+            sidePill.textContent = `🔵 الوجه الخلفي (2/2) للسند #${tNum}`;
+            sidePill.className = 'text-xs px-3 py-1 rounded-full bg-sky-500/25 text-sky-200 border border-sky-400/50 font-extrabold';
+          }
+          if (shotBtn) shotBtn.innerHTML = `📸 التقاط وحفظ الوجه الخلفي للسند #${escapeHtml(String(tNum))}`;
+        } else if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) {
+          const bNum = SS.awaitingImmediateBack.docNumber;
+          ssEl('ssTitle').textContent = `ظهر السند رقم #${bNum} · (اقلب السند الآن)`;
+          if (bannerNum) bannerNum.textContent = `#${bNum}`;
+          if (sidePill) {
+            sidePill.textContent = `🔵 الوجه الخلفي (2/2) — اقلب السند #${bNum}`;
+            sidePill.className = 'text-xs px-3 py-1 rounded-full bg-sky-500/25 text-sky-200 border border-sky-400/50 font-extrabold animate-pulse';
+          }
+          if (shotBtn) shotBtn.innerHTML = `📸 التقاط الوجه الخلفي للسند #${escapeHtml(String(bNum))}`;
+        } else if (SS.pass === 1) {
+          const isSingle = SS.mode === 'single';
+          const sideLabel = isSingle ? 'وجه واحد' : 'الوجه الأمامي (1/2)';
+          ssEl('ssTitle').textContent = `${SS.prefix} رقم ${SS.serial} · (${sideLabel} | ${dirBadge})`;
+          if (bannerNum) bannerNum.textContent = `#${SS.serial}`;
+          if (sidePill) {
+            sidePill.textContent = isSingle ? `📄 سند بوجه واحد` : `🟢 الوجه الأمامي (1/2)`;
+            sidePill.className = isSingle
+              ? 'text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-extrabold'
+              : 'text-xs px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-extrabold';
+          }
+          if (shotBtn) shotBtn.innerHTML = isSingle ? `📸 التقاط وحفظ السند #${SS.serial}` : `📸 التقاط الوجه الأمامي للسند #${SS.serial}`;
+        } else {
+          const tgt = SS.docs[SS.order === 'reverse' ? SS.docs.length - 1 - SS.ptr : SS.ptr];
+          const tNum = tgt ? tgt.docNumber : '—';
+          ssEl('ssTitle').textContent = tgt ? `ظهر السند رقم #${tNum} · (${SS.ptr + 1}/${SS.docs.length})` : 'اكتملت الأظهر';
+          if (bannerNum) bannerNum.textContent = `#${tNum}`;
+          if (sidePill) {
+            sidePill.textContent = `🔵 مرحلة الأظهر (${SS.ptr + 1}/${SS.docs.length}) — سند #${tNum}`;
+            sidePill.className = 'text-xs px-3 py-1 rounded-full bg-sky-500/25 text-sky-200 border border-sky-400/50 font-extrabold';
+          }
+          if (shotBtn) shotBtn.innerHTML = `📸 التقاط ظهر السند #${escapeHtml(String(tNum))}`;
+        }
+
+        if (msg !== undefined) {
+          ssEl('ssMsg').textContent = msg;
+          ssEl('ssMsg').className = 'text-xs font-bold ' + (cls || 'text-amber-300');
+        }
         ssEl('ssCount').textContent = `${SS.docs.length} سند`;
-        ssEl('ssBackBtn').classList.toggle('hidden', !(SS.mode === 'double_stack' && SS.pass === 1 && SS.docs.length));
-        ssEl('ssSkipImmediateBackBtn').classList.toggle('hidden', !(SS.mode === 'double_immediate' && SS.awaitingImmediateBack));
-        ssEl('ssOrderWrap').classList.toggle('hidden', SS.mode !== 'double_stack');
+        ssEl('ssBackBtn')?.classList.toggle('hidden', !(SS.mode === 'double_stack' && SS.pass === 1 && SS.docs.length));
+        ssEl('ssSkipImmediateBackBtn')?.classList.toggle('hidden', !((SS.mode === 'double_immediate' && SS.awaitingImmediateBack) || SS.targetAttachBackDoc));
+        ssEl('ssOrderWrap')?.classList.toggle('hidden', SS.mode !== 'double_stack');
         ssUpdateFolderPill();
       }
+
+      function ssRenderThumbs() {
+        const container = ssEl('ssThumbs');
+        if (!container) return;
+        if (!SS.docs.length) {
+          container.innerHTML = `<div class="text-[11px] text-slate-400 px-3 py-2">لم يتم التقاط سندات في هذه الجلسة بعد — ستظهر هنا السندات المتسلسلة مع إمكانية المعاينة أو إضافة ظهر أو الإعادة.</div>`;
+          return;
+        }
+        container.innerHTML = SS.docs.slice().reverse().map(doc => {
+          const pagesCount = (doc.pages || []).length;
+          const thumbUrl = (doc.pages && doc.pages[pagesCount - 1] && doc.pages[pagesCount - 1].dataUrl) || (doc.pages && doc.pages[0] && doc.pages[0].dataUrl) || '';
+          const isWaitingBack = (SS.awaitingImmediateBack && SS.awaitingImmediateBack.id === doc.id) || (SS.targetAttachBackDoc && SS.targetAttachBackDoc.id === doc.id);
+          const sideBadge = pagesCount >= 2
+            ? `<span class="px-1 rounded bg-emerald-500/90 text-slate-950 font-extrabold text-[9px]">وجهان ✔</span>`
+            : `<button type="button" data-ss-thumb-addback="${doc.id}" title="تصوير وإرفاق وجه خلفي لهذا السند" class="px-1 rounded bg-sky-500/80 hover:bg-sky-400 text-slate-950 font-extrabold text-[9px]">+ظهر</button>`;
+          return `<div class="relative shrink-0 w-20 rounded-xl overflow-hidden border ${isWaitingBack ? 'border-sky-400 ring-2 ring-sky-400/50' : 'border-amber-400/50'} bg-slate-950 flex flex-col">
+            <div class="relative h-14 w-full cursor-pointer" data-ss-thumb-view="${doc.id}" title="معاينة السند #${escapeHtml(String(doc.docNumber))}">
+              <img src="${thumbUrl}" class="w-full h-full object-cover" alt="" />
+              <button type="button" data-ss-thumb-del="${doc.id}" title="حذف هذا السند" class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-rose-600/90 text-white text-[10px] leading-none flex items-center justify-center">✕</button>
+            </div>
+            <div class="px-1 py-0.5 bg-slate-900 flex items-center justify-between gap-0.5 text-[10px]">
+              <span class="font-mono-code font-bold text-amber-300 truncate">#${escapeHtml(String(doc.docNumber))}</span>
+              ${sideBadge}
+            </div>
+          </div>`;
+        }).join('');
+      }
+
       async function ssWriteDocToDiskIfConnected(doc) {
         if (!SS.directDiskSave) return;
         try {
@@ -2131,14 +2377,41 @@
           }
         } catch (_) {}
       }
-      async function ssProcessSourceCanvas(src, manualTrigger) {
+
+      function ssPrepareSourceWithAdjustments(rawCanvas) {
+        const rot = ((SS.rotation % 360) + 360) % 360;
+        const swap = (rot === 90 || rot === 270);
+        const zoom = Math.max(1, SS.zoom || 1);
+        const sw = Math.round(rawCanvas.width / zoom);
+        const sh = Math.round(rawCanvas.height / zoom);
+        const sx = Math.round((rawCanvas.width - sw) / 2);
+        const sy = Math.round((rawCanvas.height - sh) / 2);
+
+        const out = document.createElement('canvas');
+        out.width = swap ? sh : sw;
+        out.height = swap ? sw : sh;
+        const ctx = out.getContext('2d', { willReadFrequently: true });
+        ctx.save();
+        ctx.translate(out.width / 2, out.height / 2);
+        if (rot) ctx.rotate((rot * Math.PI) / 180);
+        if (SS.flipH) ctx.scale(-1, 1);
+        if (SS.brightness !== 100 || SS.contrast !== 100) {
+          ctx.filter = `brightness(${SS.brightness}%) contrast(${SS.contrast}%)`;
+        }
+        ctx.drawImage(rawCanvas, sx, sy, sw, sh, -sw / 2, -sh / 2, sw, sh);
+        ctx.restore();
+        return out;
+      }
+
+      async function ssProcessSourceCanvas(rawSrc, manualTrigger) {
+        const src = ssPrepareSourceWithAdjustments(rawSrc);
         let pts;
         if (SS.cropMode === 'manual') pts = SS.manualQuadNorm.map(q => ({ x: q.x * src.width, y: q.y * src.height }));
         else if (SS.cropMode === 'full') pts = scFull(src, 0, 0);
         else { pts = scDetectQuad(src); if (!manualTrigger && Math.abs(pts[0].x - src.width * 0.05) < 0.5 && Math.abs(pts[0].y - src.height * 0.05) < 0.5) return false; }
 
         const out = scFilter(scWarp(src, pts), SS.filter || 'color');
-        const url = out.toDataURL('image/jpeg', 0.88);
+        const url = out.toDataURL('image/jpeg', 0.90);
         const size = Math.round(url.length * 0.75);
         const page = n => ({ name: `page-${n}.jpg`, type: 'image/jpeg', dataUrl: url, size });
         let thumbOk = true;
@@ -2148,7 +2421,16 @@
         SS.priority = ssEl('ssPrioritySelect')?.value || 'normal';
         SS.subFolder = (ssEl('ssSubFolderInput')?.value || '').trim();
 
-        if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) {
+        if (SS.targetAttachBackDoc) {
+          const doc = SS.targetAttachBackDoc;
+          doc.pages.push(page((doc.pages || []).length + 1));
+          doc.size = (doc.size || 0) + size;
+          SS.targetAttachBackDoc = null;
+          safeSetStorage(STORAGE_DOCS_KEY, documents);
+          await ssWriteDocToDiskIfConnected(doc);
+          refreshAllUI();
+          if (SS.voiceRead) speakArabicText(`تم إرفاق ظهر السند ${doc.docNumber}`);
+        } else if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) {
           const doc = SS.awaitingImmediateBack;
           if (!manualTrigger && ssEl('ssBlankChk')?.checked && ssBlank(out)) { showToast(`ظهر السند ${doc.docNumber} فارغ، تم تخطيه`, 'info'); thumbOk = false; }
           else { doc.pages.push(page(2)); doc.size = (doc.size || 0) + size; safeSetStorage(STORAGE_DOCS_KEY, documents); await ssWriteDocToDiskIfConnected(doc); refreshAllUI(); }
@@ -2169,33 +2451,62 @@
           else if (doc) { doc.pages.push(page(2)); doc.size = (doc.size || 0) + size; SS.log.push({ doc, added: true }); SS.ptr++; safeSetStorage(STORAGE_DOCS_KEY, documents); await ssWriteDocToDiskIfConnected(doc); refreshAllUI(); }
         }
 
-        if (thumbOk && ssEl('ssThumbs')) {
-          const wrap = document.createElement('div'); wrap.className = 'relative shrink-0 group cursor-pointer';
-          const badgeNum = SS.awaitingImmediateBack ? `${SS.awaitingImmediateBack.docNumber} (أمامي)` : (SS.docs[SS.docs.length - 1]?.docNumber || '');
-          wrap.innerHTML = `<img src="${url}" class="h-16 w-14 object-cover rounded-lg border border-amber-400/60" alt="" /><span class="absolute bottom-0.5 inset-x-0.5 text-[9px] font-mono-code bg-black/80 text-amber-300 text-center rounded px-0.5 truncate">#${escapeHtml(String(badgeNum))}</span>`;
-          ssEl('ssThumbs').prepend(wrap);
-        }
+        ssRenderThumbs();
         if (thumbOk && ssEl('ssResult')) {
           const r = ssEl('ssResult'); ssEl('ssResultImg').src = url; r.classList.remove('hidden'); r.classList.add('flex');
-          clearTimeout(SS.rt); SS.rt = setTimeout(() => { r.classList.add('hidden'); r.classList.remove('flex'); }, 1250);
+          clearTimeout(SS.rt); SS.rt = setTimeout(() => { r.classList.add('hidden'); r.classList.remove('flex'); }, 1100);
         }
         const fl = ssEl('ssFlash'); if (fl) { fl.style.opacity = '0.85'; setTimeout(() => fl.style.opacity = '0', 90); }
         try { mcBeep(true); navigator.vibrate && navigator.vibrate(30); } catch (_) {}
 
         SS.armed = false; SS.away = false; SS.ref = SS.prev;
         if (SS.pass === 2 && SS.ptr >= SS.docs.length) { showToast('اكتملت أظهر كل السندات بنجاح ✔', 'success'); ssClose(); return true; }
-        if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) ssHud(`↻ اقلب السند رقم ${SS.awaitingImmediateBack.docNumber} لتصوير الوجه الخلفي`, 'text-sky-300');
+        if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) ssHud(`↻ اقلب السند رقم #${SS.awaitingImmediateBack.docNumber} لتصوير الوجه الخلفي`, 'text-sky-300');
         else ssHud('✔ تم الحفظ المباشر — بدّل السند للقطة التالية', 'text-emerald-300');
         return true;
       }
+
       async function ssShot(manual) {
         if (SS.busy) return;
-        if (!SS.video || !SS.video.videoWidth) { if (manual && ssEl('ssFallbackFileInput')) ssEl('ssFallbackFileInput').click(); return; }
+        if (SS.camSource === 'native_mobile' || !SS.video || !SS.video.videoWidth) {
+          if (manual && ssEl('ssFallbackFileInput')) ssEl('ssFallbackFileInput').click();
+          return;
+        }
+        if (manual && SS.countdownSec > 0 && !SS.countdownTimer) {
+          let rem = SS.countdownSec;
+          const cdBadge = ssEl('ssCountdownBadge');
+          if (cdBadge) { cdBadge.textContent = rem; cdBadge.classList.remove('hidden'); }
+          await new Promise(resolve => {
+            SS.countdownTimer = setInterval(() => {
+              rem--;
+              if (rem <= 0) {
+                clearInterval(SS.countdownTimer);
+                SS.countdownTimer = null;
+                if (cdBadge) cdBadge.classList.add('hidden');
+                resolve();
+              } else {
+                if (cdBadge) cdBadge.textContent = rem;
+                playScannerBeep(660, 60);
+              }
+            }, 1000);
+          });
+        }
         SS.busy = true;
-        try { const v = SS.video, k = Math.min(1, 2200 / Math.max(v.videoWidth, v.videoHeight)), src = document.createElement('canvas'); src.width = Math.round(v.videoWidth * k); src.height = Math.round(v.videoHeight * k); src.getContext('2d', { willReadFrequently: true }).drawImage(v, 0, 0, src.width, src.height); await ssProcessSourceCanvas(src, manual); }
-        catch (e) { showToast('تعذر الالتقاط: ' + (e.message || e), 'error'); }
-        finally { SS.busy = false; }
+        try {
+          const v = SS.video, maxDim = SS.resolution === 'uhd' ? 2800 : 2200;
+          const k = Math.min(1, maxDim / Math.max(v.videoWidth, v.videoHeight));
+          const src = document.createElement('canvas');
+          src.width = Math.round(v.videoWidth * k);
+          src.height = Math.round(v.videoHeight * k);
+          src.getContext('2d', { willReadFrequently: true }).drawImage(v, 0, 0, src.width, src.height);
+          await ssProcessSourceCanvas(src, manual);
+        } catch (e) {
+          showToast('تعذر الالتقاط: ' + (e.message || e), 'error');
+        } finally {
+          SS.busy = false;
+        }
       }
+
       function ssLive() {
         const v = SS.video, cv = ssEl('ssOverlay');
         if (!cv) return;
@@ -2220,7 +2531,7 @@
         const fb = Math.abs(p[0].x - c.width * 0.05) < 0.5 && Math.abs(p[0].y - c.height * 0.05) < 0.5;
         SS.quad = fb ? null : p;
         if (!SS.quad) { x.setLineDash([10, 8]); x.strokeStyle = 'rgba(240,211,119,.85)'; x.lineWidth = 2; x.strokeRect(w * 0.08, h * 0.08, w * 0.84, h * 0.84); x.setLineDash([]); return; }
-        const ok = SS.still >= 3, col = ok ? '#34d399' : '#f0d377', kx = w / c.width, ky = h / c.height;
+        const ok = SS.still >= Math.max(2, SS.stillThreshold - 1), col = ok ? '#34d399' : '#f0d377', kx = w / c.width, ky = h / c.height;
         x.beginPath(); SS.quad.forEach((q, i) => i ? x.lineTo(q.x * kx, q.y * ky) : x.moveTo(q.x * kx, q.y * ky)); x.closePath(); x.fillStyle = ok ? 'rgba(52,211,153,.18)' : 'rgba(240,211,119,.14)'; x.fill(); x.lineWidth = 3; x.strokeStyle = col; x.stroke();
         SS.quad.forEach(q => { x.beginPath(); x.arc(q.x * kx, q.y * ky, 7, 0, 7); x.fillStyle = col; x.fill(); });
       }
@@ -2237,32 +2548,91 @@
         const c = SS.small || (SS.small = document.createElement('canvas')); c.width = 64; c.height = 48;
         const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(v, 0, 0, 64, 48);
         const d = x.getImageData(0, 0, 64, 48).data, g = new Uint8Array(3072);
-        for (let i = 0; i < 3072; i++) g[i] = (d[i * 4] + d[i * 4 + 1] + d[i * 4 + 2]) / 3;
-        SS.still = SS.prev && ssDiff(g, SS.prev) < 2.2 ? SS.still + 1 : 0;
+        let edgeSum = 0;
+        for (let i = 0; i < 3072; i++) {
+          g[i] = (d[i * 4] + d[i * 4 + 1] + d[i * 4 + 2]) / 3;
+          if (i > 0) edgeSum += Math.abs(g[i] - g[i - 1]);
+        }
+        const delta = SS.prev ? ssDiff(g, SS.prev) : 99;
+        SS.still = delta < 2.3 ? SS.still + 1 : 0;
         SS.prev = g; SS.n = (SS.n || 0) + 1;
         if (SS.n % 2 === 0) ssLive();
-        if (!SS.armed) { if (SS.ref && ssDiff(g, SS.ref) > 9) SS.away = true; if (SS.away && SS.still >= 3) { SS.armed = true; SS.away = false; ssHud(SS.auto ? 'جاهز: ضع السند التالي وثبّته' : 'الالتقاط التلقائي متوقف — اضغط 📸'); } }
-        else if (SS.auto && SS.quad && SS.still >= 4 && SS.still % 6 === 4) { ssHud('ثبّت… جارٍ الالتقاط التلقائي والحفظ', 'text-sky-300'); ssShot(false); }
+
+        const stabBar = ssEl('ssStabilityBar');
+        const sharpEl = ssEl('ssSharpnessBadge');
+        const needed = SS.stillThreshold || 4;
+        if (stabBar) {
+          const pct = Math.min(100, Math.round((SS.still / needed) * 100));
+          stabBar.style.width = pct + '%';
+          stabBar.className = `h-full transition-all duration-150 ${pct >= 100 ? 'bg-emerald-400' : 'bg-amber-400'}`;
+        }
+        if (sharpEl) {
+          const sharpScore = Math.round((edgeSum / 3072) * 10);
+          sharpEl.textContent = sharpScore >= 40 ? `وضوح ممتاز (${sharpScore}) ✔` : `ثبّت اليد (${sharpScore})`;
+          sharpEl.className = `text-[10px] font-mono-code px-2 py-0.5 rounded ${sharpScore >= 40 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`;
+        }
+
+        if (!SS.armed) {
+          if (SS.ref && ssDiff(g, SS.ref) > 8.5) SS.away = true;
+          if (SS.away && SS.still >= 2) {
+            SS.armed = true; SS.away = false;
+            ssHud(SS.auto ? 'جاهز: ضع السند التالي وثبّته للالتقاط التلقائي' : 'الالتقاط التلقائي متوقف — اضغط 📸');
+          }
+        } else if (SS.auto && SS.quad && SS.still >= needed && SS.still % (needed + 2) === needed) {
+          ssHud('ثبّت… جارٍ الالتقاط التلقائي والحفظ', 'text-sky-300');
+          ssShot(false);
+        }
       }
+
       async function ssOpen() {
         if (!can('write')) return showToast('حسابك للعرض فقط ولا يملك صلاحية الأرشفة', 'warning');
         try { stopLiveCamera(); } catch (_) {}
         let m = ssEl('ssModal');
         if (!m) {
-          m = document.createElement('div'); m.id = 'ssModal'; m.className = 'fixed inset-0 z-[6500] bg-black/85 hidden items-center justify-center p-1.5 sm:p-3 text-white';
+          m = document.createElement('div'); m.id = 'ssModal'; m.className = 'fixed inset-0 z-[6500] bg-black/90 hidden items-center justify-center p-1 sm:p-3 text-white';
           const sel = 'luxe-input !py-1 !px-2 !text-xs';
           m.innerHTML = `
-          <div class="luxe-card-gold w-full max-w-3xl max-h-[98vh] flex flex-col overflow-hidden" style="background:#080e1c">
-            <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-black/80 border-b border-white/10">
-              <div class="min-w-0"><div class="flex items-center gap-2"><span class="text-amber-400 font-extrabold text-sm">⚡ التدفق الذكي للسندات</span><div id="ssTitle" class="font-extrabold text-xs sm:text-sm text-white truncate"></div></div><div id="ssMsg" class="text-xs font-bold text-amber-300 mt-0.5"></div></div>
+          <div class="luxe-card-gold w-full max-w-4xl max-h-[98dvh] flex flex-col overflow-y-auto viewer-scroll-area" style="background:#080e1c">
+            <!-- Top Sticky Header -->
+            <div class="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-slate-950/95 border-b border-white/10 backdrop-blur-md">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-amber-400 font-extrabold text-sm">⚡ التدفق الذكي للسندات</span>
+                  <div id="ssTitle" class="font-extrabold text-xs sm:text-sm text-white truncate"></div>
+                </div>
+                <div id="ssMsg" class="text-xs font-bold text-amber-300 mt-0.5 truncate"></div>
+              </div>
               <div class="flex flex-wrap items-center gap-1.5">
+                <button type="button" id="ssToggleSettingsBtn" class="btn-luxe-outline !py-1 !px-2.5 !text-xs !border-amber-400/40 !text-amber-300" title="إظهار أو طي لوحة الإعدادات لتوسيع شاشة الكاميرا">⚙️ الإعدادات</button>
                 <button type="button" id="ssFolderStatusPill" title="اختيار أو تغيير مجلد الحفظ المباشر على جهازك" class="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold cursor-pointer"></button>
                 <span id="ssCount" class="text-xs font-mono-code px-2.5 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold">0 سند</span>
                 <button type="button" id="ssExportPdfBtn" class="btn-luxe-outline !py-1 !px-2.5 !text-xs !border-sky-400/40 !text-sky-300" title="تصدير سندات هذه الدفعة كملف PDF">📕 PDF</button>
                 <button type="button" id="ssClose" class="btn-luxe-outline !py-1 !px-2.5 !text-xs !border-rose-500/40 !text-rose-300">إنهاء ✕</button>
               </div>
             </div>
-            <div class="px-3 py-2 bg-slate-950/90 border-b border-white/10 space-y-2 text-xs">
+
+            <!-- Sequential Voucher Banner (Single / Double-Sided Live Status & Quick Stepper) -->
+            <div class="px-3 py-2 bg-slate-900/95 border-b border-amber-400/25 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs text-slate-300 font-bold">السند الحالي:</span>
+                <div class="inline-flex items-center rounded-lg border border-amber-400/40 bg-slate-950 p-0.5">
+                  <button type="button" id="ssSerialDecBtn" class="px-2 py-0.5 text-xs font-extrabold text-amber-300 hover:bg-amber-500/20 rounded" title="إنقاص رقم السند (-1)">➖</button>
+                  <span id="ssBannerSerialNum" class="font-mono-code font-extrabold text-sm text-amber-400 px-2.5">#1005</span>
+                  <button type="button" id="ssSerialIncBtn" class="px-2 py-0.5 text-xs font-extrabold text-amber-300 hover:bg-amber-500/20 rounded" title="زيادة رقم السند (+1)">➕</button>
+                </div>
+                <span id="ssCurrentSidePill" class="text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-extrabold">📄 سند بوجه واحد</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="ssSharpnessBadge" class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-800 text-slate-300">الوضوح: —</span>
+                <div class="w-20 h-2 rounded-full bg-slate-800 overflow-hidden" title="مؤشر ثبات اليد للالتقاط التلقائي">
+                  <div id="ssStabilityBar" class="h-full bg-amber-400 transition-all duration-150" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsible Settings Panel -->
+            <div id="ssSettingsPanel" class="px-3 py-2.5 bg-slate-950/90 border-b border-white/10 space-y-2.5 text-xs">
+              <!-- Row 1: Voucher Numbering & Sides -->
               <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                 <div><label class="block text-[10px] text-amber-300 font-bold mb-0.5">🔢 بداية رقم السند</label><input type="number" id="ssSerialInput" class="${sel} w-full font-mono-code font-bold text-amber-300" value="1005" min="1" /></div>
                 <div><label class="block text-[10px] text-amber-300 font-bold mb-0.5">↕️ ترتيب الترقيم</label><select id="ssStepDirSelect" class="${sel} w-full font-bold"><option value="asc">تصاعدي (+1)</option><option value="desc">تنازلي (-1)</option></select></div>
@@ -2271,47 +2641,129 @@
                 <div><label class="block text-[10px] text-sky-300 font-bold mb-0.5">🏷️ تصنيف السندات</label><select id="ssCategorySelect" class="${sel} w-full font-bold"></select></div>
                 <div><label class="block text-[10px] text-slate-300 font-bold mb-0.5">✏️ مسمى السند</label><input type="text" id="ssPrefixInput" class="${sel} w-full" value="سند مالي" placeholder="مثال: سند قبض" /></div>
               </div>
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/5">
+
+              <!-- Row 2: Camera Selection & Capture Controls -->
+              <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1.5 border-t border-white/10">
+                <div class="col-span-2">
+                  <label class="block text-[10px] text-emerald-300 font-bold mb-0.5">🎥 اختيار نوع / جهاز الكاميرا</label>
+                  <div class="flex gap-1">
+                    <select id="ssCameraSelect" class="${sel} flex-1 font-bold"></select>
+                    <button type="button" id="ssSwitchCamBtn" class="btn-luxe-outline !py-1 !px-2 text-xs shrink-0" title="تبديل سريع بين الكاميرات">🔄</button>
+                    <button type="button" id="ssRestartCamBtn" class="btn-luxe-outline !py-1 !px-2 text-xs shrink-0" title="إعادة تشغيل وتحديث الكاميرا">🔌</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-sky-300 font-bold mb-0.5">📺 دقة التصوير</label>
+                  <select id="ssResolutionSelect" class="${sel} w-full font-bold">
+                    <option value="hd">⚡ قياسي (HD 720p)</option>
+                    <option value="fhd" selected>✨ عالي الدقة (FHD 1080p)</option>
+                    <option value="uhd">💎 فائق الدقة (2K/4K)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-amber-300 font-bold mb-0.5">⏱️ سرعة الالتقاط التلقائي</label>
+                  <select id="ssSensitivitySelect" class="${sel} w-full font-bold">
+                    <option value="2">⚡ سريع جداً (0.4 ثانية)</option>
+                    <option value="4" selected>⚖️ متوازن (0.8 ثانية)</option>
+                    <option value="7">🎯 دقيق (1.4 ثانية ثبات)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-purple-300 font-bold mb-0.5">⏳ مؤقت قبل الالتقاط</label>
+                  <select id="ssTimerSelect" class="${sel} w-full font-bold">
+                    <option value="0" selected>بدون مؤقت (فوري)</option>
+                    <option value="2">مؤقت ثانيتين (2s)</option>
+                    <option value="3">مؤقت 3 ثوانٍ (3s)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-300 font-bold mb-0.5">🎨 معالجة لون السند</label>
+                  <select id="ssFilter" class="${sel} w-full font-bold"><option value="color">🎨 ملوّن محسّن</option><option value="gray">🌗 رمادي</option><option value="bw">⬛ أبيض وأسود حاد</option><option value="original">🖼️ أصلي</option></select>
+                </div>
+              </div>
+
+              <!-- Row 3: Live Optical/Digital Controls (Zoom, Rotate, Flip, Brightness, Contrast) -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-white/10">
                 <div class="flex flex-wrap items-center gap-2">
-                  <select id="ssFilter" class="${sel}"><option value="color">🎨 ملوّن محسّن</option><option value="gray">🌗 رمادي</option><option value="bw">⬛ أبيض وأسود حاد</option><option value="original">🖼️ أصلي</option></select>
+                  <label class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-white/10">
+                    <span class="text-[11px] text-amber-300 font-bold">🔍 تقريب:</span>
+                    <input type="range" id="ssZoomRange" min="1" max="3.5" step="0.1" value="1" class="w-16 accent-amber-400 cursor-pointer" />
+                    <span id="ssZoomVal" class="font-mono-code text-[11px] text-amber-400 font-bold">1.0x</span>
+                  </label>
+                  <label class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-white/10">
+                    <span class="text-[11px] text-sky-300 font-bold">☀️ سطوع:</span>
+                    <input type="range" id="ssBrightnessRange" min="60" max="150" step="5" value="100" class="w-14 accent-sky-400 cursor-pointer" />
+                  </label>
+                  <label class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-white/10">
+                    <span class="text-[11px] text-emerald-300 font-bold">◐ تباين:</span>
+                    <input type="range" id="ssContrastRange" min="70" max="160" step="5" value="105" class="w-14 accent-emerald-400 cursor-pointer" />
+                  </label>
+                  <button type="button" id="ssRotateCamBtn" class="btn-luxe-outline !py-1 !px-2 !text-[11px]" title="تدوير الكاميرا 90 درجة">↻ تدوير 90°</button>
+                  <button type="button" id="ssFlipHorizBtn" class="btn-luxe-outline !py-1 !px-2 !text-[11px]" title="عكس اتجاه الكاميرا أفقياً">⇄ عكس</button>
+                  <button type="button" id="ssResetCamAdjBtn" class="btn-luxe-outline !py-1 !px-2 !text-[11px]" title="إعادة ضبط التقريب والسطوع والتدوير">↺ ضبط</button>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
                   <select id="ssPrioritySelect" class="${sel}"><option value="normal">أولوية: عادي</option><option value="important">⭐ هام جداً</option></select>
-                  <input type="text" id="ssSubFolderInput" class="${sel} w-32 sm:w-40" placeholder="مجلد فرعي (اختياري)..." />
+                  <input type="text" id="ssSubFolderInput" class="${sel} w-28 sm:w-36" placeholder="مجلد فرعي (اختياري)..." />
                   <label id="ssOrderWrap" class="hidden flex items-center gap-1"><span>ترتيب الأظهر:</span><select id="ssOrder" class="${sel}"><option value="reverse">عكسي (أقلب الرزمة كاملة)</option><option value="same">بنفس الترتيب</option></select></label>
                   <button type="button" id="ssResetManualCornersBtn" class="hidden btn-luxe-outline !py-1 !px-2 !text-[11px] !border-sky-400/50 !text-sky-300">🎯 إعادة ضبط الزوايا</button>
                 </div>
-                <div class="flex flex-wrap items-center gap-3 text-[11px]">
-                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssAuto" checked class="accent-amber-400" /> التقاط تلقائي</label>
+              </div>
+
+              <!-- Row 4: Smart Toggles -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/5 text-[11px]">
+                <div class="flex flex-wrap items-center gap-3">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssAuto" checked class="accent-amber-400" /> 🤖 التقاط تلقائي عند ثبات السند</label>
                   <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssBlankChk" checked class="accent-amber-400" /> تخطي الظهر الفارغ</label>
-                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssAutoOcrChk" checked class="accent-amber-400" /> OCR عند الإنهاء</label>
-                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssVoiceChk" checked class="accent-amber-400" /> 🔊 نطق الرقم</label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssAutoOcrChk" checked class="accent-amber-400" /> استخراج OCR عند الإنهاء</label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="ssVoiceChk" checked class="accent-amber-400" /> 🔊 نطق الرقم صوتياً</label>
                 </div>
               </div>
             </div>
-            <div class="flex-1 min-h-[210px] overflow-hidden flex items-center justify-center bg-black p-1 relative">
-              <div class="relative leading-none" id="ssStage">
-                <video id="ssVideo" class="block rounded-lg" style="max-width:100%;max-height:44vh" playsinline muted autoplay></video>
+
+            <!-- Live Camera Viewport -->
+            <div class="flex-1 min-h-[240px] sm:min-h-[300px] overflow-hidden flex items-center justify-center bg-black p-1.5 relative">
+              <div class="relative leading-none flex items-center justify-center w-full h-full" id="ssStage">
+                <video id="ssVideo" class="block rounded-lg transition-transform duration-150" style="max-width:100%;max-height:48vh" playsinline muted autoplay></video>
                 <canvas id="ssOverlay" class="absolute inset-0 w-full h-full" style="touch-action:none; cursor:crosshair;"></canvas>
+                <div id="ssCountdownBadge" class="hidden absolute z-30 w-20 h-20 rounded-full bg-amber-400/90 text-slate-950 font-extrabold text-4xl flex items-center justify-center shadow-2xl">3</div>
+                <!-- Fallback / Native Mobile Mode Box inside stage -->
+                <div id="ssNoStreamOverlay" class="hidden absolute inset-2 rounded-xl bg-slate-950/95 border border-amber-400/30 flex-col items-center justify-center text-center p-4 gap-2.5 z-10">
+                  <div class="text-4xl">📷</div>
+                  <div id="ssNoStreamTitle" class="font-extrabold text-sm text-amber-400">الكاميرا جاهزة للتصوير المباشر</div>
+                  <p id="ssNoStreamDesc" class="text-xs text-slate-300 max-w-md leading-relaxed">اختر الكاميرا المناسبة من القائمة أعلاه، أو اضغط على زر الالتقاط لفتح كاميرا الجوال الأصلية.</p>
+                  <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    <button type="button" id="ssRetryLiveStreamBtn" class="btn-luxe-gold !py-1.5 !px-3.5 text-xs">🎥 إعادة محاولة البث الحي</button>
+                    <button type="button" id="ssUseNativeCamQuickBtn" class="btn-luxe-outline !py-1.5 !px-3.5 text-xs !border-emerald-400/50 !text-emerald-300">📱 فتح كاميرا الجوال الأصلية</button>
+                  </div>
+                </div>
                 <div id="ssFlash" class="absolute inset-0 bg-white pointer-events-none" style="opacity:0;transition:opacity .15s"></div>
-                <div id="ssResult" class="hidden absolute inset-1 rounded-lg bg-black/85 flex-col items-center justify-center gap-2 p-2">
+                <div id="ssResult" class="hidden absolute inset-1 rounded-lg bg-black/85 flex-col items-center justify-center gap-2 p-2 z-20">
                   <img id="ssResultImg" alt="" class="max-h-[75%] max-w-full rounded shadow-2xl border border-emerald-400/60" />
                   <div class="text-emerald-300 text-xs sm:text-sm font-bold">✔ تم الحفظ المباشر — بدّل السند</div>
                   <button id="ssRedo" type="button" class="btn-luxe-outline !py-1 !px-3 !text-xs">↩ إعادة تصوير هذا السند</button>
                 </div>
               </div>
             </div>
-            <div id="ssThumbs" class="flex gap-1.5 overflow-x-auto px-2 py-1.5 bg-black/80 min-h-[4.4rem] items-center"></div>
-            <div class="p-2.5 bg-black/95 space-y-2 border-t border-white/10">
+
+            <!-- Captured Vouchers Interactive Filmstrip -->
+            <div id="ssThumbs" class="flex gap-2 overflow-x-auto px-3 py-2 bg-slate-950/95 border-t border-white/10 min-h-[5.2rem] items-center"></div>
+
+            <!-- Sticky Bottom Capture & Control Bar -->
+            <div class="sticky bottom-0 z-20 p-2.5 bg-slate-950/95 space-y-2 border-t border-white/15 backdrop-blur-md">
               <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                <button id="ssShotBtn" type="button" class="btn-luxe-gold col-span-2 !py-2.5 text-sm font-extrabold">📸 التقاط وحفظ السند الآن</button>
-                <button id="ssPickFileBtn" type="button" class="btn-luxe-outline !py-2.5 !text-xs !border-emerald-400/40 !text-emerald-300" title="التقاط من كاميرا الجوال الأصلية أو رفع صور">📱 كاميرا الجوال / ملف</button>
-                <button id="ssUndo" type="button" class="btn-luxe-outline !py-2.5 !text-xs">↩ تراجع</button>
-                <button id="ssSkip" type="button" class="btn-luxe-outline !py-2.5 !text-xs">⏭ تخطي رقم</button>
+                <button id="ssShotBtn" type="button" class="btn-luxe-gold col-span-2 !py-2.5 text-xs sm:text-sm font-extrabold">📸 التقاط وحفظ السند الآن</button>
+                <button id="ssPickFileBtn" type="button" class="btn-luxe-outline !py-2 !text-xs !border-emerald-400/40 !text-emerald-300" title="التقاط من كاميرا الجوال الأصلية أو رفع صور">📱 كاميرا الجوال / ملف</button>
+                <button id="ssUndo" type="button" class="btn-luxe-outline !py-2 !text-xs">↩ تراجع</button>
+                <button id="ssSkip" type="button" class="btn-luxe-outline !py-2 !text-xs">⏭ تخطي رقم</button>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <button id="ssTorch" type="button" class="btn-luxe-outline !py-1.5 !text-xs">🔦 الفلاش</button>
-                <button id="ssPickFolderBtn" type="button" class="btn-luxe-outline !py-1.5 !text-xs !border-amber-400/40 !text-amber-300">📂 تحديد مجلد الأرشيف للحفظ المباشر</button>
-                <button id="ssSkipImmediateBackBtn" type="button" class="btn-luxe-outline !py-1.5 !text-xs !border-amber-400/50 !text-amber-300 hidden">🚫 هذا السند بدون ظهر (تخطي الخلفي)</button>
-                <button id="ssBackBtn" type="button" class="btn-luxe-gold !py-1.5 !text-xs hidden">🔄 انتهت الأوجه — ابدأ تصوير الأظهر</button>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-1.5 flex-1">
+                  <button id="ssTorch" type="button" class="btn-luxe-outline !py-1.5 !px-3 !text-xs">🔦 الفلاش</button>
+                  <button id="ssPickFolderBtn" type="button" class="btn-luxe-outline !py-1.5 !px-3 !text-xs !border-amber-400/40 !text-amber-300">📂 تحديد مجلد الحفظ المباشر</button>
+                  <button id="ssSkipImmediateBackBtn" type="button" class="btn-luxe-outline !py-1.5 !px-3 !text-xs !border-amber-400/50 !text-amber-300 hidden">🚫 هذا السند بدون ظهر (حفظ الأمامي فقط)</button>
+                  <button id="ssBackBtn" type="button" class="btn-luxe-gold !py-1.5 !px-3 !text-xs hidden">🔄 انتهت الأوجه الأمامية — ابدأ تصوير الأظهر</button>
+                </div>
               </div>
             </div>
             <input type="file" id="ssFallbackFileInput" accept="image/*" capture="environment" multiple class="hidden" />
@@ -2319,14 +2771,77 @@
           document.body.appendChild(m);
 
           ssEl('ssClose').onclick = ssClose;
+          ssEl('ssToggleSettingsBtn').onclick = () => {
+            SS.settingsCollapsed = !SS.settingsCollapsed;
+            ssEl('ssSettingsPanel').classList.toggle('hidden', SS.settingsCollapsed);
+            ssEl('ssToggleSettingsBtn').textContent = SS.settingsCollapsed ? '⚙️ إظهار الإعدادات ▼' : '⚙️ طي الإعدادات ▲';
+          };
+          ssEl('ssSerialDecBtn').onclick = () => { SS.serial = Math.max(1, SS.serial - 1); ssEl('ssSerialInput').value = SS.serial; if (ssEl('camNextSerial')) ssEl('camNextSerial').value = SS.serial; ssHud(`تم تعديل رقم السند إلى #${SS.serial}`); };
+          ssEl('ssSerialIncBtn').onclick = () => { SS.serial = SS.serial + 1; ssEl('ssSerialInput').value = SS.serial; if (ssEl('camNextSerial')) ssEl('camNextSerial').value = SS.serial; ssHud(`تم تعديل رقم السند إلى #${SS.serial}`); };
+
           ssEl('ssRedo').onclick = () => { ssEl('ssUndo').onclick(); ssEl('ssResult').classList.add('hidden'); ssEl('ssResult').classList.remove('flex'); };
           ssEl('ssShotBtn').onclick = () => ssShot(true);
           ssEl('ssPickFileBtn').onclick = () => ssEl('ssFallbackFileInput').click();
-          ssEl('ssFallbackFileInput').onchange = async e => { const files = Array.from(e.target.files || []); e.target.value = ''; for (const f of files) { const im = await loadImageFromFile(f); if (!im) continue; const k = Math.min(1, 2200 / Math.max(im.naturalWidth || 1200, im.naturalHeight || 900)); const cv = document.createElement('canvas'); cv.width = Math.round((im.naturalWidth || 1200) * k); cv.height = Math.round((im.naturalHeight || 900) * k); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); await ssProcessSourceCanvas(cv, true); } };
+          ssEl('ssUseNativeCamQuickBtn').onclick = () => ssEl('ssFallbackFileInput').click();
+          ssEl('ssRetryLiveStreamBtn').onclick = () => ssStartCameraStream('environment');
+
+          ssEl('ssFallbackFileInput').onchange = async e => {
+            const files = Array.from(e.target.files || []);
+            e.target.value = '';
+            for (const f of files) {
+              const im = await loadImageFromFile(f);
+              if (!im) continue;
+              const k = Math.min(1, 2200 / Math.max(im.naturalWidth || 1200, im.naturalHeight || 900));
+              const cv = document.createElement('canvas');
+              cv.width = Math.round((im.naturalWidth || 1200) * k);
+              cv.height = Math.round((im.naturalHeight || 900) * k);
+              cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+              await ssProcessSourceCanvas(cv, true);
+            }
+            if (SS.camSource === 'native_mobile' && SS.on) {
+              showToast(`✔ تم حفظ السند — اضغط 📸 لتصوير السند التالي (#${SS.serial})`, 'success');
+            }
+          };
+
+          ssEl('ssCameraSelect').onchange = e => ssStartCameraStream(e.target.value);
+          ssEl('ssSwitchCamBtn').onclick = async () => {
+            const sel = ssEl('ssCameraSelect');
+            if (!sel || !sel.options.length) return;
+            const liveOpts = Array.from(sel.options).filter(o => o.value !== 'native_mobile');
+            if (!liveOpts.length) return;
+            const curIdx = liveOpts.findIndex(o => o.value === sel.value);
+            const nextOpt = liveOpts[(curIdx + 1) % liveOpts.length];
+            sel.value = nextOpt.value;
+            await ssStartCameraStream(nextOpt.value);
+          };
+          ssEl('ssRestartCamBtn').onclick = () => ssStartCameraStream( ssEl('ssCameraSelect').value );
+          ssEl('ssResolutionSelect').onchange = e => { SS.resolution = e.target.value; ssStartCameraStream(SS.camSource); };
+          ssEl('ssSensitivitySelect').onchange = e => { SS.stillThreshold = parseInt(e.target.value, 10) || 4; };
+          ssEl('ssTimerSelect').onchange = e => { SS.countdownSec = parseInt(e.target.value, 10) || 0; };
+
+          ssEl('ssZoomRange').oninput = e => {
+            SS.zoom = parseFloat(e.target.value) || 1;
+            ssEl('ssZoomVal').textContent = SS.zoom.toFixed(1) + 'x';
+            ssApplyVideoTransform();
+            try {
+              const track = SS.stream && SS.stream.getVideoTracks()[0];
+              if (track) track.applyConstraints({ advanced: [{ zoom: SS.zoom }] }).catch(() => {});
+            } catch (_) {}
+          };
+          ssEl('ssBrightnessRange').oninput = e => { SS.brightness = parseInt(e.target.value, 10) || 100; ssApplyVideoTransform(); };
+          ssEl('ssContrastRange').oninput = e => { SS.contrast = parseInt(e.target.value, 10) || 105; ssApplyVideoTransform(); };
+          ssEl('ssRotateCamBtn').onclick = () => { SS.rotation = (SS.rotation + 90) % 360; ssApplyVideoTransform(); showToast(`تم تدوير الكاميرا إلى ${SS.rotation}°`, 'info'); };
+          ssEl('ssFlipHorizBtn').onclick = () => { SS.flipH = !SS.flipH; ssApplyVideoTransform(); };
+          ssEl('ssResetCamAdjBtn').onclick = () => {
+            SS.zoom = 1; SS.rotation = 0; SS.flipH = false; SS.brightness = 100; SS.contrast = 105;
+            ssEl('ssZoomRange').value = '1'; ssEl('ssZoomVal').textContent = '1.0x';
+            ssEl('ssBrightnessRange').value = '100'; ssEl('ssContrastRange').value = '105';
+            ssApplyVideoTransform();
+          };
 
           ssEl('ssSerialInput').oninput = e => { const val = parseInt(e.target.value, 10); if (!isNaN(val) && val >= 1) { SS.serial = val; ssHud('تم تحديث رقم السند الحالي'); } };
           ssEl('ssStepDirSelect').onchange = e => { SS.stepDir = e.target.value; ssHud(SS.stepDir === 'desc' ? 'تم تفعيل الترتيب التنازلي (-1)' : 'تم تفعيل الترتيب التصاعدي (+1)'); };
-          ssEl('ssMode').onchange = e => { SS.mode = e.target.value; SS.awaitingImmediateBack = null; ssHud('تم تحديث نمط أوجه السند'); };
+          ssEl('ssMode').onchange = e => { SS.mode = e.target.value; SS.awaitingImmediateBack = null; SS.targetAttachBackDoc = null; ssRenderThumbs(); ssHud('تم تحديث نمط أوجه السند'); };
           ssEl('ssCropModeSelect').onchange = e => {
             SS.cropMode = e.target.value;
             ssEl('ssResetManualCornersBtn').classList.toggle('hidden', SS.cropMode !== 'manual');
@@ -2351,17 +2866,72 @@
           ssEl('ssPickFolderBtn').onclick = pickFolderHandler;
           ssEl('ssFolderStatusPill').onclick = pickFolderHandler;
 
-          ssEl('ssSkipImmediateBackBtn').onclick = () => { if (!SS.awaitingImmediateBack) return; const finishedNum = SS.awaitingImmediateBack.docNumber; SS.awaitingImmediateBack = null; ssAdvanceSerial(1); ssHud(`تم اعتماد السند ${finishedNum} بوجه واحد فقط — جاهز للسند التالي`); };
-          ssEl('ssBackBtn').onclick = () => { SS.pass = 2; SS.ptr = 0; SS.log = []; SS.armed = false; SS.away = false; SS.ref = SS.prev; ssEl('ssBackBtn').classList.add('hidden'); ssEl('ssThumbs').innerHTML = ''; ssHud(SS.order === 'reverse' ? 'اقلب الرزمة كاملة وصوّر الأظهر من الأعلى' : 'اقلب كل سند وصوّره بالترتيب'); };
-          ssEl('ssSkip').onclick = () => { if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) { ssEl('ssSkipImmediateBackBtn').onclick(); return; } if (SS.pass === 1) { ssAdvanceSerial(1); ssHud('تم تخطي الرقم إلى السند التالي'); } else { const doc = SS.docs[SS.order === 'reverse' ? SS.docs.length - 1 - SS.ptr : SS.ptr]; if (doc) { SS.log.push({ doc, added: false }); SS.ptr++; } if (SS.ptr >= SS.docs.length) return ssClose(); ssHud('تم تخطي الظهر'); } };
+          ssEl('ssSkipImmediateBackBtn').onclick = () => {
+            if (SS.targetAttachBackDoc) {
+              SS.targetAttachBackDoc = null;
+              ssRenderThumbs();
+              ssHud('تم إلغاء إرفاق الوجه الخلفي — العودة للتسلسل العادي');
+              return;
+            }
+            if (!SS.awaitingImmediateBack) return;
+            const finishedNum = SS.awaitingImmediateBack.docNumber;
+            SS.awaitingImmediateBack = null;
+            ssAdvanceSerial(1);
+            ssRenderThumbs();
+            ssHud(`تم اعتماد السند #${finishedNum} بوجه واحد فقط — جاهز للسند التالي`);
+          };
+          ssEl('ssBackBtn').onclick = () => { SS.pass = 2; SS.ptr = 0; SS.log = []; SS.armed = false; SS.away = false; SS.ref = SS.prev; ssEl('ssBackBtn').classList.add('hidden'); ssRenderThumbs(); ssHud(SS.order === 'reverse' ? 'اقلب الرزمة كاملة وصوّر الأظهر من الأعلى' : 'اقلب كل سند وصوّره بالترتيب'); };
+          ssEl('ssSkip').onclick = () => { if ((SS.mode === 'double_immediate' && SS.awaitingImmediateBack) || SS.targetAttachBackDoc) { ssEl('ssSkipImmediateBackBtn').onclick(); return; } if (SS.pass === 1) { ssAdvanceSerial(1); ssHud('تم تخطي الرقم إلى السند التالي'); } else { const doc = SS.docs[SS.order === 'reverse' ? SS.docs.length - 1 - SS.ptr : SS.ptr]; if (doc) { SS.log.push({ doc, added: false }); SS.ptr++; } if (SS.ptr >= SS.docs.length) return ssClose(); ssHud('تم تخطي الظهر'); } };
           ssEl('ssUndo').onclick = () => {
-            if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) { const d = SS.docs.pop(); SS.awaitingImmediateBack = null; if (d) { documents = documents.filter(x => x !== d); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); if (ssEl('ssThumbs').firstChild) ssEl('ssThumbs').firstChild.remove(); } ssHud('تم التراجع عن الوجه الأمامي — أعد تصويره'); return; }
-            if (SS.pass === 1) { const d = SS.docs.pop(); if (!d) return; documents = documents.filter(x => x !== d); ssAdvanceSerial(-1); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); if (ssEl('ssThumbs').firstChild) ssEl('ssThumbs').firstChild.remove(); }
-            else { const l = SS.log.pop(); if (!l) return; SS.ptr--; if (l.added) { l.doc.pages.pop(); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); if (ssEl('ssThumbs').firstChild) ssEl('ssThumbs').firstChild.remove(); } }
+            if (SS.targetAttachBackDoc) { SS.targetAttachBackDoc = null; ssRenderThumbs(); ssHud('تم إلغاء إرفاق الظهر'); return; }
+            if (SS.mode === 'double_immediate' && SS.awaitingImmediateBack) { const d = SS.docs.pop(); SS.awaitingImmediateBack = null; if (d) { documents = documents.filter(x => x !== d); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); ssRenderThumbs(); } ssHud('تم التراجع عن الوجه الأمامي — أعد تصويره'); return; }
+            if (SS.pass === 1) { const d = SS.docs.pop(); if (!d) return; documents = documents.filter(x => x !== d); ssAdvanceSerial(-1); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); ssRenderThumbs(); }
+            else { const l = SS.log.pop(); if (!l) return; SS.ptr--; if (l.added) { l.doc.pages.pop(); safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); ssRenderThumbs(); } }
             SS.armed = false; SS.away = true; ssHud('تم التراجع — أعد تصوير السند');
           };
           ssEl('ssExportPdfBtn').onclick = async () => { if (!SS.docs.length) return showToast('صوّر سنداً واحداً على الأقل لتصديره كـ PDF', 'warning'); const allPages = []; SS.docs.forEach(d => (d.pages || []).forEach(p => { if (p.dataUrl) allPages.push(p); })); await downloadPdf(allPages, `AlkamalyPro_SmartStream_${SS.docs.length}_Vouchers.pdf`); };
           ssEl('ssTorch').onclick = async () => { try { SS.torch = !SS.torch; await SS.stream.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: SS.torch }] }); } catch (_) { showToast('الفلاش غير مدعوم في هذه الكاميرا', 'warning'); } };
+
+          ssEl('ssThumbs').addEventListener('click', e => {
+            const addBackBtn = e.target.closest('[data-ss-thumb-addback]');
+            if (addBackBtn) {
+              e.stopPropagation();
+              const docId = addBackBtn.getAttribute('data-ss-thumb-addback');
+              const targetDoc = SS.docs.find(d => d.id === docId);
+              if (targetDoc) {
+                SS.targetAttachBackDoc = targetDoc;
+                ssRenderThumbs();
+                ssHud(`↻ اقلب السند رقم #${targetDoc.docNumber} والتقط الوجه الخلفي الآن`, 'text-sky-300');
+              }
+              return;
+            }
+            const delBtn = e.target.closest('[data-ss-thumb-del]');
+            if (delBtn) {
+              e.stopPropagation();
+              const docId = delBtn.getAttribute('data-ss-thumb-del');
+              SS.docs = SS.docs.filter(d => d.id !== docId);
+              if (SS.awaitingImmediateBack && SS.awaitingImmediateBack.id === docId) SS.awaitingImmediateBack = null;
+              if (SS.targetAttachBackDoc && SS.targetAttachBackDoc.id === docId) SS.targetAttachBackDoc = null;
+              documents = documents.filter(d => d.id !== docId);
+              safeSetStorage(STORAGE_DOCS_KEY, documents);
+              refreshAllUI();
+              ssRenderThumbs();
+              ssHud('تم حذف السند من الدفعة');
+              return;
+            }
+            const viewEl = e.target.closest('[data-ss-thumb-view]');
+            if (viewEl) {
+              const docId = viewEl.getAttribute('data-ss-thumb-view');
+              const targetDoc = SS.docs.find(d => d.id === docId);
+              if (targetDoc && targetDoc.pages && targetDoc.pages[0]) {
+                const r = ssEl('ssResult');
+                ssEl('ssResultImg').src = targetDoc.pages[targetDoc.pages.length - 1].dataUrl;
+                r.classList.remove('hidden'); r.classList.add('flex');
+                clearTimeout(SS.rt);
+                SS.rt = setTimeout(() => { r.classList.add('hidden'); r.classList.remove('flex'); }, 2500);
+              }
+            }
+          });
 
           ssBindManualOverlayDrag(ssEl('ssOverlay'));
         }
@@ -2377,27 +2947,29 @@
         SS.prefix = startPrefix;
         if (ssEl('ssPrefixInput')) ssEl('ssPrefixInput').value = startPrefix;
 
-        Object.assign(SS, { on: true, pass: 1, ptr: 0, docs: [], log: [], awaitingImmediateBack: null, armed: true, away: false, prev: null, ref: null, still: 0, mode: ssEl('ssMode').value, stepDir: ssEl('ssStepDirSelect').value, cropMode: ssEl('ssCropModeSelect').value, filter: ssEl('ssFilter').value, order: ssEl('ssOrder').value, auto: ssEl('ssAuto').checked, autoOcrOnClose: ssEl('ssAutoOcrChk').checked, voiceRead: ssEl('ssVoiceChk').checked });
+        Object.assign(SS, {
+          on: true, pass: 1, ptr: 0, docs: [], log: [], awaitingImmediateBack: null, targetAttachBackDoc: null,
+          armed: true, away: false, prev: null, ref: null, still: 0,
+          mode: ssEl('ssMode').value, stepDir: ssEl('ssStepDirSelect').value, cropMode: ssEl('ssCropModeSelect').value,
+          filter: ssEl('ssFilter').value, order: ssEl('ssOrder').value, auto: ssEl('ssAuto').checked,
+          autoOcrOnClose: ssEl('ssAutoOcrChk').checked, voiceRead: ssEl('ssVoiceChk').checked
+        });
 
-        ssEl('ssThumbs').innerHTML = '';
+        ssRenderThumbs();
         m.classList.remove('hidden'); m.classList.add('flex');
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          try {
-            SS.stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
-            try { await SS.stream.getVideoTracks()[0].applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (_) {}
-            SS.video = ssEl('ssVideo'); SS.video.srcObject = SS.stream;
-          } catch (e) { showToast('تعذر فتح البث الحي — يمكنك التصوير عبر زر «📱 كاميرا الجوال / ملف»', 'info'); }
-        }
+        await ssPopulateCameraDevices();
+        await ssStartCameraStream(SS.camSource || 'environment');
 
         try { mcKeepAwake(); } catch (_) {}
         clearInterval(SS.tick); SS.tick = setInterval(ssTick, 140);
         ssUpdateFolderPill();
-        ssHud('جاهز: حدّد رقم البداية والتصنيف ثم ضع السند أمام الكاميرا');
+        ssHud('جاهز: حدّد رقم البداية ونوع الكاميرا ثم ضع السند أمام الكاميرا');
       }
       function ssClose() {
         if (!SS.on) return;
         SS.on = false; clearInterval(SS.tick);
+        if (SS.countdownTimer) { clearInterval(SS.countdownTimer); SS.countdownTimer = null; }
         try { if (SS.stream) SS.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
         SS.stream = null;
         try { mcReleaseAwake(); } catch (_) {}
