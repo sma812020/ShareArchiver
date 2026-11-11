@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="base-uri 'self'; form-action 'self'; object-src 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v9." />
@@ -31,6 +30,7 @@
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
       --bg-primary: #070d1b;
@@ -278,12 +278,34 @@
     @keyframes mcFlashOk { 0% { background-color: rgba(22, 163, 74, 0.25); } 100% { background-color: transparent; } }
     .mc-flash { animation: mcFlashOk 0.45s ease; }
 
-    /* ===== v9: تكيّف الجوال/الكمبيوتر وأداء القوائم الكبيرة ===== */
+    /* ===== v9 & v10: تكيّف الجوال/الكمبيوتر، تمرير الشريط الجانبي، وتحسين شاشات عرض المستندات ===== */
     html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     body{min-height:100vh;min-height:100dvh}
     [data-doc-card]{content-visibility:auto;contain-intrinsic-size:auto 320px}
     .v9-more{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:1rem;font-size:.8rem;color:var(--text-secondary)}
-    @media (pointer:coarse){button,select,.luxe-input,.btn-luxe-gold,.btn-luxe-outline{min-height:44px}input[type=checkbox]{width:22px;height:22px}}
+    #sidebar {
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      max-height: 100vh;
+      max-height: 100dvh;
+    }
+    #sidebar * {
+      touch-action: pan-y;
+    }
+    .viewer-scroll-area {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @media (pointer:coarse){
+      button,select,.luxe-input,.btn-luxe-gold,.btn-luxe-outline{min-height:44px}
+      #docViewerModal button, #docViewerModal .btn-luxe-outline, #docViewerModal .btn-luxe-gold { min-height: 34px; }
+      input[type=checkbox]{width:22px;height:22px}
+    }
     @media (max-width:767px){body{padding-bottom:env(safe-area-inset-bottom)}.luxe-input{font-size:16px}#toastContainer{max-width:calc(100vw - 24px)}}
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @media print{#sidebar,#toastContainer,.v9-more{display:none!important}}
@@ -331,11 +353,11 @@
 
   <!-- Main Application Shell -->
   <div id="appShell" class="flex min-h-screen w-full">
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/65 z-40 hidden lg:hidden backdrop-blur-[1px]"></div>
 
     <!-- Right Sidebar -->
-    <aside id="sidebar" class="fixed lg:static inset-y-0 right-0 z-40 w-72 transform translate-x-full lg:translate-x-0 transition-transform duration-200 flex flex-col justify-between p-4 border-l" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
-      <div>
+    <aside id="sidebar" class="fixed lg:static inset-y-0 right-0 z-50 lg:z-40 w-72 max-w-[85vw] h-[100dvh] lg:h-auto overflow-y-auto overscroll-contain transform translate-x-full lg:translate-x-0 transition-transform duration-200 flex flex-col justify-between p-4 pb-24 lg:pb-4 border-l" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
+      <div class="shrink-0">
         <div class="flex items-center justify-between gap-3 pb-4 mb-4 border-b" style="border-color: var(--border-subtle);">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-xl flex items-center justify-center border border-amber-400/40 bg-amber-500/10 shrink-0">
@@ -384,7 +406,7 @@
         </nav>
       </div>
 
-      <div class="pt-4 border-t" style="border-color: var(--border-subtle);">
+      <div class="pt-4 mt-4 border-t shrink-0" style="border-color: var(--border-subtle);">
         <div class="luxe-card p-3 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-sm text-slate-950" style="background: linear-gradient(135deg, #f0d377, #c89f2c);">A</div>
@@ -1232,51 +1254,73 @@
   </div>
 
   <!-- DOC VIEWER MODAL -->
-  <div id="docViewerModal" role="dialog" aria-modal="true" aria-labelledby="viewerDocTitle" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-5 bg-black/85 backdrop-blur-md">
-    <div class="luxe-card-gold w-full max-w-6xl h-[92dvh] flex flex-col overflow-hidden">
-      <div class="px-5 py-3.5 border-b flex flex-wrap items-center justify-between gap-3 shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
-        <div class="flex items-center gap-3 min-w-0">
-          <span class="text-xl">🏛️</span>
-          <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <h3 id="viewerDocTitle" class="font-extrabold text-base truncate">عنوان المستند</h3>
-              <span id="viewerDocCategory" class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-semibold">تصنيف</span>
-              <span id="viewerDocImportantBadge" class="hidden text-[11px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold">⭐ هام</span>
+  <div id="docViewerModal" role="dialog" aria-modal="true" aria-labelledby="viewerDocTitle" class="fixed inset-0 z-50 hidden items-center justify-center p-1.5 sm:p-4 bg-black/85 backdrop-blur-md">
+    <div class="luxe-card-gold w-full max-w-6xl h-[96dvh] sm:h-[92dvh] flex flex-col overflow-hidden">
+      <!-- Top Header -->
+      <div class="px-3 sm:px-5 py-2.5 sm:py-3 border-b flex flex-wrap items-center justify-between gap-2 shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+          <span class="text-lg sm:text-xl shrink-0">🏛️</span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h3 id="viewerDocTitle" class="font-extrabold text-sm sm:text-base truncate max-w-[200px] sm:max-w-md">عنوان المستند</h3>
+              <span id="viewerDocCategory" class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-semibold shrink-0">تصنيف</span>
+              <span id="viewerDocImportantBadge" class="hidden text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold shrink-0">⭐ هام</span>
             </div>
-            <div id="viewerDocMeta" class="text-xs truncate" style="color: var(--text-secondary);">المجلد • التاريخ • الحجم</div>
+            <div id="viewerDocMeta" class="text-[11px] sm:text-xs truncate mt-0.5" style="color: var(--text-secondary);">المجلد • التاريخ • الحجم</div>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button type="button" id="viewerPrevDocBtn" class="btn-luxe-outline !py-1.5 !px-3 text-xs" title="المستند السابق">→ السابق</button>
-          <button type="button" id="viewerNextDocBtn" class="btn-luxe-outline !py-1.5 !px-3 text-xs" title="المستند التالي">التالي ←</button>
-          <button type="button" id="viewerDownloadBtn" class="btn-luxe-outline !py-1.5 !px-3 text-xs">⬇️ تنزيل</button>
-          <button type="button" id="closeViewerModalBtn" class="btn-luxe-outline !py-1.5 !px-3 text-xs !border-rose-500/40 !text-rose-400">✕ إغلاق</button>
+        <div class="flex items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0" style="border-color: var(--border-subtle);">
+          <button type="button" id="viewerPrevDocBtn" class="btn-luxe-outline !py-1 !px-2.5 text-xs flex-1 sm:flex-initial" title="المستند السابق">→ السابق</button>
+          <button type="button" id="viewerNextDocBtn" class="btn-luxe-outline !py-1 !px-2.5 text-xs flex-1 sm:flex-initial" title="المستند التالي">التالي ←</button>
+          <button type="button" id="viewerDownloadBtn" class="btn-luxe-outline !py-1 !px-2.5 text-xs flex-1 sm:flex-initial">⬇️ تنزيل</button>
+          <button type="button" id="closeViewerModalBtn" class="btn-luxe-outline !py-1 !px-2.5 text-xs !border-rose-500/40 !text-rose-400 flex-1 sm:flex-initial">✕ إغلاق</button>
         </div>
       </div>
 
-      <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
-        <div class="lg:col-span-7 flex flex-col border-b lg:border-b-0 lg:border-l min-h-[280px] overflow-hidden" style="border-color: var(--border-subtle);">
-          <div class="px-4 py-2 border-b flex flex-wrap items-center justify-between gap-2 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
-            <div class="flex items-center gap-1.5">
-              <button type="button" id="zoomOutBtn" class="btn-luxe-outline !py-1 !px-2.5" title="تصغير">➖</button>
-              <span id="zoomLevelText" class="font-mono-code px-2 font-bold text-amber-400">100%</span>
-              <button type="button" id="zoomInBtn" class="btn-luxe-outline !py-1 !px-2.5" title="تكبير">➕</button>
-              <button type="button" id="zoomResetBtn" class="btn-luxe-outline !py-1 !px-2" title="إعادة ضبط (0)">1:1</button>
-              <button type="button" id="rotateDocBtn" class="btn-luxe-outline !py-1 !px-2.5" title="تدوير 90 درجة">↻ تدوير</button>
-              <button type="button" id="enhanceScanBtn" class="btn-luxe-outline !py-1 !px-2.5" title="تحسين وضوح المسح الضوئي">✨ تباين</button>
-              <button type="button" id="zonalOcrModeBtn" class="btn-luxe-outline !py-1 !px-2.5 !border-amber-400/50 !text-amber-300" title="تحديد منطقة معينة بالماوس على الصورة لقراءتها بـ OCR">🎯 قراءة منطقة</button>
-              <button type="button" id="viewerStampModalBtn" class="btn-luxe-outline !py-1 !px-2.5 !border-emerald-400/50 !text-emerald-300" title="ختم رسمي أو توقيع إلكتروني">✒️ ختم وتوقيع</button>
-              <button type="button" id="viewerExportSinglePdfBtn" class="btn-luxe-outline !py-1 !px-2.5 !border-sky-400/50 !text-sky-300" title="تصدير هذا المستند كملف PDF">📕 PDF</button>
+      <!-- Mobile View Switcher Tabs (Only on screens < lg) -->
+      <div id="viewerMobileTabs" class="lg:hidden grid grid-cols-3 gap-1 p-1.5 border-b shrink-0 text-xs font-bold" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
+        <button type="button" data-viewer-tab="both" class="viewer-tab-btn py-1.5 px-2 rounded-lg bg-amber-400 text-slate-950 text-center">🔀 عرض متكامل</button>
+        <button type="button" data-viewer-tab="media" class="viewer-tab-btn py-1.5 px-2 rounded-lg text-slate-300 hover:bg-white/5 text-center">🖼️ المستند فقط</button>
+        <button type="button" data-viewer-tab="ocr" class="viewer-tab-btn py-1.5 px-2 rounded-lg text-slate-300 hover:bg-white/5 text-center">📝 النص والبيانات</button>
+      </div>
+
+      <!-- Main Body: Scrollable on mobile in combined mode, 12-col split on desktop -->
+      <div id="viewerBodyGrid" class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-y-auto lg:overflow-hidden viewer-scroll-area">
+        <!-- Media Pane -->
+        <div id="viewerMediaPane" class="lg:col-span-7 flex flex-col border-b lg:border-b-0 lg:border-l min-h-[340px] sm:min-h-[420px] lg:min-h-0 lg:h-full shrink-0 overflow-hidden" style="border-color: var(--border-subtle);">
+          <div class="px-2.5 sm:px-4 py-1.5 border-b flex flex-col gap-1.5 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
+            <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+              <button type="button" id="zoomOutBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تصغير">➖</button>
+              <span id="zoomLevelText" class="font-mono-code px-1.5 font-bold text-amber-400 shrink-0">100%</span>
+              <button type="button" id="zoomInBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تكبير">➕</button>
+              <button type="button" id="zoomResetBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="إعادة ضبط (0)">1:1</button>
+              <button type="button" id="rotateDocBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تدوير 90 درجة">↻ تدوير</button>
+              <button type="button" id="enhanceScanBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تحسين وضوح المسح الضوئي">✨ تباين</button>
+              <button type="button" id="zonalOcrModeBtn" class="btn-luxe-outline !py-1 !px-2 !border-amber-400/50 !text-amber-300 shrink-0" title="تحديد منطقة على المستند لقراءتها بـ OCR">🎯 قراءة منطقة</button>
+              <button type="button" id="viewerStampModalBtn" class="btn-luxe-outline !py-1 !px-2 !border-emerald-400/50 !text-emerald-300 shrink-0" title="ختم رسمي أو توقيع إلكتروني">✒️ ختم وتوقيع</button>
+              <button type="button" id="viewerExportSinglePdfBtn" class="btn-luxe-outline !py-1 !px-2 !border-sky-400/50 !text-sky-300 shrink-0" title="تصدير هذا المستند كملف PDF">📕 PDF</button>
+              <button type="button" id="viewerOpenRawPdfBtn" class="hidden btn-luxe-gold !py-1 !px-2.5 text-xs shrink-0" title="فتح أو مشاركة ملف PDF الأصلي">📄 فتح PDF الأصلي</button>
             </div>
-            <div id="viewerPagesBar" class="hidden flex items-center gap-1.5">
-              <span style="color: var(--text-secondary);">الصفحة:</span>
-              <div id="viewerPageButtons" class="flex items-center gap-1"></div>
+            <div id="viewerPagesBar" class="hidden flex items-center justify-between gap-2 pt-1 border-t" style="border-color: var(--border-subtle);">
+              <span class="text-[11px] shrink-0" style="color: var(--text-secondary);">الصفحة / الوجه:</span>
+              <div id="viewerPageButtons" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
             </div>
           </div>
-          <div id="viewerMediaContainer" class="flex-1 doc-viewer-stage overflow-auto flex items-center justify-center p-4 relative select-none">
+
+          <div id="viewerMediaContainer" class="flex-1 doc-viewer-stage overflow-auto flex items-center justify-center p-2 sm:p-4 relative select-none min-h-[260px] sm:min-h-[340px]">
+            <div id="viewerPdfLoadingBadge" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-slate-950/90 border border-amber-400/40 text-amber-300 text-xs font-bold shadow-lg">⏳ جارٍ تجهيز وعرض صفحة PDF...</div>
             <img id="viewerImageEl" src="" alt="معاينة المستند" draggable="false" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-transform duration-150" />
             <div id="zonalSelectionBox" class="hidden zonal-selection-rect"></div>
             <iframe id="viewerPdfEl" src="" title="عارض PDF" class="hidden w-full h-full rounded-lg border-0 bg-white"></iframe>
+            <div id="viewerPdfFallbackCard" class="hidden text-center p-6 max-w-sm rounded-2xl border mx-auto" style="background-color: var(--bg-card); border-color: var(--border-gold);">
+              <div class="text-5xl mb-3">📕</div>
+              <h4 id="viewerPdfFallbackTitle" class="text-sm font-extrabold text-amber-400 mb-1">مستند PDF مؤرشف</h4>
+              <p class="text-xs mb-4 leading-relaxed" style="color: var(--text-secondary);">يمكنك فتح ملف PDF مباشرة أو استخراج نصه عبر OCR</p>
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <button type="button" id="viewerPdfFallbackOpenBtn" class="btn-luxe-gold text-xs px-4 py-2">📄 فتح / تنزيل ملف PDF</button>
+                <button type="button" id="viewerPdfFallbackOcrBtn" class="btn-luxe-outline text-xs px-3 py-2">✨ استخراج النص OCR</button>
+              </div>
+            </div>
             <div id="viewerNoMediaEl" class="hidden text-center p-8">
               <div class="text-5xl mb-3">📄</div>
               <p class="text-sm font-bold">مستند نصي / سجل مفهرس بدون صورة مرفقة</p>
@@ -1285,11 +1329,12 @@
           </div>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col min-h-[260px] overflow-hidden" style="background-color: var(--bg-card);">
-          <div class="px-4 py-2.5 border-b flex flex-wrap items-center justify-between gap-2 shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
+        <!-- OCR & Smart Entities Pane -->
+        <div id="viewerOcrPane" class="lg:col-span-5 flex flex-col min-h-[340px] lg:min-h-0 lg:h-full shrink-0 lg:overflow-hidden" style="background-color: var(--bg-card);">
+          <div class="px-3 sm:px-4 py-2 border-b flex flex-wrap items-center justify-between gap-2 shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
             <div class="flex items-center gap-2">
-              <span class="text-sm font-extrabold text-amber-400">📝 نص OCR المستخرج</span>
-              <span id="viewerOcrStatusBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold">جاهز</span>
+              <span class="text-xs sm:text-sm font-extrabold text-amber-400">📝 نص OCR المستخرج</span>
+              <span id="viewerOcrStatusBadge" class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold">جاهز</span>
             </div>
             <div class="flex flex-wrap items-center gap-1">
               <button type="button" id="viewerRunOcrBtn" class="btn-luxe-gold !py-1 !px-2.5 text-xs">✨ استخراج OCR</button>
@@ -1300,36 +1345,42 @@
               <button type="button" id="viewerDirToggleBtn" class="btn-luxe-outline !py-1 !px-2 text-xs font-mono-code" title="تبديل اتجاه النص RTL/LTR">RTL</button>
             </div>
           </div>
-          <div id="viewerSmartEntities" class="px-4 py-2.5 border-b space-y-2 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
-            <div class="grid grid-cols-3 gap-2">
-              <div class="p-2 rounded-lg border" style="border-color: var(--border-subtle);">
-                <div class="text-[10px] flex items-center justify-between" style="color: var(--text-secondary);"><span>رقم السند / الحوالة</span><button type="button" id="applyDetectedNumBtn" class="text-[10px] text-amber-400 hover:underline">اعتماد</button></div>
+          <div id="viewerSmartEntities" class="px-3 sm:px-4 py-2 border-b space-y-1.5 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+              <div class="p-1.5 sm:p-2 rounded-lg border" style="border-color: var(--border-subtle);">
+                <div class="text-[10px] flex items-center justify-between gap-1" style="color: var(--text-secondary);"><span class="truncate">رقم السند</span><button type="button" id="applyDetectedNumBtn" class="text-[10px] text-amber-400 hover:underline shrink-0">اعتماد</button></div>
                 <div id="entityVoucherNum" class="font-mono-code font-bold text-amber-400 truncate mt-0.5">—</div>
               </div>
-              <div class="p-2 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px]" style="color: var(--text-secondary);">المبلغ والعملة</div><div id="entityAmount" class="font-mono-code font-bold text-emerald-400 truncate mt-0.5">—</div></div>
-              <div class="p-2 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px]" style="color: var(--text-secondary);">التاريخ</div><div id="entityDate" class="font-mono-code font-bold text-sky-400 truncate mt-0.5">—</div></div>
+              <div class="p-1.5 sm:p-2 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px] truncate" style="color: var(--text-secondary);">المبلغ والعملة</div><div id="entityAmount" class="font-mono-code font-bold text-emerald-400 truncate mt-0.5">—</div></div>
+              <div class="p-1.5 sm:p-2 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px] truncate" style="color: var(--text-secondary);">التاريخ</div><div id="entityDate" class="font-mono-code font-bold text-sky-400 truncate mt-0.5">—</div></div>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px]" style="color: var(--text-secondary);">المرسل / الدافع</div><div id="entitySender" class="font-semibold truncate mt-0.5">—</div></div>
-              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px]" style="color: var(--text-secondary);">المستلم / المستفيد</div><div id="entityReceiver" class="font-semibold truncate mt-0.5">—</div></div>
-              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px]" style="color: var(--text-secondary);">مطابقة التفقيط والثقة</div><div id="entityAuditBadge" class="font-bold text-emerald-400 truncate mt-0.5">—</div></div>
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px] truncate" style="color: var(--text-secondary);">المرسل / الدافع</div><div id="entitySender" class="font-semibold truncate mt-0.5">—</div></div>
+              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px] truncate" style="color: var(--text-secondary);">المستلم / المستفيد</div><div id="entityReceiver" class="font-semibold truncate mt-0.5">—</div></div>
+              <div class="p-1.5 rounded-lg border" style="border-color: var(--border-subtle);"><div class="text-[10px] truncate" style="color: var(--text-secondary);">مطابقة التفقيط</div><div id="entityAuditBadge" class="font-bold text-emerald-400 truncate mt-0.5">—</div></div>
             </div>
           </div>
-          <div class="flex-1 flex flex-col p-4 overflow-hidden space-y-2.5">
-            <div class="flex items-center justify-between text-xs">
+          <div class="flex-1 flex flex-col p-3 sm:p-4 lg:overflow-hidden space-y-2 min-h-[220px]">
+            <div class="flex items-center justify-between text-xs shrink-0">
               <span id="ocrCharStats" style="color: var(--text-secondary);">0 كلمة • 0 حرف</span>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <button type="button" id="ocrFontDecBtn" class="btn-luxe-outline !py-0.5 !px-2 text-xs">A-</button>
                 <button type="button" id="ocrFontIncBtn" class="btn-luxe-outline !py-0.5 !px-2 text-xs">A+</button>
               </div>
             </div>
-            <textarea id="viewerOcrTextarea" dir="rtl" class="luxe-input flex-1 w-full resize-none leading-relaxed text-sm p-3.5" placeholder="لا يوجد نص مستخرج لهذا المستند بعد. اضغط على «✨ استخراج OCR» لقراءة النص من الصورة تلقائياً، أو اكتب النص هنا..."></textarea>
+            <textarea id="viewerOcrTextarea" dir="rtl" class="luxe-input flex-1 w-full min-h-[150px] resize-y lg:resize-none leading-relaxed text-sm p-3" placeholder="لا يوجد نص مستخرج لهذا المستند بعد. اضغط على «✨ استخراج OCR» لقراءة النص من الصورة أو ملف PDF تلقائياً، أو اكتب النص هنا..."></textarea>
             <div class="flex items-center justify-between gap-2 pt-1 shrink-0">
-              <button type="button" id="viewerToggleImportantBtn" class="btn-luxe-outline text-xs">⭐ تمييز كهام</button>
-              <button type="button" id="viewerSaveOcrBtn" class="btn-luxe-gold text-xs px-5">💾 حفظ تعديلات OCR</button>
+              <button type="button" id="viewerToggleImportantBtn" class="btn-luxe-outline text-xs !py-1.5">⭐ تمييز كهام</button>
+              <button type="button" id="viewerSaveOcrBtn" class="btn-luxe-gold text-xs px-4 !py-1.5">💾 حفظ تعديلات OCR</button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Non-overlapping Viewer Footer Bar -->
+      <div id="viewerBottomFooter" class="px-3 sm:px-5 py-1.5 border-t flex items-center justify-between gap-2 text-[11px] shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
+        <span class="hidden md:inline text-slate-400">⌨ الأسهم: تنقّل • + − تكبير • 0 ضبط • R تدوير • نقرتان: تكبير • Esc إغلاق</span>
+        <span class="md:hidden text-slate-400">💡 اسحب بإصبعين للتكبير أو بدّل التبويب أعلاه</span>
       </div>
     </div>
   </div>
@@ -2970,21 +3021,25 @@
           for (const [folderPath, entries] of byFolder.entries()) {
             const mediaEntries = entries.filter(e => supportedMediaExt.test(e.file.name)), ocrTxtEntry = entries.find(e => /^ocr\.txt$/i.test(e.file.name)); let folderOcrText = '';
             if (ocrTxtEntry) { try { folderOcrText = await ocrTxtEntry.file.text(); } catch (_) {} }
-            const hasPageNaming = mediaEntries.some(e => /^page-\d+\./i.test(e.file.name));
+            const hasPageNaming = mediaEntries.some(e => /^(?:page-|p)\d+\./i.test(e.file.name));
             if (groupingMode === 'smart-folder' && mediaEntries.length > 0 && (hasPageNaming || (ocrTxtEntry && mediaEntries.length <= 4))) {
               mediaEntries.sort((a, b) => a.file.name.localeCompare(b.file.name, undefined, { numeric: true }));
               const pages = []; let totalSize = 0;
-              for (const m of mediaEntries) { totalSize += m.file.size; const dataUrl = await readOptimizedMediaDataUrl(m.file, compressImages); pages.push({ name: m.file.name, type: m.file.type || 'image/jpeg', dataUrl }); updateProg(`قراءة: ${m.file.name}`); }
-              const folderLeaf = folderPath.split('/').pop() || 'سند مؤرشف', entities = extractSmartEntities(folderOcrText + ' ' + folderLeaf);
-              newDocs.push({ id: 'fld-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), title: folderLeaf.replace(/[_-]+/g, ' '), docNumber: entities.voucherNumber !== '—' ? entities.voucherNumber : folderLeaf, folder: folderPath, category: customCategory || guessCategory(folderPath + ' ' + folderOcrText), date: new Date(mediaEntries[0].file.lastModified || Date.now()).toISOString().slice(0, 10), priority: folderOcrText.includes('هام') ? 'important' : 'normal', source: 'folder', ocrText: repairArabicOcrText(folderOcrText), pages, size: totalSize, dirHandle: entries[0].dirHandle || null });
+              for (const m of mediaEntries) { totalSize += m.file.size; const dataUrl = await readOptimizedMediaDataUrl(m.file, compressImages); const mimeType = m.file.type || (/\.pdf$/i.test(m.file.name) ? 'application/pdf' : 'image/jpeg'); pages.push({ name: m.file.name, type: mimeType, dataUrl }); updateProg(`قراءة: ${m.file.name}`); }
+              const rawLeaf = folderPath.split('/').pop() || 'سند مؤرشف';
+              const folderLeaf = rawLeaf.replace(/_[a-z0-9]{5,7}$/i, '').replace(/[_-]+/g, ' ').trim() || rawLeaf;
+              const entities = extractSmartEntities(folderOcrText + ' ' + folderLeaf);
+              newDocs.push({ id: 'fld-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), title: folderLeaf, docNumber: entities.voucherNumber !== '—' ? entities.voucherNumber : folderLeaf, folder: folderPath, category: customCategory || guessCategory(folderPath + ' ' + folderOcrText), date: new Date(mediaEntries[0].file.lastModified || Date.now()).toISOString().slice(0, 10), priority: folderOcrText.includes('هام') ? 'important' : 'normal', source: 'folder', ocrText: repairArabicOcrText(folderOcrText), pages, size: totalSize, dirHandle: entries[0].dirHandle || null });
             } else {
               for (const item of entries) {
                 if (!supportedMediaExt.test(item.file.name) && !/\.txt$/i.test(item.file.name)) continue;
                 if (/^ocr\.txt$/i.test(item.file.name)) continue;
                 const isTxt = /\.txt$/i.test(item.file.name); let textContent = '', pages = [];
                 if (isTxt) { textContent = await item.file.text(); updateProg(`قراءة نص: ${item.file.name}`); }
-                else { const dataUrl = await readOptimizedMediaDataUrl(item.file, compressImages); pages.push({ name: item.file.name, type: item.file.type || 'image/jpeg', dataUrl }); const base = item.file.name.replace(/\.[^.]+$/, ''); const siblingTxt = entries.find(e => e.file.name.toLowerCase() === (base + '.txt').toLowerCase()); if (siblingTxt) { try { textContent = await siblingTxt.file.text(); } catch (_) {} } updateProg(`استيراد: ${item.file.name}`); }
-                const cleanTitle = item.file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '), entities = extractSmartEntities(textContent + ' ' + cleanTitle);
+                else { const dataUrl = await readOptimizedMediaDataUrl(item.file, compressImages); const mimeType = item.file.type || (/\.pdf$/i.test(item.file.name) ? 'application/pdf' : 'image/jpeg'); pages.push({ name: item.file.name, type: mimeType, dataUrl }); const base = item.file.name.replace(/\.[^.]+$/, ''); const siblingTxt = entries.find(e => e.file.name.toLowerCase() === (base + '.txt').toLowerCase()); if (siblingTxt) { try { textContent = await siblingTxt.file.text(); } catch (_) {} } updateProg(`استيراد: ${item.file.name}`); }
+                let rawBase = item.file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+                if (/^(?:page\s*\d+|p\d+)$/i.test(rawBase) && folderPath) { const parentLeaf = folderPath.split('/').pop().replace(/_[a-z0-9]{5,7}$/i, '').replace(/[_-]+/g, ' ').trim(); if (parentLeaf) rawBase = parentLeaf; }
+                const cleanTitle = rawBase || 'مستند مؤرشف', entities = extractSmartEntities(textContent + ' ' + cleanTitle);
                 newDocs.push({ id: 'doc-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7), title: cleanTitle, docNumber: entities.voucherNumber !== '—' ? entities.voucherNumber : '', folder: folderPath, category: customCategory || guessCategory(folderPath + ' ' + cleanTitle + ' ' + textContent), date: new Date(item.file.lastModified || Date.now()).toISOString().slice(0, 10), priority: 'normal', source: 'folder', ocrText: repairArabicOcrText(textContent), pages, size: item.file.size, dirHandle: item.dirHandle || null });
               }
             }
@@ -3017,31 +3072,121 @@
         else { badge.textContent = `${documents.length} مستند`; badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-400/30'; refreshBtn.classList.add('hidden'); }
       }
 
-      // ==================== OCR ====================
+      // ==================== OCR & PDF RENDER ENGINE ====================
+      const pdfRenderCache = new Map();
+      function isPdfPageObj(p) {
+        if (!p) return false;
+        return p.type === 'application/pdf' || (p.dataUrl && /^data:application\/pdf/i.test(p.dataUrl)) || /\.pdf$/i.test(p.name || p.file || '');
+      }
+      function dataUrlToUint8Array(dataUrl) {
+        const m = /^data:[^,]*;base64,(.*)$/s.exec(dataUrl || '');
+        if (!m) return null;
+        const bin = atob(m[1]), u8 = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+        return u8;
+      }
+      async function renderPdfPageDataUrlToImages(dataUrl, cacheKey = '', maxPages = 12) {
+        if (cacheKey && pdfRenderCache.has(cacheKey)) return pdfRenderCache.get(cacheKey);
+        if (typeof window.pdfjsLib === 'undefined') return null;
+        try {
+          if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          }
+          const u8 = dataUrlToUint8Array(dataUrl);
+          if (!u8) return null;
+          const pdfDoc = await window.pdfjsLib.getDocument({ data: u8 }).promise;
+          const count = Math.min(pdfDoc.numPages || 1, maxPages);
+          const pagesOut = [];
+          for (let pNum = 1; pNum <= count; pNum++) {
+            const pdfPage = await pdfDoc.getPage(pNum);
+            const vp1 = pdfPage.getViewport({ scale: 1 });
+            const targetScale = Math.min(2.2, Math.max(1.4, 1600 / Math.max(vp1.width, vp1.height, 1)));
+            const viewport = pdfPage.getViewport({ scale: targetScale });
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(viewport.width));
+            canvas.height = Math.max(1, Math.round(viewport.height));
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+            let embeddedText = '';
+            try {
+              const tc = await pdfPage.getTextContent();
+              embeddedText = (tc.items || []).map(it => it.str || '').join(' ').trim();
+            } catch (_) {}
+            pagesOut.push({ pageNumber: pNum, totalPages: pdfDoc.numPages, dataUrl: canvas.toDataURL('image/jpeg', 0.91), embeddedText });
+          }
+          const res = { numPages: pdfDoc.numPages, pages: pagesOut };
+          if (cacheKey) {
+            if (pdfRenderCache.size > 25) pdfRenderCache.clear();
+            pdfRenderCache.set(cacheKey, res);
+          }
+          return res;
+        } catch (err) {
+          return null;
+        }
+      }
+
       async function runOcrOnDocument(docId, showProgress = true) {
         await V9.need(documents.find(d => d.id === docId)); return runOcrOnDocumentRaw(docId, showProgress);
       }
       async function runOcrOnDocumentRaw(docId, showProgress = true) {
         const doc = documents.find(d => d.id === docId); if (!doc) return false;
-        const imagePages = (doc.pages || []).filter(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
-        if (!imagePages.length) { if (showProgress) showToast('هذا المستند لا يحتوي على صور قابلة للمسح الضوئي (OCR)', 'warning'); return false; }
-        if (typeof Tesseract === 'undefined') { showToast('محرك OCR قيد التحميل، حاول بعد لحظات', 'warning'); return false; }
+        const ocrTargets = [];
+        const embeddedPdfTexts = [];
+        for (let idx = 0; idx < (doc.pages || []).length; idx++) {
+          const p = doc.pages[idx];
+          if (p.dataUrl && p.dataUrl.startsWith('data:image')) {
+            ocrTargets.push(p.dataUrl);
+          } else if (isPdfPageObj(p) && p.dataUrl) {
+            if (showProgress) showToast('📄 جارٍ تحويل صفحات PDF لاستخراج النص منها...', 'info');
+            const rendered = await renderPdfPageDataUrlToImages(p.dataUrl, `${doc.id}_${idx}`, 10);
+            if (rendered && rendered.pages && rendered.pages.length) {
+              rendered.pages.forEach(rp => {
+                if (rp.dataUrl) ocrTargets.push(rp.dataUrl);
+                if (rp.embeddedText && rp.embeddedText.length > 10) embeddedPdfTexts.push(rp.embeddedText);
+              });
+            }
+          }
+        }
+        if (!ocrTargets.length && !embeddedPdfTexts.length) {
+          if (showProgress) showToast('هذا المستند لا يحتوي على صور أو صفحات PDF قابلة للمسح الضوئي (OCR)', 'warning');
+          return false;
+        }
+        if (typeof Tesseract === 'undefined' && !embeddedPdfTexts.length) {
+          showToast('محرك OCR قيد التحميل، حاول بعد لحظات', 'warning');
+          return false;
+        }
         const lang = document.getElementById('ocrLangSelect')?.value || 'ara+eng';
         const progressCard = document.getElementById('ocrProgressCard'), progressLabel = document.getElementById('ocrProgressLabel'), progressPct = document.getElementById('ocrProgressPct'), progressBar = document.getElementById('ocrProgressBar');
         if (showProgress && progressCard) { progressCard.classList.remove('hidden'); progressLabel.textContent = `جارٍ استخراج النص من: ${doc.title}...`; progressPct.textContent = '5%'; progressBar.style.width = '5%'; }
         try {
-          const worker = await V9.worker(lang, { logger: m => { if (showProgress && m.status === 'recognizing text' && progressBar) { const pct = Math.max(10, Math.round((m.progress || 0) * 100)); progressPct.textContent = pct + '%'; progressBar.style.width = pct + '%'; } } });
           const extractedParts = [];
-          for (let i = 0; i < imagePages.length; i++) { const ret = await worker.recognize(imagePages[i].dataUrl); const pageText = (ret && ret.data && ret.data.text) ? ret.data.text.trim() : ''; if (imagePages.length > 1) extractedParts.push(`=== الصفحة ${i + 1} ===\n${pageText}`); else extractedParts.push(pageText); }
+          if (ocrTargets.length && typeof Tesseract !== 'undefined') {
+            const worker = await V9.worker(lang, { logger: m => { if (showProgress && m.status === 'recognizing text' && progressBar) { const pct = Math.max(10, Math.round((m.progress || 0) * 100)); progressPct.textContent = pct + '%'; progressBar.style.width = pct + '%'; } } });
+            for (let i = 0; i < ocrTargets.length; i++) {
+              const ret = await worker.recognize(ocrTargets[i]);
+              const pageText = (ret && ret.data && ret.data.text) ? ret.data.text.trim() : '';
+              const fallbackText = (!pageText && embeddedPdfTexts[i]) ? embeddedPdfTexts[i] : pageText;
+              if (ocrTargets.length > 1) extractedParts.push(`=== الصفحة ${i + 1} ===\n${fallbackText}`);
+              else extractedParts.push(fallbackText);
+            }
+          } else if (embeddedPdfTexts.length) {
+            extractedParts.push(...embeddedPdfTexts);
+          }
           /* v9: العامل مشترك ويُغلق تلقائياً عند الخمول */
-          doc.ocrText = extractedParts.join('\n\n').trim();
+          doc.ocrText = repairArabicOcrText(extractedParts.join('\n\n').trim());
           const entities = extractSmartEntities(doc.ocrText);
           if (!doc.docNumber && entities.voucherNumber !== '—') doc.docNumber = entities.voucherNumber;
           safeSetStorage(STORAGE_DOCS_KEY, documents);
           if (doc.dirHandle && typeof doc.dirHandle.getFileHandle === 'function') { try { const ocrHandle = await doc.dirHandle.getFileHandle('OCR.txt', { create: true }); const writable = await ocrHandle.createWritable(); await writable.write(doc.ocrText); await writable.close(); } catch (_) {} }
           if (showProgress && progressCard) { progressPct.textContent = '100%'; progressBar.style.width = '100%'; setTimeout(() => progressCard.classList.add('hidden'), 900); }
           refreshAllUI();
-          if (currentViewerDocId === doc.id) openDocumentViewer(doc.id);
+          if (currentViewerDocId === doc.id) {
+            document.getElementById('viewerOcrTextarea').value = doc.ocrText || '';
+            updateViewerOcrMetadata(doc.ocrText || '');
+          }
+          if (showProgress) showToast('✔ تم استخراج النص وتحديث بيانات السند بنجاح', 'success');
           return true;
         } catch (err) { if (showProgress && progressCard) progressCard.classList.add('hidden'); showToast('تعذر إتمام OCR على هذا الملف', 'error'); return false; }
       }
@@ -3085,14 +3230,14 @@
         if (displayMode === 'table') { tableWrap.classList.remove('hidden'); grid.classList.add('hidden'); }
         else { tableWrap.classList.add('hidden'); grid.classList.remove('hidden'); }
 
-        tbody.innerHTML = list.map(doc => {
+        tbody.innerHTML = list.map(doc => { getReadableDocTitle(doc);
           const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image')), isPdf = (doc.pages || []).some(p => p.type === 'application/pdf'), hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
           const snippet = hasOcr ? escapeHtml(doc.ocrText.replace(/\s+/g, ' ').slice(0, 72)) + '...' : '<span class="opacity-50">بانتظار OCR</span>';
           const checked = selectedDocIds.has(doc.id) ? 'checked' : '', catObj = categories.find(c => c.name === doc.category), badgeColor = catObj ? catObj.color : '#d4af37';
           return `<tr class="hover:bg-amber-500/5 transition-colors cursor-pointer" data-doc-row="${doc.id}"><td class="p-3.5" onclick="event.stopPropagation()"><input type="checkbox" class="doc-select-cb rounded accent-amber-400" data-id="${doc.id}" ${checked} /></td><td class="p-3.5"><div class="w-12 h-12 rounded-lg overflow-hidden border flex items-center justify-center bg-slate-900" style="border-color: var(--border-subtle);">${thumbPage ? `<img src="${thumbPage.dataUrl}" alt="" class="w-full h-full object-cover" />` : `<span class="text-xl">${isPdf ? '📕' : '📄'}</span>`}</div></td><td class="p-3.5"><div class="font-bold flex items-center gap-1.5"><span>${escapeHtml(doc.title)}</span>${doc.priority === 'important' ? '<span title="هام">⭐</span>' : ''}${doc.source === 'camera' ? '<span title="مُلتقط بكاميرا الجوال" class="text-xs">📱</span>' : ''}${(doc.pages && doc.pages.length > 1) ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-400 font-mono-code">${doc.pages.length} وجه</span>` : ''}</div><div class="text-xs font-mono-code mt-0.5" style="color: var(--text-secondary);">${doc.docNumber ? `#${escapeHtml(doc.docNumber)} • ` : ''}${formatBytes(doc.size)}</div></td><td class="p-3.5 text-xs"><span class="px-2 py-1 rounded-md bg-white/5 font-mono-code text-[11px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span></td><td class="p-3.5"><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}44;">${catObj ? catObj.icon + ' ' : ''}${escapeHtml(doc.category)}</span></td><td class="p-3.5 max-w-xs"><div class="text-xs leading-relaxed" style="color: var(--text-secondary);">${snippet}</div></td><td class="p-3.5 text-xs font-mono-code" style="color: var(--text-secondary);">${escapeHtml(doc.date || '—')}</td><td class="p-3.5 text-center" onclick="event.stopPropagation()"><div class="inline-flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}" title="عرض المستند ونص OCR">👁️ عرض</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}" title="حذف">🗑️</button></div></td></tr>`;
         }).join('');
 
-        grid.innerHTML = list.map(doc => {
+        grid.innerHTML = list.map(doc => { getReadableDocTitle(doc);
           const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image')), isPdf = (doc.pages || []).some(p => p.type === 'application/pdf'), hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
           return `<div class="luxe-card overflow-hidden flex flex-col justify-between group cursor-pointer hover:border-amber-400/50" data-doc-card="${doc.id}"><div><div class="h-44 bg-slate-950 relative overflow-hidden flex items-center justify-center border-b" style="border-color: var(--border-subtle);">${thumbPage ? `<img src="${thumbPage.dataUrl}" alt="${escapeHtml(doc.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />` : `<span class="text-5xl">${isPdf ? '📕' : '📄'}</span>`}<div class="absolute top-2.5 right-2.5 flex items-center gap-1">${hasOcr ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/90 text-slate-950 font-bold">OCR ✔</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900/90 text-amber-400 border border-amber-400/30">بدون OCR</span>'}${doc.source === 'camera' ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-bold">📱 كاميرا</span>' : ''}</div></div><div class="p-4"><div class="flex items-center justify-between text-[11px] mb-1" style="color: var(--text-secondary);"><span>${escapeHtml(doc.category)}</span><span class="font-mono-code">${escapeHtml(doc.date || '')}</span></div><h4 class="font-bold text-sm truncate mb-1.5">${escapeHtml(doc.title)}</h4><p class="text-xs line-clamp-2 leading-relaxed" style="color: var(--text-secondary);">${hasOcr ? escapeHtml(doc.ocrText.slice(0, 110)) : 'اضغط لفتح العارض واستخراج النص عبر OCR'}</p></div></div><div class="px-4 py-2.5 border-t flex items-center justify-between" style="border-color: var(--border-subtle); background-color: rgba(0,0,0,0.12);" onclick="event.stopPropagation()"><span class="text-[11px] font-mono-code truncate max-w-[120px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span><div class="flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}">عرض OCR</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}">🗑️</button></div></div></div>`;
         }).join('');
@@ -3200,37 +3345,188 @@
       }
 
       // ==================== DOC VIEWER ====================
+      let currentPdfSubPageIdx = 0;
+      let activeViewerMobileTab = 'both';
+
+      function getReadableDocTitle(doc) {
+        if (!doc) return 'مستند مؤرشف';
+        const raw = String(doc.title || '').trim();
+        if (raw && !/^(?:p\d+|page[-_\s]*\d+)$/i.test(raw)) return raw;
+        if (doc.folder) {
+          const parts = String(doc.folder).split('/').filter(Boolean);
+          const leaf = parts[parts.length - 1] || '';
+          const cleaned = leaf.replace(/_[a-z0-9]{5,7}$/i, '').replace(/[_-]+/g, ' ').trim();
+          if (cleaned && !/^(?:p\d+|files|الوثائق|الوثايق)$/i.test(cleaned)) {
+            doc.title = cleaned;
+            return cleaned;
+          }
+        }
+        if (doc.docNumber && !/^(?:p\d+|—)$/i.test(doc.docNumber)) return `سند رقم ${doc.docNumber}`;
+        return raw || 'مستند مؤرشف';
+      }
+
+      function setViewerMobileTab(mode) {
+        activeViewerMobileTab = mode || 'both';
+        const bodyGrid = document.getElementById('viewerBodyGrid');
+        const mediaPane = document.getElementById('viewerMediaPane');
+        const ocrPane = document.getElementById('viewerOcrPane');
+        document.querySelectorAll('.viewer-tab-btn').forEach(btn => {
+          const isAct = btn.getAttribute('data-viewer-tab') === activeViewerMobileTab;
+          btn.className = `viewer-tab-btn py-1.5 px-2 rounded-lg text-center transition-colors ${isAct ? 'bg-amber-400 text-slate-950 font-extrabold' : 'text-slate-300 hover:bg-white/5 font-bold'}`;
+        });
+        if (!mediaPane || !ocrPane || !bodyGrid) return;
+        if (activeViewerMobileTab === 'media') {
+          mediaPane.classList.remove('hidden');
+          mediaPane.classList.add('flex', 'h-full');
+          ocrPane.classList.add('hidden', 'lg:flex');
+          ocrPane.classList.remove('flex');
+          bodyGrid.classList.remove('overflow-y-auto');
+          bodyGrid.classList.add('overflow-hidden');
+        } else if (activeViewerMobileTab === 'ocr') {
+          ocrPane.classList.remove('hidden', 'lg:flex');
+          ocrPane.classList.add('flex', 'h-full');
+          mediaPane.classList.add('hidden', 'lg:flex');
+          mediaPane.classList.remove('flex');
+          bodyGrid.classList.add('overflow-y-auto', 'lg:overflow-hidden');
+          bodyGrid.classList.remove('overflow-hidden');
+        } else {
+          mediaPane.classList.remove('hidden', 'lg:flex', 'h-full');
+          mediaPane.classList.add('flex');
+          ocrPane.classList.remove('hidden', 'lg:flex', 'h-full');
+          ocrPane.classList.add('flex');
+          bodyGrid.classList.add('overflow-y-auto', 'lg:overflow-hidden');
+          bodyGrid.classList.remove('overflow-hidden');
+        }
+      }
+
+      function openRawPdfInNewTabOrDownload(page, doc) {
+        if (!page || !page.dataUrl) return;
+        const blobUrl = v10PdfUrl(page.dataUrl);
+        const safeName = ((doc && getReadableDocTitle(doc)) || 'document').replace(/[\\/:*?"<>|]+/g, '_') + '.pdf';
+        const win = window.open(blobUrl, '_blank', 'noopener');
+        if (!win) {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = safeName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+      }
+
       function openDocumentViewer(docId) {
         const d = documents.find(x => x.id === docId);
         if (d && Store.ready && (d.pages || []).some(p => p.file && !p.dataUrl)) V9.need(d).then(() => openDocumentViewerRaw(docId)); else openDocumentViewerRaw(docId);
       }
       function openDocumentViewerRaw(docId) {
         const doc = documents.find(d => d.id === docId); if (!doc) return;
-        currentViewerDocId = docId; currentViewerPageIdx = 0; viewerZoom = 1; viewerPanX = viewerPanY = 0; viewerRotation = 0; viewerScanBoost = false;
-        document.getElementById('viewerDocTitle').textContent = doc.title;
+        currentViewerDocId = docId; currentViewerPageIdx = 0; currentPdfSubPageIdx = 0;
+        viewerZoom = 1; viewerPanX = viewerPanY = 0; viewerRotation = 0; viewerScanBoost = false;
+        const cleanTitle = getReadableDocTitle(doc);
+        document.getElementById('viewerDocTitle').textContent = cleanTitle;
         document.getElementById('viewerDocCategory').textContent = doc.category;
-        document.getElementById('viewerDocMeta').textContent = `📂 ${doc.folder || 'رئيسي'}  •  📅 ${doc.date || '—'}  •  💾 ${formatBytes(doc.size)}`;
+        const shortFolder = (doc.folder || 'رئيسي').split('/').map(s => s.replace(/_[a-z0-9]{5,7}$/i, '')).join('/');
+        document.getElementById('viewerDocMeta').textContent = `📂 ${shortFolder}  •  📅 ${doc.date || '—'}  •  💾 ${formatBytes(doc.size)}`;
         const impBadge = document.getElementById('viewerDocImportantBadge');
         if (doc.priority === 'important') impBadge.classList.remove('hidden'); else impBadge.classList.add('hidden');
-        const pages = doc.pages || [], pagesBar = document.getElementById('viewerPagesBar'), pageBtns = document.getElementById('viewerPageButtons');
-        if (pages.length > 1) {
-          pagesBar.classList.remove('hidden');
-          pageBtns.innerHTML = pages.map((p, idx) => `<button type="button" class="px-2.5 py-0.5 rounded text-xs font-bold viewer-page-switch ${idx === 0 ? 'bg-amber-400 text-slate-950' : 'bg-white/10 text-slate-200'}" data-idx="${idx}">${idx === 0 ? '1 (أمامي)' : idx === 1 ? '2 (خلفي)' : idx + 1}</button>`).join('');
-          pageBtns.querySelectorAll('.viewer-page-switch').forEach(b => b.addEventListener('click', () => { currentViewerPageIdx = Number(b.getAttribute('data-idx')); renderViewerMedia(); }));
-        } else pagesBar.classList.add('hidden');
+        setViewerMobileTab(activeViewerMobileTab || 'both');
         document.getElementById('viewerOcrTextarea').value = doc.ocrText || '';
         updateViewerOcrMetadata(doc.ocrText || '');
         renderViewerMedia();
         const modal = document.getElementById('docViewerModal'); modal.classList.remove('hidden'); modal.classList.add('flex');
       }
-      function renderViewerMedia() {
+
+      function buildViewerPageSwitchButtons(doc, pdfRenderedInfo = null) {
+        const pages = (doc && doc.pages) || [];
+        const pagesBar = document.getElementById('viewerPagesBar');
+        const pageBtns = document.getElementById('viewerPageButtons');
+        if (!pagesBar || !pageBtns) return;
+        const hasMultipleDocPages = pages.length > 1;
+        const hasMultiplePdfPages = pdfRenderedInfo && pdfRenderedInfo.pages && pdfRenderedInfo.pages.length > 1;
+        if (!hasMultipleDocPages && !hasMultiplePdfPages) {
+          pagesBar.classList.add('hidden');
+          pageBtns.innerHTML = '';
+          return;
+        }
+        pagesBar.classList.remove('hidden');
+        let htmlBtns = '';
+        if (hasMultipleDocPages) {
+          htmlBtns += pages.map((p, idx) => `<button type="button" class="px-2.5 py-0.5 rounded text-xs font-bold shrink-0 viewer-page-switch ${idx === currentViewerPageIdx ? 'bg-amber-400 text-slate-950' : 'bg-white/10 text-slate-200'}" data-idx="${idx}">${idx === 0 ? '1 (أمامي)' : idx === 1 ? '2 (خلفي)' : idx + 1}</button>`).join('');
+        }
+        if (hasMultiplePdfPages) {
+          if (hasMultipleDocPages) htmlBtns += `<span class="mx-1 opacity-40">|</span>`;
+          htmlBtns += pdfRenderedInfo.pages.map((rp, sIdx) => `<button type="button" class="px-2.5 py-0.5 rounded text-xs font-bold shrink-0 viewer-pdf-subpage-switch ${sIdx === currentPdfSubPageIdx ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-slate-200'}" data-subidx="${sIdx}">صفحة PDF ${sIdx + 1}/${pdfRenderedInfo.pages.length}</button>`).join('');
+        }
+        pageBtns.innerHTML = htmlBtns;
+        pageBtns.querySelectorAll('.viewer-page-switch').forEach(b => b.addEventListener('click', () => {
+          currentViewerPageIdx = Number(b.getAttribute('data-idx'));
+          currentPdfSubPageIdx = 0;
+          viewerZoom = 1; viewerPanX = viewerPanY = 0; viewerRotation = 0;
+          renderViewerMedia();
+        }));
+        pageBtns.querySelectorAll('.viewer-pdf-subpage-switch').forEach(b => b.addEventListener('click', () => {
+          currentPdfSubPageIdx = Number(b.getAttribute('data-subidx'));
+          viewerZoom = 1; viewerPanX = viewerPanY = 0;
+          renderViewerMedia();
+        }));
+      }
+
+      async function renderViewerMedia() {
         const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return;
         const pages = doc.pages || [], page = pages[currentViewerPageIdx];
         const imgEl = document.getElementById('viewerImageEl'), pdfEl = document.getElementById('viewerPdfEl'), noMediaEl = document.getElementById('viewerNoMediaEl');
-        document.querySelectorAll('.viewer-page-switch').forEach(btn => { const idx = Number(btn.getAttribute('data-idx')); btn.className = `px-2.5 py-0.5 rounded text-xs font-bold viewer-page-switch ${idx === currentViewerPageIdx ? 'bg-amber-400 text-slate-950' : 'bg-white/10 text-slate-200'}`; });
-        if (page && page.dataUrl && page.dataUrl.startsWith('data:image')) { imgEl.src = page.dataUrl; imgEl.classList.remove('hidden'); pdfEl.classList.add('hidden'); noMediaEl.classList.add('hidden'); applyImageTransform(); }
-        else if (page && page.dataUrl && page.type === 'application/pdf') { pdfEl.src = v10PdfUrl(page.dataUrl); pdfEl.classList.remove('hidden'); imgEl.classList.add('hidden'); noMediaEl.classList.add('hidden'); }
-        else { imgEl.classList.add('hidden'); pdfEl.classList.add('hidden'); noMediaEl.classList.remove('hidden'); }
+        const pdfFallbackCard = document.getElementById('viewerPdfFallbackCard'), pdfLoadingBadge = document.getElementById('viewerPdfLoadingBadge'), openRawPdfBtn = document.getElementById('viewerOpenRawPdfBtn');
+        if (pdfFallbackCard) pdfFallbackCard.classList.add('hidden');
+        if (pdfLoadingBadge) pdfLoadingBadge.classList.add('hidden');
+        if (openRawPdfBtn) openRawPdfBtn.classList.add('hidden');
+        pdfEl.classList.add('hidden');
+
+        if (page && page.dataUrl && page.dataUrl.startsWith('data:image')) {
+          buildViewerPageSwitchButtons(doc, null);
+          imgEl.src = page.dataUrl;
+          imgEl.classList.remove('hidden');
+          noMediaEl.classList.add('hidden');
+          applyImageTransform();
+        } else if (page && page.dataUrl && isPdfPageObj(page)) {
+          if (openRawPdfBtn) {
+            openRawPdfBtn.classList.remove('hidden');
+            openRawPdfBtn.onclick = () => openRawPdfInNewTabOrDownload(page, doc);
+          }
+          if (pdfLoadingBadge) pdfLoadingBadge.classList.remove('hidden');
+          noMediaEl.classList.add('hidden');
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          if (pdfLoadingBadge) pdfLoadingBadge.classList.add('hidden');
+          if (currentViewerDocId !== doc.id) return;
+          if (rendered && rendered.pages && rendered.pages.length > 0) {
+            const subPage = rendered.pages[Math.min(currentPdfSubPageIdx, rendered.pages.length - 1)] || rendered.pages[0];
+            buildViewerPageSwitchButtons(doc, rendered);
+            imgEl.src = subPage.dataUrl;
+            imgEl.classList.remove('hidden');
+            applyImageTransform();
+            if ((!doc.ocrText || !doc.ocrText.trim()) && subPage.embeddedText && subPage.embeddedText.length > 8) {
+              const allEmbedded = rendered.pages.map(p => p.embeddedText).filter(Boolean).join('\n\n').trim();
+              if (allEmbedded) {
+                doc.ocrText = repairArabicOcrText(allEmbedded);
+                document.getElementById('viewerOcrTextarea').value = doc.ocrText;
+                updateViewerOcrMetadata(doc.ocrText);
+                safeSetStorage(STORAGE_DOCS_KEY, documents);
+              }
+            }
+          } else {
+            buildViewerPageSwitchButtons(doc, null);
+            imgEl.classList.add('hidden');
+            if (pdfFallbackCard) {
+              document.getElementById('viewerPdfFallbackTitle').textContent = getReadableDocTitle(doc) + ' (PDF)';
+              document.getElementById('viewerPdfFallbackOpenBtn').onclick = () => openRawPdfInNewTabOrDownload(page, doc);
+              document.getElementById('viewerPdfFallbackOcrBtn').onclick = () => runOcrOnDocument(doc.id, true);
+              pdfFallbackCard.classList.remove('hidden');
+            }
+          }
+        } else {
+          buildViewerPageSwitchButtons(doc, null);
+          imgEl.classList.add('hidden');
+          noMediaEl.classList.remove('hidden');
+        }
       }
       function applyImageTransform() {
         const imgEl = document.getElementById('viewerImageEl'); imgEl.style.transform = `translate(${viewerPanX}px,${viewerPanY}px) scale(${viewerZoom}) rotate(${viewerRotation}deg)`; imgEl.style.cursor = (viewerZoom > 1 && !zonalModeActive) ? 'grab' : 'default';
@@ -3527,6 +3823,7 @@
         if (titles[viewName]) { document.getElementById('viewTitle').textContent = titles[viewName][0]; document.getElementById('viewSubtitle').textContent = titles[viewName][1]; }
         document.getElementById('sidebar').classList.add('translate-x-full');
         document.getElementById('sidebarBackdrop').classList.add('hidden');
+        document.body.style.overflow = '';
         if (viewName === 'folder') renderFolderExplorer();
         if (viewName === 'ocr') renderOcrStudio();
         if (viewName === 'audit') renderAuditView();
@@ -3890,15 +4187,20 @@
       }
       function openStampSignatureModal() {
         const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return;
+        const imgEl = document.getElementById('viewerImageEl');
         const page = (doc.pages || [])[currentViewerPageIdx];
-        if (!page || !page.dataUrl || !page.dataUrl.startsWith('data:image')) { showToast('الختم الإلكتروني يعمل على صفحات الصور الممسوحة', 'warning'); return; }
+        const hasVisibleImage = imgEl && !imgEl.classList.contains('hidden') && imgEl.src && imgEl.src.startsWith('data:image');
+        if (!hasVisibleImage && (!page || !page.dataUrl || !page.dataUrl.startsWith('data:image'))) { showToast('الختم الإلكتروني يعمل على المستندات المصورة أو صفحات PDF المعروضة', 'warning'); return; }
         const m = document.getElementById('stampSignatureModal'); m.classList.remove('hidden'); m.classList.add('flex');
       }
       function closeStampSignatureModal() { const m = document.getElementById('stampSignatureModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
       async function applyOfficialStampToCurrentPage() {
         const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return;
-        const page = (doc.pages || [])[currentViewerPageIdx]; if (!page || !page.dataUrl) return;
-        const img = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = page.dataUrl; });
+        const page = (doc.pages || [])[currentViewerPageIdx]; if (!page) return;
+        const imgEl = document.getElementById('viewerImageEl');
+        const srcDataUrl = (imgEl && !imgEl.classList.contains('hidden') && imgEl.src && imgEl.src.startsWith('data:image')) ? imgEl.src : page.dataUrl;
+        if (!srcDataUrl) return;
+        const img = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = srcDataUrl; });
         if (!img) return;
         const c = document.createElement('canvas'); c.width = img.naturalWidth || img.width || 900; c.height = img.naturalHeight || img.height || 620;
         const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
@@ -3917,7 +4219,7 @@
         ctx.font = `${Math.round(radius * 0.17)}px Cairo, sans-serif`; ctx.fillText(signer, 0, radius * 0.54);
         if (sigHasInk) { const pad = document.getElementById('signaturePadCanvas'); ctx.drawImage(pad, -radius * 0.75, radius * 0.58, radius * 1.5, radius * 0.42); }
         ctx.restore();
-        page.dataUrl = c.toDataURL('image/jpeg', 0.9); safeSetStorage(STORAGE_DOCS_KEY, documents);
+        page.dataUrl = c.toDataURL('image/jpeg', 0.9); page.type = 'image/jpeg'; pdfRenderCache.delete(`${doc.id}_${currentViewerPageIdx}`); safeSetStorage(STORAGE_DOCS_KEY, documents);
         closeStampSignatureModal(); renderViewerMedia(); refreshAllUI();
         logActivity(`ختم رسمي على: ${doc.title}`); playScannerBeep(1040, 90);
         showToast('تم دمج الختم الرسمي والتوقيع على المستند بنجاح ✔', 'success');
@@ -3931,7 +4233,6 @@
         document.getElementById('txCameraInput')?.addEventListener('change', function () { if (this.files && this.files.length) handleTransmitterFiles(this.files); this.value = ''; });
         document.getElementById('txGalleryInput')?.addEventListener('change', function () { if (this.files && this.files.length) handleTransmitterFiles(this.files); this.value = ''; });
         try { const params = new URLSearchParams(window.location.search); const roomParam = params.get('room'); if (roomParam) setTimeout(() => openMobileTransmitterMode(roomParam), 250); else initHostPeerReceiver(); } catch (_) {}
-        const quickLoginBtn = document.getElementById('loginQuickGuestBtn');
         /* v10: تم حذف «الدخول السريع» لأنه كان يتجاوز المصادقة بكلمة مرور ثابتة داخل الكود */
         document.getElementById('ledgerCurrencyFilter')?.addEventListener('change', renderLedgerView);
         document.getElementById('ledgerPartySearch')?.addEventListener('input', renderLedgerView);
@@ -3943,7 +4244,20 @@
         document.getElementById('closeStampModalBtn')?.addEventListener('click', closeStampSignatureModal);
         document.getElementById('cancelStampModalBtn')?.addEventListener('click', closeStampSignatureModal);
         document.getElementById('applyStampToDocBtn')?.addEventListener('click', applyOfficialStampToCurrentPage);
-        document.getElementById('viewerExportSinglePdfBtn')?.addEventListener('click', async () => { const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return; const imgPages = (doc.pages || []).filter(p => p.dataUrl && p.dataUrl.startsWith('data:image')); if (!imgPages.length) return showToast('لا توجد صفحات مصورة لتصديرها كـ PDF', 'warning'); await downloadPdf(imgPages, `${doc.title || 'AlkamalyPro_Document'}.pdf`); });
+        document.getElementById('viewerExportSinglePdfBtn')?.addEventListener('click', async () => {
+          const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return;
+          const imgPages = (doc.pages || []).filter(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
+          if (imgPages.length) {
+            await downloadPdf(imgPages, `${getReadableDocTitle(doc) || 'AlkamalyPro_Document'}.pdf`);
+            return;
+          }
+          const pdfPage = (doc.pages || []).find(p => isPdfPageObj(p) && p.dataUrl);
+          if (pdfPage) {
+            openRawPdfInNewTabOrDownload(pdfPage, doc);
+            return;
+          }
+          showToast('لا توجد صفحات مصورة لتصديرها كـ PDF', 'warning');
+        });
       }
       window.addEventListener('DOMContentLoaded', bindV6ProFeatures);
 
@@ -3967,9 +4281,20 @@
 
         document.getElementById('themeToggleBtn').addEventListener('click', () => { const cur = document.documentElement.getAttribute('data-theme'), next = cur === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', next); document.getElementById('themeIcon').textContent = next === 'light' ? '🌙' : '☀️'; safeSetStorage(STORAGE_THEME_KEY, next); renderCharts(); });
 
-        document.getElementById('openSidebarBtn').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('translate-x-full'); document.getElementById('sidebarBackdrop').classList.remove('hidden'); });
-        document.getElementById('closeSidebarBtn').addEventListener('click', () => { document.getElementById('sidebar').classList.add('translate-x-full'); document.getElementById('sidebarBackdrop').classList.add('hidden'); });
-        document.getElementById('sidebarBackdrop').addEventListener('click', () => { document.getElementById('sidebar').classList.add('translate-x-full'); document.getElementById('sidebarBackdrop').classList.add('hidden'); });
+        const openMobileSidebar = () => {
+          const sb = document.getElementById('sidebar');
+          sb.classList.remove('translate-x-full');
+          document.getElementById('sidebarBackdrop').classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+        const closeMobileSidebar = () => {
+          document.getElementById('sidebar').classList.add('translate-x-full');
+          document.getElementById('sidebarBackdrop').classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+        document.getElementById('openSidebarBtn').addEventListener('click', openMobileSidebar);
+        document.getElementById('closeSidebarBtn').addEventListener('click', closeMobileSidebar);
+        document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
         document.querySelectorAll('.nav-link[data-view]').forEach(link => link.addEventListener('click', () => switchView(link.getAttribute('data-view'))));
 
         ['topMobileCamBtn', 'sidebarCameraBtn', 'bannerOpenCamStudioBtn', 'emptyOpenCamBtn', 'mobileBarCamBtn'].forEach(id => { const btn = document.getElementById(id); if (btn) btn.addEventListener('click', () => { switchView('camera'); syncMobileCaptureStateUI(); }); });
@@ -4083,7 +4408,21 @@
         document.getElementById('enhanceScanBtn').addEventListener('click', () => { viewerScanBoost = !viewerScanBoost; applyImageTransform(); showToast(viewerScanBoost ? 'تم تفعيل تحسين تباين المسح الضوئي' : 'تم إيقاف تحسين التباين', 'info'); });
         document.getElementById('viewerPrevDocBtn').addEventListener('click', () => { const list = getFilteredDocuments(), idx = list.findIndex(d => d.id === currentViewerDocId); if (idx > 0) openDocumentViewer(list[idx - 1].id); });
         document.getElementById('viewerNextDocBtn').addEventListener('click', () => { const list = getFilteredDocuments(), idx = list.findIndex(d => d.id === currentViewerDocId); if (idx >= 0 && idx < list.length - 1) openDocumentViewer(list[idx + 1].id); });
-        document.getElementById('viewerDownloadBtn').addEventListener('click', () => { const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return; const page = (doc.pages || [])[currentViewerPageIdx]; if (page && page.dataUrl) { const a = document.createElement('a'); a.href = page.dataUrl; a.download = page.name || `${doc.title}.jpg`; document.body.appendChild(a); a.click(); a.remove(); } else { const blob = new Blob([doc.ocrText || doc.title], { type: 'text/plain;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `${doc.title}_OCR.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); } });
+        document.querySelectorAll('.viewer-tab-btn').forEach(btn => btn.addEventListener('click', () => setViewerMobileTab(btn.getAttribute('data-viewer-tab'))));
+        document.getElementById('viewerDownloadBtn').addEventListener('click', () => {
+          const doc = documents.find(d => d.id === currentViewerDocId); if (!doc) return;
+          const cleanName = getReadableDocTitle(doc).replace(/[\\/:*?"<>|]+/g, '_');
+          const page = (doc.pages || [])[currentViewerPageIdx];
+          if (page && page.dataUrl) {
+            if (isPdfPageObj(page)) {
+              const a = document.createElement('a'); a.href = v10PdfUrl(page.dataUrl); a.download = `${cleanName}.pdf`; document.body.appendChild(a); a.click(); a.remove();
+            } else {
+              const a = document.createElement('a'); a.href = page.dataUrl; a.download = `${cleanName}.jpg`; document.body.appendChild(a); a.click(); a.remove();
+            }
+          } else {
+            const blob = new Blob([doc.ocrText || cleanName], { type: 'text/plain;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `${cleanName}_OCR.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+          }
+        });
         document.getElementById('viewerRunOcrBtn').addEventListener('click', () => { if (currentViewerDocId) runOcrOnDocument(currentViewerDocId, true); });
         document.getElementById('viewerCopyOcrBtn').addEventListener('click', () => { const ta = document.getElementById('viewerOcrTextarea'); ta.select(); try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value); else document.execCommand('copy'); } catch (_) { document.execCommand('copy'); } showToast('تم نسخ نص OCR إلى الحافظة', 'success'); });
         document.getElementById('viewerDirToggleBtn').addEventListener('click', () => { const ta = document.getElementById('viewerOcrTextarea'), btn = document.getElementById('viewerDirToggleBtn'), nextDir = ta.getAttribute('dir') === 'rtl' ? 'ltr' : 'rtl'; ta.setAttribute('dir', nextDir); btn.textContent = nextDir.toUpperCase(); });
@@ -4119,28 +4458,82 @@
         document.getElementById('applyDetectedNumBtn').addEventListener('click', () => { const doc = documents.find(d => d.id === currentViewerDocId), detected = document.getElementById('entityVoucherNum').textContent; if (!doc || !detected || detected === '—') return; doc.docNumber = detected; safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); showToast(`تم اعتماد الرقم #${detected} رسمياً للسند`, 'success'); });
 
         const mediaStage = document.getElementById('viewerMediaContainer'), zonalBox = document.getElementById('zonalSelectionBox');
-        document.getElementById('zonalOcrModeBtn').addEventListener('click', () => { zonalModeActive = !zonalModeActive; const btn = document.getElementById('zonalOcrModeBtn'); if (zonalModeActive) { btn.className = 'btn-luxe-gold !py-1 !px-2.5 text-xs'; mediaStage.style.cursor = 'crosshair'; showToast('🎯 اسحب بالماوس فوق أي منطقة في الصورة لقراءة نصها فقط (Zonal OCR)', 'info'); } else { btn.className = 'btn-luxe-outline !py-1 !px-2.5 !border-amber-400/50 !text-amber-300'; mediaStage.style.cursor = 'default'; zonalBox.classList.add('hidden'); } });
-        mediaStage.addEventListener('mousedown', e => { if (!zonalModeActive) return; const rect = mediaStage.getBoundingClientRect(); zonalStartPt = { x: e.clientX - rect.left, y: e.clientY - rect.top }; zonalBox.style.left = zonalStartPt.x + 'px'; zonalBox.style.top = zonalStartPt.y + 'px'; zonalBox.style.width = '0px'; zonalBox.style.height = '0px'; zonalBox.classList.remove('hidden'); });
-        mediaStage.addEventListener('mousemove', e => { if (!zonalModeActive || !zonalStartPt) return; const rect = mediaStage.getBoundingClientRect(), curX = e.clientX - rect.left, curY = e.clientY - rect.top, left = Math.min(zonalStartPt.x, curX), top = Math.min(zonalStartPt.y, curY), width = Math.abs(curX - zonalStartPt.x), height = Math.abs(curY - zonalStartPt.y); zonalBox.style.left = left + 'px'; zonalBox.style.top = top + 'px'; zonalBox.style.width = width + 'px'; zonalBox.style.height = height + 'px'; });
-        mediaStage.addEventListener('mouseup', async () => {
+        document.getElementById('zonalOcrModeBtn').addEventListener('click', () => {
+          zonalModeActive = !zonalModeActive;
+          const btn = document.getElementById('zonalOcrModeBtn');
+          if (zonalModeActive) {
+            if (activeViewerMobileTab === 'ocr') setViewerMobileTab('both');
+            btn.className = 'btn-luxe-gold !py-1 !px-2 text-xs shrink-0';
+            mediaStage.style.cursor = 'crosshair';
+            mediaStage.style.touchAction = 'none';
+            showToast('🎯 اسحب بإصبعك أو بالماوس فوق المنطقة المراد قراءتها بـ OCR', 'info');
+          } else {
+            btn.className = 'btn-luxe-outline !py-1 !px-2 !border-amber-400/50 !text-amber-300 shrink-0';
+            mediaStage.style.cursor = 'default';
+            mediaStage.style.touchAction = '';
+            zonalBox.classList.add('hidden');
+          }
+        });
+        mediaStage.addEventListener('pointerdown', e => {
+          if (!zonalModeActive) return;
+          e.preventDefault();
+          try { mediaStage.setPointerCapture(e.pointerId); } catch (_) {}
+          const rect = mediaStage.getBoundingClientRect();
+          zonalStartPt = { x: e.clientX - rect.left + mediaStage.scrollLeft, y: e.clientY - rect.top + mediaStage.scrollTop };
+          zonalBox.style.left = zonalStartPt.x + 'px';
+          zonalBox.style.top = zonalStartPt.y + 'px';
+          zonalBox.style.width = '0px';
+          zonalBox.style.height = '0px';
+          zonalBox.classList.remove('hidden');
+        });
+        mediaStage.addEventListener('pointermove', e => {
+          if (!zonalModeActive || !zonalStartPt) return;
+          e.preventDefault();
+          const rect = mediaStage.getBoundingClientRect();
+          const curX = e.clientX - rect.left + mediaStage.scrollLeft;
+          const curY = e.clientY - rect.top + mediaStage.scrollTop;
+          const left = Math.min(zonalStartPt.x, curX), top = Math.min(zonalStartPt.y, curY);
+          const width = Math.abs(curX - zonalStartPt.x), height = Math.abs(curY - zonalStartPt.y);
+          zonalBox.style.left = left + 'px';
+          zonalBox.style.top = top + 'px';
+          zonalBox.style.width = width + 'px';
+          zonalBox.style.height = height + 'px';
+        });
+        const finishZonalSelection = async () => {
           if (!zonalModeActive || !zonalStartPt) return;
           const boxRect = zonalBox.getBoundingClientRect(), imgEl = document.getElementById('viewerImageEl'), imgRect = imgEl.getBoundingClientRect();
-          zonalStartPt = null; zonalBox.classList.add('hidden'); zonalModeActive = false;
-          document.getElementById('zonalOcrModeBtn').className = 'btn-luxe-outline !py-1 !px-2.5 !border-amber-400/50 !text-amber-300'; mediaStage.style.cursor = 'default';
-          if (boxRect.width < 20 || boxRect.height < 15 || imgEl.classList.contains('hidden')) return;
+          zonalStartPt = null;
+          zonalBox.classList.add('hidden');
+          zonalModeActive = false;
+          document.getElementById('zonalOcrModeBtn').className = 'btn-luxe-outline !py-1 !px-2 !border-amber-400/50 !text-amber-300 shrink-0';
+          mediaStage.style.cursor = 'default';
+          mediaStage.style.touchAction = '';
+          if (boxRect.width < 16 || boxRect.height < 14 || imgEl.classList.contains('hidden')) return;
           try {
-            const scaleX = imgEl.naturalWidth / imgRect.width, scaleY = imgEl.naturalHeight / imgRect.height, sx = Math.max(0, (boxRect.left - imgRect.left) * scaleX), sy = Math.max(0, (boxRect.top - imgRect.top) * scaleY), sw = Math.min(imgEl.naturalWidth - sx, boxRect.width * scaleX), sh = Math.min(imgEl.naturalHeight - sy, boxRect.height * scaleY);
-            const cropCanvas = document.createElement('canvas'); cropCanvas.width = Math.max(1, Math.round(sw)); cropCanvas.height = Math.max(1, Math.round(sh));
+            const scaleX = imgEl.naturalWidth / Math.max(1, imgRect.width), scaleY = imgEl.naturalHeight / Math.max(1, imgRect.height);
+            const sx = Math.max(0, (boxRect.left - imgRect.left) * scaleX), sy = Math.max(0, (boxRect.top - imgRect.top) * scaleY);
+            const sw = Math.min(imgEl.naturalWidth - sx, boxRect.width * scaleX), sh = Math.min(imgEl.naturalHeight - sy, boxRect.height * scaleY);
+            const cropCanvas = document.createElement('canvas');
+            cropCanvas.width = Math.max(1, Math.round(sw));
+            cropCanvas.height = Math.max(1, Math.round(sh));
             cropCanvas.getContext('2d').drawImage(imgEl, sx, sy, sw, sh, 0, 0, cropCanvas.width, cropCanvas.height);
             showToast('🎯 جارٍ قراءة المنطقة المحددة عبر Zonal OCR...', 'info');
             if (typeof Tesseract !== 'undefined') {
               const lang = document.getElementById('ocrLangSelect')?.value || 'ara+eng';
-              const worker = await Tesseract.createWorker(lang, 1), ret = await worker.recognize(cropCanvas.toDataURL('image/jpeg', 0.92)); await worker.terminate();
+              const worker = await V9.worker(lang, {});
+              const ret = await worker.recognize(cropCanvas.toDataURL('image/jpeg', 0.92));
               const zoneText = repairArabicOcrText((ret && ret.data && ret.data.text) ? ret.data.text : '');
-              if (zoneText) { const ta = document.getElementById('viewerOcrTextarea'); ta.value = (ta.value ? ta.value + '\n' : '') + `[منطقة محددة]: ${zoneText}`; updateViewerOcrMetadata(ta.value); showToast('تمت إضافة نص المنطقة المحددة بنجاح ✔', 'success'); } else showToast('لم يتم العثور على نص واضح داخل المنطقة المحددة', 'warning');
+              if (zoneText) {
+                const ta = document.getElementById('viewerOcrTextarea');
+                ta.value = (ta.value ? ta.value + '\n' : '') + `[منطقة محددة]: ${zoneText}`;
+                updateViewerOcrMetadata(ta.value);
+                showToast('تمت إضافة نص المنطقة المحددة بنجاح ✔', 'success');
+              } else showToast('لم يتم العثور على نص واضح داخل المنطقة المحددة', 'warning');
             }
           } catch (_) { showToast('تعذر قراءة المنطقة المحددة', 'error'); }
-        });
+        };
+        mediaStage.addEventListener('pointerup', finishZonalSelection);
+        mediaStage.addEventListener('pointercancel', () => { zonalStartPt = null; zonalBox.classList.add('hidden'); });
 
         document.getElementById('topCommandPaletteBtn').addEventListener('click', openCommandPalette);
         document.getElementById('closeCmdPaletteBtn').addEventListener('click', closeCommandPalette);
@@ -4398,7 +4791,7 @@
           arm(); return wk;
         };
         const batchOcr = async ids => {
-          const isImg = p => (p.dataUrl && p.dataUrl.startsWith('data:image')) || (p.file && /\.(jpe?g|png|webp|bmp)$/i.test(p.file));
+          const isImg = p => (p.dataUrl && (p.dataUrl.startsWith('data:image') || p.dataUrl.startsWith('data:application/pdf'))) || isPdfPageObj(p) || (p.file && /\.(jpe?g|png|webp|bmp|pdf)$/i.test(p.file));
           const todo = documents.filter(d => (!ids || ids.includes(d.id)) && (d.pages || []).some(isImg) && (!d.ocrText || d.ocrText.trim().length < 5));
           if (!todo.length) return showToast('جميع المستندات المصورة معالجة مسبقاً بـ OCR ✔', 'info');
           showToast(`بدء معالجة OCR لعدد ${todo.length} مستند...`, 'info');
@@ -4525,11 +4918,17 @@
         ['pointerup', 'pointercancel'].forEach(t => img.addEventListener(t, e => { pts.delete(e.pointerId); pd = 0; applyImageTransform(); }));
         img.addEventListener('dblclick', () => { viewerZoom = viewerZoom > 1 ? 1 : 2; viewerPanX = viewerPanY = 0; applyImageTransform(); });
         img.addEventListener('error', () => { if (!img.getAttribute('src')) return; img.classList.add('hidden'); $('viewerNoMediaEl').classList.remove('hidden'); showToast('تعذّر عرض صورة هذا المستند (الملف تالف أو غير مكتمل)', 'warning'); });
-        // شريط الاختصارات + معلومات المطوّر داخل شاشة العرض
-        const bar = document.createElement('div');
-        bar.className = 'absolute bottom-1.5 inset-x-2 flex items-center justify-between gap-2 text-[10px] pointer-events-none opacity-80';
-        bar.innerHTML = '<span class="hidden lg:inline px-2 py-0.5 rounded bg-black/50 text-slate-200">⌨ → ← تنقّل • + − تكبير • 0 ضبط • R تدوير • Esc إغلاق • نقرتان = تكبير</span><button type="button" id="v10ViewerDev" class="pointer-events-auto mr-auto px-2 py-0.5 rounded bg-black/50 text-amber-300">👨‍💻 ' + V10C.name + ' • ' + V10C.phones[0] + '</button>';
-        stage.appendChild(bar); bar.querySelector('#v10ViewerDev').addEventListener('click', v10OpenContact);
+        // شريط الاختصارات + معلومات المطوّر في الفوتر السفلي دون تغطية صورة المستند
+        const footerBar = $('viewerBottomFooter');
+        if (footerBar && !$('v10ViewerDev')) {
+          const devBtn = document.createElement('button');
+          devBtn.type = 'button';
+          devBtn.id = 'v10ViewerDev';
+          devBtn.className = 'mr-auto px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-400/30 text-amber-300 hover:bg-amber-500/20 font-semibold text-[11px] shrink-0';
+          devBtn.textContent = '👨‍💻 ' + V10C.name + ' • ' + V10C.phones[0];
+          devBtn.addEventListener('click', v10OpenContact);
+          footerBar.appendChild(devBtn);
+        }
         // زر المطوّر في الشريط الجانبي وشاشة الدخول
         const card = $('currentUserName') && $('currentUserName').closest('.luxe-card');
         if (card && card.parentElement) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-luxe-outline w-full mt-2 !py-1.5 text-[11px]'; b.textContent = '📞 معلومات المطوّر'; b.addEventListener('click', v10OpenContact); card.parentElement.appendChild(b); }
