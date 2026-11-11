@@ -20,7 +20,7 @@
   <meta name="theme-color" content="#070d1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v10</title>
+  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v11</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -427,6 +427,7 @@
           <div class="nav-link" data-view="trash"><span>🗑️</span><span>سلة المحذوفات والاسترجاع</span><span id="navTrashCount" class="mr-auto text-xs px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 font-mono-code">0</span></div>
           <div class="nav-link" data-view="timeline"><span>⏱️</span><span>الأرشيف الزمني</span></div>
           <div class="nav-link" data-view="insights"><span>🧠</span><span>المركز الذكي والأمان</span><span class="mr-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-extrabold">v7</span></div>
+          <div class="nav-link" data-view="smart"><span>✨</span><span>المساعد الذكي</span><span class="mr-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-extrabold">v11</span></div>
           <div class="nav-link" data-view="categories"><span>🏷️</span><span>إدارة التصنيفات</span></div>
           <div class="nav-link" data-view="settings"><span>⚙️</span><span>الإعدادات والنسخ الاحتياطي</span></div>
         </nav>
@@ -1165,6 +1166,51 @@
                 <h4 class="font-bold text-sm text-amber-400">🕘 سجل النشاط</h4>
                 <div id="insLog" class="space-y-1 text-xs max-h-40 overflow-auto"></div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SMART VIEW v11 -->
+        <section id="view-smart" class="hidden space-y-5">
+          <div class="luxe-card-gold p-5">
+            <h3 class="text-lg font-extrabold text-amber-400">✨ المساعد الذكي v11</h3>
+            <p class="text-xs mt-0.5" style="color: var(--text-secondary);">بحث بلغة طبيعية، تصنيف تلقائي، كشف التكرار والشذوذ والأرقام المفقودة، وتقرير تنفيذي — كله يعمل محلياً دون إنترنت</p>
+          </div>
+          <div id="v11Kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+          <div class="luxe-card p-5 space-y-3">
+            <h4 class="font-bold text-sm text-amber-400">🔎 بحث ذكي بلغة طبيعية</h4>
+            <div class="flex gap-2">
+              <input id="v11Q" class="luxe-input flex-1" placeholder="مثال: سندات الدولار أكثر من 5000 الشهر الماضي — أو اسم جهة" />
+              <button type="button" id="v11Mic" class="btn-luxe-outline !px-3" title="بحث صوتي">🎤</button>
+              <button type="button" id="v11Go" class="btn-luxe-gold">بحث</button>
+            </div>
+            <div id="v11Chips" class="flex flex-wrap gap-1.5 text-[11px]"></div>
+            <div id="v11Res" class="space-y-2 max-h-96 overflow-auto"></div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="luxe-card p-5 space-y-3">
+              <div class="flex items-center justify-between gap-2"><h4 class="font-bold text-sm text-amber-400">🏷️ التصنيف التلقائي المقترح</h4><button type="button" id="v11ApplyAll" class="btn-luxe-gold !py-1 text-xs">تطبيق الكل</button></div>
+              <div id="v11Cls" class="space-y-2 max-h-80 overflow-auto"></div>
+            </div>
+            <div class="luxe-card p-5 space-y-3">
+              <h4 class="font-bold text-sm text-amber-400">🛡️ التكرار والشذوذ والفجوات</h4>
+              <div id="v11Anom" class="space-y-2 max-h-80 overflow-auto"></div>
+            </div>
+          </div>
+          <div class="luxe-card p-5 space-y-3">
+            <div class="flex items-center justify-between gap-2"><h4 class="font-bold text-sm text-amber-400">📑 التقرير التنفيذي الذكي</h4><button type="button" id="v11Export" class="btn-luxe-outline text-xs">⬇️ تنزيل التقرير</button></div>
+            <div id="v11Rep" class="text-sm leading-7"></div>
+            <div class="pt-3 border-t space-y-2" style="border-color: var(--border-subtle);">
+              <h4 class="font-bold text-sm text-amber-400">🤖 تحليل بالذكاء الاصطناعي (اختياري — عبر الإنترنت)</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <input id="v11Key" type="password" class="luxe-input sm:col-span-2" placeholder="مفتاح Anthropic API (sk-ant-...)" autocomplete="off" />
+                <input id="v11Model" class="luxe-input font-en" value="claude-sonnet-5-5" />
+              </div>
+              <label class="flex items-center gap-2 text-[11px]" style="color: var(--text-secondary);"><input type="checkbox" id="v11AiRemember" /> تذكّر المفتاح على هذا الجهاز فقط</label>
+              <label class="flex items-center gap-2 text-[11px]" style="color: var(--text-secondary);"><input type="checkbox" id="v11AiNames" /> السماح بإرسال أسماء الجهات وعناوين المستندات (الافتراضي: إخفاؤها)</label>
+              <p class="text-[11px] text-amber-300">يُرسل ملخص إحصائي فقط (أعداد وإجماليات وأنواع الملاحظات). لا تُرسل صور المستندات ولا نصوص OCR أبداً.</p>
+              <button type="button" id="v11AiBtn" class="btn-luxe-gold text-xs">🤖 حلّل التقرير بالذكاء الاصطناعي</button>
+              <div id="v11AiOut" class="text-sm leading-7 whitespace-pre-wrap"></div>
             </div>
           </div>
         </section>
@@ -4376,7 +4422,7 @@
       function switchView(viewName) {
         if (currentView === 'camera' && viewName !== 'camera') stopLiveCamera();
         currentView = viewName;
-        const views = ['dashboard', 'camera', 'folder', 'ocr', 'audit', 'ledger', 'trash', 'timeline', 'insights', 'categories', 'settings'];
+        const views = ['dashboard', 'camera', 'folder', 'ocr', 'audit', 'ledger', 'trash', 'timeline', 'insights', 'smart', 'categories', 'settings'];
         const titles = {
           dashboard: ['لوحة التحكم الرئيسية', 'الأرشفة عبر كاميرا الجوال، ربط مجلدات الأرشيف، وقراءة نصوص OCR'],
           camera: ['الأرشفة بكاميرا الجوال', 'تصوير السندات والوثائق مباشرة مع تحسين المسح الضوئي واستخراج OCR'],
@@ -4387,6 +4433,7 @@
           trash: ['سلة المحذوفات والاسترجاع الآمن', 'استعادة الوثائق المحذوفة بضغطة واحدة أو إفراغ السلة نهائياً'],
           timeline: ['الأرشيف الزمني', 'تتبع الوثائق حسب الأشهر والتواريخ'],
           insights: ['المركز الذكي والأمان', 'صحة الأرشيف، كشف التكرار، نسخ مشفّر وقفل تلقائي'],
+          smart: ['المساعد الذكي v11', 'بحث بلغة طبيعية، تصنيف تلقائي، كشف الشذوذ، وتقرير تنفيذي'],
           categories: ['إدارة التصنيفات', 'تخصيص فئات المستندات وألوان التمييز'],
           settings: ['الإعدادات والنسخ الاحتياطي', 'تصدير التقارير، كود التضمين لمواقع Google، وإدارة البيانات']
         };
@@ -4404,6 +4451,7 @@
         if (viewName === 'timeline') renderTimeline();
         if (viewName === 'insights') renderInsightsView();
         if (viewName === 'categories') renderCategoriesView();
+        if (viewName === 'smart') V11.render();
       }
 
       // ==================== INSIGHTS ====================
@@ -4413,6 +4461,7 @@
       function logActivity(msg) { const l = safeGetStorage(STORAGE_LOG_KEY, []); l.unshift({ t: Date.now(), m: msg }); safeSetStorage(STORAGE_LOG_KEY, l.slice(0, 40)); }
       function extraCmdActions() {
         return [
+          { icon: '✨', title: 'فتح المساعد الذكي (بحث لغة طبيعية + تصنيف + شذوذ)', sub: 'v11', run: () => switchView('smart') },
           { icon: '📒', title: 'فتح دفتر الأستاذ وكشوفات الحساب المالي بالعملات', sub: 'v7 Pro', run: () => switchView('ledger') },
           { icon: '🗑️', title: 'فتح سلة المحذوفات واسترجاع الوثائق', sub: 'v7 Pro', run: () => switchView('trash') },
           { icon: '🧠', title: 'فتح المركز الذكي وفحص صحة الأرشيف', sub: 'v7', run: () => switchView('insights') },
@@ -4679,6 +4728,7 @@
         if (currentView === 'timeline') renderTimeline();
         if (currentView === 'insights') renderInsightsView();
         if (currentView === 'categories') renderCategoriesView();
+        if (currentView === 'smart') V11.render();
       }
 
       // ==================== LEDGER / TRASH / STAMP ====================
@@ -5506,6 +5556,163 @@
         if (card && card.parentElement) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-luxe-outline w-full mt-2 !py-1.5 text-[11px]'; b.textContent = '📞 معلومات المطوّر'; b.addEventListener('click', v10OpenContact); card.parentElement.appendChild(b); }
         const lb = $('v10LoginContactBtn'); if (lb) lb.addEventListener('click', v10OpenContact);
       }
+
+      // ==================== V11: الطبقة الذكية ====================
+      const V11 = (() => {
+        const $ = id => document.getElementById(id), cache = new WeakMap();
+        const norm = s => toWesternDigits(String(s || '')).toLowerCase().replace(/[\u064B-\u0652\u0640]/g, '').replace(/[إأآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
+        const toks = s => norm(s).split(/[^\p{L}\p{N}]+/u).filter(w => w.length > 1);
+        const money = (n, c) => (n == null ? '—' : Math.round(n).toLocaleString('en-US') + ' ' + ({ YER: 'ر.ي', USD: '$', SAR: 'ر.س' }[c] || c || ''));
+        const info = d => {
+          const t = d.ocrText || '', c = cache.get(d);
+          if (c && c.t === t && c.ti === d.title) return c;
+          let e = {}; try { e = extractSmartEntities(t) || {}; } catch (_) {}
+          const n = { t, ti: d.title, e, amt: e.numericAmount || null, cur: e.currency || 'YER', party: [e.receiver, e.sender].find(x => x && x !== '—') || '', norm: norm((d.title || '') + ' ' + (d.docNumber || '') + ' ' + t), tk: new Set(toks((d.title || '') + ' ' + t)) };
+          cache.set(d, n); return n;
+        };
+        const STOP = new Set(['من', 'في', 'على', 'الى', 'عن', 'كل', 'ما', 'هو', 'هي', 'مع', 'او', 'ان', 'سند', 'سندات', 'وثايق', 'وثيقه', 'مستند', 'مستندات', 'اكثر', 'اقل', 'بعد', 'قبل', 'هذا', 'هذه', 'الشهر', 'الماضي', 'الحالي', 'اليوم', 'الاسبوع', 'السنه', 'العام', 'مبلغ', 'بمبلغ']);
+        const CLS = { vouchers: 'سند قبض صرف حواله استلمنا مبلغ وقدره مستلم مرسل دفعه', contracts: 'عقد اتفاقيه الطرف الاول الطرف الثاني بنود شروط التزام مدته', invoices: 'فاتوره ضريبه ضريبة المبيعات invoice tax vat اجمالي الصنف', reports: 'تقرير كشف ميزانيه ملخص ارصده حساب ختامي', identity: 'بطاقه هويه جواز رخصه شهاده سجل تجاري وزاره' };
+        let results = [], suggestions = [], anomalies = [], lastAi = '';
+
+        function parseQuery(q) {
+          const n = norm(q), f = { chips: [] }, now = new Date(), iso = d => d.toISOString().slice(0, 10), y = now.getFullYear(), m = now.getMonth();
+          if (/دولار|usd|\$/.test(n)) { f.cur = 'USD'; f.chips.push('💵 دولار'); } else if (/سعودي|sar/.test(n)) { f.cur = 'SAR'; f.chips.push('🇸🇦 سعودي'); } else if (/يمني|yer/.test(n)) { f.cur = 'YER'; f.chips.push('🇾🇪 يمني'); }
+          const mx = n.match(/(?:اكثر من|اعلي من|فوق|اكبر من|>)\s*([\d,\.]+)/), mn = n.match(/(?:اقل من|اصغر من|تحت|<)\s*([\d,\.]+)/);
+          if (mx) { f.min = parseFloat(mx[1].replace(/,/g, '')); f.chips.push('⬆️ > ' + f.min.toLocaleString()); }
+          if (mn) { f.max = parseFloat(mn[1].replace(/,/g, '')); f.chips.push('⬇️ < ' + f.max.toLocaleString()); }
+          if (/اليوم/.test(n)) { f.from = f.to = iso(now); f.chips.push('📅 اليوم'); }
+          else if (/الشهر الماضي/.test(n)) { f.from = iso(new Date(Date.UTC(y, m - 1, 1))); f.to = iso(new Date(Date.UTC(y, m, 0))); f.chips.push('📅 الشهر الماضي'); }
+          else if (/هذا الشهر|الشهر الحالي/.test(n)) { f.from = iso(new Date(Date.UTC(y, m, 1))); f.to = iso(now); f.chips.push('📅 هذا الشهر'); }
+          else if (/الاسبوع/.test(n)) { f.from = iso(new Date(now - 6048e5)); f.to = iso(now); f.chips.push('📅 آخر أسبوع'); }
+          else if (/هذه السنه|هذا العام|السنه الحاليه/.test(n)) { f.from = y + '-01-01'; f.to = iso(now); f.chips.push('📅 هذا العام'); }
+          f.terms = toks(n.replace(/[\d,\.]+/g, ' ')).filter(w => !STOP.has(w) && !/^(دولار|سعودي|يمني|ريال|usd|sar|yer)$/.test(w));
+          if (f.terms.length) f.chips.push('🔤 ' + f.terms.join(' + '));
+          return f;
+        }
+        function search(q) {
+          const f = parseQuery(q), out = [];
+          documents.forEach(d => {
+            const i = info(d); let sc = 0;
+            if (f.cur && i.cur !== f.cur) return;
+            if ((f.min != null || f.max != null) && (i.amt == null || (f.min != null && i.amt <= f.min) || (f.max != null && i.amt >= f.max))) return;
+            if (f.from && (!d.date || d.date < f.from || d.date > f.to)) return;
+            for (const t of f.terms) {
+              const tn = norm(d.title), num = norm(d.docNumber);
+              let hit = 0; if (num === t) hit = 6; else if (tn.includes(t)) hit = 4; else if (i.tk.has(t)) hit = 3; else if (i.norm.includes(t)) hit = 1.5;
+              if (!hit) return; sc += hit;
+            }
+            out.push({ d, i, sc });
+          });
+          out.sort((a, b) => b.sc - a.sc || String(b.d.date).localeCompare(String(a.d.date)));
+          return { f, out };
+        }
+        const row = (d, i, extra) => `<div class="v11-open p-2.5 rounded-xl cursor-pointer flex items-center justify-between gap-2" data-id="${escapeHtml(String(d.id))}" style="background:var(--bg-input)"><div class="min-w-0"><div class="text-sm font-bold truncate">${escapeHtml(d.title || 'بدون عنوان')}</div><div class="text-[11px] truncate" style="color:var(--text-secondary)">${escapeHtml(String(d.docNumber || '—'))} • ${escapeHtml(d.date || '—')}${i.party ? ' • ' + escapeHtml(i.party) : ''}</div>${extra || ''}</div><div class="font-en text-xs font-bold text-amber-400 shrink-0">${i.amt ? money(i.amt, i.cur) : ''}</div></div>`;
+        const bindOpen = box => box.querySelectorAll('.v11-open').forEach(el => el.addEventListener('click', () => { const d = documents.find(x => String(x.id) === el.getAttribute('data-id')); if (d) openDocumentViewer(d.id); }));
+
+        function renderSearch() {
+          const q = $('v11Q').value.trim(), box = $('v11Res');
+          if (!q) { $('v11Chips').innerHTML = ''; box.innerHTML = '<p class="text-xs" style="color:var(--text-muted)">اكتب سؤالك: العملة، المبلغ، الفترة، أو اسم الجهة — سيفهمها المساعد تلقائياً.</p>'; return; }
+          const { f, out } = search(q); results = out;
+          $('v11Chips').innerHTML = f.chips.map(c => `<span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">${escapeHtml(c)}</span>`).join('');
+          box.innerHTML = out.length ? `<div class="text-[11px]" style="color:var(--text-secondary)">${out.length} نتيجة</div>` + out.slice(0, 60).map(r => row(r.d, r.i)).join('') : '<p class="text-xs text-rose-400">لا نتائج مطابقة.</p>';
+          bindOpen(box);
+        }
+        function classify() {
+          suggestions = [];
+          const ids = new Set(categories.map(c => c.id));
+          documents.forEach(d => {
+            const n = info(d).norm; if (n.length < 12) return;
+            let best = null, bs = 0, cur = 0;
+            for (const [id, kw] of Object.entries(CLS)) { if (!ids.has(id)) continue; const s = kw.split(' ').reduce((a, k) => a + (n.includes(norm(k)) ? 1 : 0), 0); if (id === d.category) cur = s; if (s > bs) { bs = s; best = id; } }
+            if (best && best !== d.category && bs >= 2 && bs > cur) suggestions.push({ d, to: best, score: bs });
+          });
+          suggestions.sort((a, b) => b.score - a.score);
+        }
+        const catName = id => (categories.find(c => c.id === id || c.name === id) || {}).name || id;
+        function renderCls() {
+          const box = $('v11Cls');
+          box.innerHTML = suggestions.length ? suggestions.slice(0, 40).map((s, k) => `<div class="p-2.5 rounded-xl flex items-center justify-between gap-2" style="background:var(--bg-input)"><div class="min-w-0"><div class="text-xs font-bold truncate">${escapeHtml(s.d.title || '')}</div><div class="text-[11px]" style="color:var(--text-secondary)">${escapeHtml(catName(s.d.category))} ← <b class="text-emerald-400">${escapeHtml(catName(s.to))}</b> • ثقة ${Math.min(99, 40 + s.score * 15)}%</div></div><button type="button" class="btn-luxe-outline !py-1 !px-2 text-[11px] v11-apply" data-k="${k}">تطبيق</button></div>`).join('') : '<p class="text-xs text-emerald-400">✅ التصنيفات متسقة مع محتوى المستندات.</p>';
+          box.querySelectorAll('.v11-apply').forEach(b => b.addEventListener('click', () => { applyCls([suggestions[+b.dataset.k]]); }));
+        }
+        function applyCls(list) {
+          list.forEach(s => { if (s && s.d) s.d.category = s.to; });
+          safeSetStorage(STORAGE_DOCS_KEY, documents); logActivity(`المساعد الذكي: إعادة تصنيف ${list.length} مستند`);
+          showToast(`تم تحديث تصنيف ${list.length} مستند`, 'success'); refreshAllUI();
+        }
+        function detect() {
+          anomalies = []; const add = (sev, title, txt, id) => anomalies.push({ sev, title, txt, id });
+          const L = documents.map(d => ({ d, i: info(d) }));
+          if (L.length <= 400) for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) {
+            const A = L[a], B = L[b], sameFin = A.i.amt && A.i.amt === B.i.amt && A.i.cur === B.i.cur && A.d.date && A.d.date === B.d.date;
+            let jac = 0; if (A.i.tk.size > 8 && B.i.tk.size > 8) { let c = 0; A.i.tk.forEach(t => { if (B.i.tk.has(t)) c++; }); jac = c / (A.i.tk.size + B.i.tk.size - c); }
+            if (jac >= 0.85 || (sameFin && jac >= 0.5)) add('bad', 'احتمال تكرار', `«${A.d.title}» ≈ «${B.d.title}» (تشابه ${Math.round(jac * 100)}%)`, A.d.id);
+          }
+          const by = {}; L.forEach(x => { if (x.i.amt) (by[x.i.cur] = by[x.i.cur] || []).push(x); });
+          Object.entries(by).forEach(([cur, arr]) => {
+            if (arr.length < 8) return; const m = arr.reduce((s, x) => s + x.i.amt, 0) / arr.length, sd = Math.sqrt(arr.reduce((s, x) => s + (x.i.amt - m) ** 2, 0) / arr.length) || 1;
+            arr.forEach(x => { const z = (x.i.amt - m) / sd; if (z > 3) add('warn', 'مبلغ شاذ', `«${x.d.title}» بمبلغ ${money(x.i.amt, cur)} أعلى بكثير من المعتاد (متوسط ${money(m, cur)})`, x.d.id); });
+          });
+          L.forEach(x => { if (x.i.e.amountsMatch === false) add('bad', 'تعارض المبلغ', `«${x.d.title}»: المبلغ رقماً لا يطابق المكتوب حروفاً`, x.d.id); });
+          const seq = {}; documents.forEach(d => { const n = String(d.docNumber || '').trim(); if (/^\d{1,9}$/.test(n)) (seq[d.category] = seq[d.category] || []).push(+n); });
+          Object.entries(seq).forEach(([cat, a]) => { a = [...new Set(a)].sort((x, y) => x - y); for (let k = 1; k < a.length; k++) { const gap = a[k] - a[k - 1] - 1; if (gap > 0 && gap <= 20) add('warn', 'أرقام مفقودة', `في «${catName(cat)}»: ${gap === 1 ? 'السند ' + (a[k - 1] + 1) : 'من ' + (a[k - 1] + 1) + ' إلى ' + (a[k] - 1)} غير موجود في الأرشيف`, null); } });
+        }
+        function renderAnom() {
+          const box = $('v11Anom'), col = { bad: 'text-rose-400', warn: 'text-amber-400' };
+          box.innerHTML = anomalies.length ? anomalies.slice(0, 60).map(a => `<div class="${a.id ? 'v11-open cursor-pointer ' : ''}p-2.5 rounded-xl" ${a.id ? `data-id="${escapeHtml(String(a.id))}"` : ''} style="background:var(--bg-input)"><div class="text-xs font-bold ${col[a.sev]}">${a.title}</div><div class="text-[11px]" style="color:var(--text-secondary)">${escapeHtml(a.txt)}</div></div>`).join('') : '<p class="text-xs text-emerald-400">✅ لا شذوذ أو تكرار ملحوظ.</p>';
+          bindOpen(box);
+        }
+        function stats() {
+          const tot = {}, parties = {}, months = {};
+          documents.forEach(d => { const i = info(d); if (i.amt) { tot[i.cur] = tot[i.cur] || { s: 0, n: 0 }; tot[i.cur].s += i.amt; tot[i.cur].n++; } if (i.party) parties[i.party] = (parties[i.party] || 0) + 1; const mk = (d.date || '').slice(0, 7); if (mk) months[mk] = (months[mk] || 0) + 1; });
+          const top = Object.entries(parties).sort((a, b) => b[1] - a[1]).slice(0, 5), mm = Object.entries(months).sort().slice(-6);
+          return { tot, top, mm, health: analyzeArchive().score };
+        }
+        function narrative(st) {
+          const n = documents.length; if (!n) return 'لا توجد مستندات بعد.';
+          const ocr = documents.filter(d => (d.ocrText || '').trim()).length, parts = [`يضم الأرشيف <b>${n}</b> مستنداً، منها <b>${ocr}</b> (${Math.round(ocr / n * 100)}%) مفهرسة نصياً بـ OCR، وصحة الأرشيف <b>${st.health}%</b>.`];
+          const t = Object.entries(st.tot).map(([c, v]) => `${money(v.s, c)} (${v.n} سند)`); if (t.length) parts.push('إجمالي المبالغ المستخرجة: ' + t.join(' • ') + '.');
+          if (st.top.length) parts.push('أكثر الجهات تكراراً: ' + st.top.map(p => `${escapeHtml(p[0])} (${p[1]})`).join('، ') + '.');
+          if (st.mm.length > 1) { const l = st.mm[st.mm.length - 1][1], p = st.mm[st.mm.length - 2][1]; parts.push(`نشاط الأرشفة في الشهر الأخير ${l >= p ? 'ارتفع' : 'انخفض'} من ${p} إلى ${l} مستنداً.`); }
+          const bad = anomalies.filter(a => a.sev === 'bad').length; parts.push(bad ? `⚠️ يوجد <b>${bad}</b> ملاحظة حرجة (تكرار/تعارض مبلغ) تستحق المراجعة.` : '✅ لا ملاحظات حرجة.');
+          return parts.join(' ');
+        }
+        function render() {
+          if (!$('view-smart')) return; classify(); detect(); const st = stats(), k = (l, v, c) => `<div class="luxe-card p-4"><div class="text-[11px]" style="color:var(--text-secondary)">${l}</div><div class="text-2xl font-extrabold mt-1 font-en" style="${c || ''}">${v}</div></div>`;
+          $('v11Kpis').innerHTML = k('مستندات', documents.length) + k('اقتراحات تصنيف', suggestions.length, 'color:#34d399') + k('ملاحظات حرجة', anomalies.filter(a => a.sev === 'bad').length, 'color:#fb7185') + k('تحذيرات', anomalies.filter(a => a.sev === 'warn').length, 'color:#fbbf24');
+          renderSearch(); renderCls(); renderAnom(); $('v11Rep').innerHTML = narrative(st) + (st.mm.length ? `<div class="mt-3 space-y-1">${st.mm.map(([m, c]) => `<div class="flex items-center gap-2 text-[11px]"><span class="font-en w-16 shrink-0">${m}</span><div class="h-2 rounded bg-amber-400" style="width:${Math.max(4, c / Math.max(...st.mm.map(x => x[1])) * 100)}%"></div><span class="font-en">${c}</span></div>`).join('')}</div>` : '');
+        }
+        function exportReport() {
+          const st = stats(), html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير التنفيذي الذكي</title><style>body{font-family:Tahoma,Arial,sans-serif;padding:28px;color:#0f172a;line-height:1.9}h1{color:#8e6b19;border-bottom:2px solid #d4af37;padding-bottom:8px}li{margin:4px 0}</style></head><body><h1>التقرير التنفيذي الذكي — أرشيف الكمالي برو</h1><p>${narrative(st)}</p>${lastAi ? '<h3>تحليل الذكاء الاصطناعي</h3><p style="white-space:pre-wrap">' + escapeHtml(lastAi) + '</p>' : ''}<h3>ملاحظات المراجعة</h3><ul>${anomalies.slice(0, 80).map(a => `<li><b>${a.title}:</b> ${escapeHtml(a.txt)}</li>`).join('') || '<li>لا ملاحظات.</li>'}</ul><p style="color:#64748b;font-size:12px">أُنشئ في ${new Date().toLocaleString('ar-YE')}</p>${typeof v10ReportFooter === 'function' ? v10ReportFooter() : ''}</body></html>`;
+          const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' })); a.download = `Smart_Report_${new Date().toISOString().slice(0, 10)}.html`; document.body.appendChild(a); a.click(); a.remove(); logActivity('تصدير التقرير التنفيذي الذكي');
+        }
+        async function aiAnalyze() {
+          const key = $('v11Key').value.trim(), model = $('v11Model').value.trim() || 'claude-sonnet-5-5', out = $('v11AiOut'), btn = $('v11AiBtn');
+          if (!key) return showToast('أدخل مفتاح API أولاً', 'warning');
+          if (!navigator.onLine) return showToast('لا يوجد اتصال بالإنترنت', 'warning');
+          if (!documents.length) return showToast('لا توجد مستندات لتحليلها', 'warning');
+          if ($('v11AiRemember').checked) safeSetStorage('alka_v11_ai', { key, model }); else safeSetStorage('alka_v11_ai', {});
+          classify(); detect(); const st = stats(), names = $('v11AiNames').checked, mask = (t, i) => names ? t : 'جهة ' + (i + 1);
+          const data = { documents: documents.length, ocrIndexed: documents.filter(d => (d.ocrText || '').trim()).length, healthScore: st.health, totalsByCurrency: st.tot, topParties: st.top.map((p, i) => ({ name: mask(p[0], i), count: p[1] })), docsPerMonth: st.mm, findings: anomalies.slice(0, 30).map(a => ({ type: a.title, severity: a.sev, detail: names ? a.txt : undefined })), pendingCategorySuggestions: suggestions.length };
+          btn.disabled = true; out.textContent = '⏳ جارٍ التحليل...';
+          try {
+            const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model, max_tokens: 1500, system: 'أنت محلل مالي ومدقق أرشيف مستندات خبير. اكتب بالعربية الفصحى المختصرة تحليلاً لملخص الأرشيف المرسل: (1) أهم الملاحظات، (2) المخاطر وما يستحق المراجعة العاجلة، (3) توصيات عملية مرتبة بالأولوية. لا تخترع أرقاماً غير موجودة في البيانات، وصرّح بما لا تستطيع استنتاجه.', messages: [{ role: 'user', content: JSON.stringify(data) }] }) });
+            const j = await r.json(); if (!r.ok) throw new Error((j.error && j.error.message) || ('HTTP ' + r.status));
+            lastAi = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n'); out.textContent = lastAi || 'لم يصل رد.'; logActivity('تحليل التقرير بالذكاء الاصطناعي');
+          } catch (e) { out.innerHTML = '<span class="text-rose-400">تعذّر التحليل: ' + escapeHtml(e.message || String(e)) + '</span>'; }
+          btn.disabled = false;
+        }
+        function bind() {
+          if (!$('v11Q') || $('v11Q').dataset.b) return; $('v11Q').dataset.b = 1;
+          let tm; $('v11Q').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(renderSearch, 220); });
+          $('v11Q').addEventListener('keydown', e => { if (e.key === 'Enter') renderSearch(); });
+          $('v11Go').addEventListener('click', renderSearch); $('v11AiBtn').addEventListener('click', aiAnalyze); { const sv = safeGetStorage('alka_v11_ai', {}); if (sv.key) { $('v11Key').value = sv.key; $('v11AiRemember').checked = true; } if (sv.model) $('v11Model').value = sv.model; } $('v11Export').addEventListener('click', exportReport);
+          $('v11ApplyAll').addEventListener('click', async () => { if (suggestions.length && await showConfirmDialog('تطبيق التصنيفات', `سيُعاد تصنيف ${suggestions.length} مستند تلقائياً. متابعة؟`)) applyCls(suggestions.slice()); });
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SR) $('v11Mic').classList.add('hidden'); else $('v11Mic').addEventListener('click', () => { const r = new SR(); r.lang = 'ar-SA'; r.onresult = e => { $('v11Q').value = e.results[0][0].transcript; renderSearch(); }; r.onerror = () => showToast('تعذّر البحث الصوتي', 'warning'); try { r.start(); showToast('🎤 تحدّث الآن...', 'info'); } catch (_) {} });
+        }
+        return { render, bind, search };
+      })();
+      window.addEventListener('DOMContentLoaded', () => setTimeout(V11.bind, 120));
       window.addEventListener('DOMContentLoaded', () => setTimeout(initV10, 80));
 
       window.addEventListener('DOMContentLoaded', initApp);
