@@ -371,6 +371,10 @@
     [data-theme="light"] .text-rose-300:not(#ssModal *), [data-theme="light"] .text-rose-400:not(#ssModal *), [data-theme="light"] .text-red-300:not(#ssModal *), [data-theme="light"] .text-red-400:not(#ssModal *) { color: #b91c1c !important; }
     [data-theme="light"] .text-slate-300:not(#ssModal *), [data-theme="light"] .text-slate-400:not(#ssModal *) { color: #475569 !important; }
     [data-theme="light"] .text-white:not(#ssModal *):not(.btn-luxe-gold):not([class*="bg-"]) { color: var(--text-primary) !important; }
+    /* v12: الشريط الجانبي يبقى ثابتاً في الكمبيوتر عند تمرير الصفحة (يتمرر داخلياً فقط إن طال) */
+    @media (min-width: 1024px) {
+      #sidebar { position: sticky !important; top: 0; align-self: flex-start; flex-shrink: 0; height: 100vh !important; height: 100dvh !important; }
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-amber-500/30 pb-16 sm:pb-0">
