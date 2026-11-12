@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v9." />
+  <meta name="description" content="أرشيف الكمالي برو — منصة أرشفة إلكترونية ذكية مع تصوير مباشر بكاميرا الجوال، استخراج نصوص OCR عربي، مطابقة مالية ذكية، دمج PDF، وتصدير Excel و CSV. Alkamaly Pro Archive Luxe v12." />
   <meta name="keywords" content="أرشيف الكمالي برو, Alkamaly Pro, أرشفة إلكترونية, OCR عربي, مسح ضوئي, أرشيف رقمي, سندات مالية, كاميرا الجوال, Google Sites" />
   <meta name="author" content="م. سمير مدهش الكمالي — sma812020@gmail.com" />
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Alkamaly Pro Archive" />
-  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v9" />
+  <meta property="og:title" content="أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v12" />
   <meta property="og:description" content="منصة الأرشفة الذكية، التصوير المباشر بكاميرا الجوال، واستخراج النصوص OCR العربي" />
   <meta property="og:url" content="https://sites.google.com/view/alkamalypro/full-page-embed" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -20,17 +20,18 @@
   <meta name="theme-color" content="#070d1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v11</title>
+  <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v12</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <link rel="stylesheet" href="libs/fonts/fonts.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap'" />
+  <script src="libs/tailwind.js"></script>
+  <script>window.tailwind||document.write('<script src="https://cdn.tailwindcss.com/3.4.17"><\/script>')</script>
+  <script defer src="libs/chart.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';document.head.appendChild(s)"></script>
+  <script defer src="libs/tesseract.min.js" onload="window.__tessLocal=true" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';document.head.appendChild(s)"></script>
+  <script defer src="libs/qrious.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';document.head.appendChild(s)"></script>
+  <script defer src="libs/jszip.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';document.head.appendChild(s)"></script>
+  <script defer src="libs/peerjs.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';document.head.appendChild(s)"></script>
+  <script defer src="libs/pdf.min.js" onload="window.__pdfLocal=true" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';document.head.appendChild(s)"></script>
   <style>
     :root {
       --bg-primary: #070d1b;
@@ -46,7 +47,7 @@
       --border-subtle: rgba(255, 255, 255, 0.08);
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
-      --text-muted: #64748b;
+      --text-muted: #8c9bb5;
       --shadow-luxe: 0 14px 36px rgba(0, 0, 0, 0.45);
     }
 
@@ -56,9 +57,9 @@
       --bg-card: #ffffff;
       --bg-card-hover: #faf8f4;
       --bg-input: #f8f6f1;
-      --gold: #b48a28;
-      --gold-light: #d4af37;
-      --gold-dark: #8e6b19;
+      --gold: #8e6b19;
+      --gold-light: #b48a28;
+      --gold-dark: #6f5210;
       --gold-soft: rgba(180, 138, 40, 0.12);
       --border-gold: rgba(180, 138, 40, 0.35);
       --border-subtle: rgba(15, 23, 42, 0.09);
@@ -335,6 +336,41 @@
     @media (max-width:767px){body{padding-bottom:env(safe-area-inset-bottom)}.luxe-input{font-size:16px}#toastContainer{max-width:calc(100vw - 24px)}}
     @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     @media print{#sidebar,#toastContainer,.v9-more{display:none!important}}
+
+    /* ===== v12: تكيّف شامل للنوافذ المنبثقة والشاشات + ألوان الوضع النهاري ===== */
+    img, video, canvas, svg { max-width: 100%; }
+    table { max-width: 100%; }
+    .luxe-input, select, textarea { min-width: 0; max-width: 100%; }
+    :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+    [id$="Modal"].fixed {
+      overflow-y: auto; overscroll-behavior: contain;
+      padding-top: max(.5rem, env(safe-area-inset-top, 0px));
+      padding-bottom: max(.5rem, env(safe-area-inset-bottom, 0px));
+      padding-left: max(.5rem, env(safe-area-inset-left, 0px));
+      padding-right: max(.5rem, env(safe-area-inset-right, 0px));
+    }
+    [id$="Modal"].fixed > .luxe-card-gold { max-height: calc(100dvh - 1rem) !important; overflow-y: auto; margin-block: auto; }
+    #docViewerModal > .luxe-card-gold, #ssModal > .luxe-card-gold { overflow: hidden auto; }
+    #docViewerModal > .luxe-card-gold { overflow: hidden; }
+    #confirmModal > .luxe-card-gold, #stampSignatureModal > .luxe-card-gold, #qrCertificateModal > .luxe-card-gold { padding: 1.1rem; }
+    @media (max-width: 640px) {
+      [id$="Modal"].fixed > .luxe-card-gold { border-radius: 14px; }
+      #ssModal > .luxe-card-gold, #docViewerModal > .luxe-card-gold { max-width: 100% !important; border-radius: 10px; }
+      #toastContainer { left: 8px !important; right: 8px !important; }
+    }
+    @media (max-height: 520px) and (orientation: landscape) {
+      [id$="Modal"].fixed > .luxe-card-gold { max-height: calc(100dvh - .5rem) !important; }
+    }
+    @media (min-width: 1536px) { html { font-size: 17px; } }
+    @media (min-width: 1920px) { html { font-size: 18px; } #ssModal > .luxe-card-gold { max-width: 64rem; } }
+
+    /* ألوان نص تيلويند الفاتحة غير مقروءة على خلفية النهار: نعيد ضبطها خارج النوافذ الداكنة الثابتة */
+    [data-theme="light"] .text-amber-300:not(#ssModal *), [data-theme="light"] .text-amber-400:not(#ssModal *), [data-theme="light"] .text-yellow-300:not(#ssModal *) { color: #8e6b19 !important; }
+    [data-theme="light"] .text-emerald-300:not(#ssModal *), [data-theme="light"] .text-emerald-400:not(#ssModal *) { color: #047857 !important; }
+    [data-theme="light"] .text-sky-300:not(#ssModal *), [data-theme="light"] .text-sky-400:not(#ssModal *), [data-theme="light"] .text-blue-300:not(#ssModal *), [data-theme="light"] .text-blue-400:not(#ssModal *) { color: #1d4ed8 !important; }
+    [data-theme="light"] .text-rose-300:not(#ssModal *), [data-theme="light"] .text-rose-400:not(#ssModal *), [data-theme="light"] .text-red-300:not(#ssModal *), [data-theme="light"] .text-red-400:not(#ssModal *) { color: #b91c1c !important; }
+    [data-theme="light"] .text-slate-300:not(#ssModal *), [data-theme="light"] .text-slate-400:not(#ssModal *) { color: #475569 !important; }
+    [data-theme="light"] .text-white:not(#ssModal *):not(.btn-luxe-gold):not([class*="bg-"]) { color: var(--text-primary) !important; }
   </style>
 </head>
 <body class="antialiased selection:bg-amber-500/30 pb-16 sm:pb-0">
@@ -2483,7 +2519,10 @@
           SS.awaitingImmediateBack = null; ssAdvanceSerial(1);
           if (SS.voiceRead) speakArabicText(`اكتمل وجهان للسند ${doc.docNumber}`);
         } else if (SS.pass === 1) {
-          const serial = String(SS.serial);
+          let serial = String(SS.serial);
+          { const used = new Set(documents.map(d => d.title + '|' + d.docNumber)); let g = 0, moved = false;
+            while (used.has(`${SS.prefix} رقم ${serial}|${serial}`) && g++ < 5000) { const nx = SS.serial + ssStepDelta(); if (nx < 1) break; SS.serial = nx; serial = String(nx); moved = true; }
+            if (moved) { ssAdvanceSerial(0); showToast(`الرقم المتسلسل مستخدم مسبقاً — تم الانتقال تلقائياً إلى #${serial}`, 'info'); } }
           const customFolder = SS.subFolder ? `${activeFolderName}/${SS.subFolder}` : `${activeFolderName}/التدفق_الذكي_${new Date().toISOString().slice(0, 10)}`;
           await finalizeCameraDocument({ title: `${SS.prefix} رقم ${serial}`, docNumber: serial, category: SS.category, priority: SS.priority, pages: [page(1)], size, autoOcr: false, autoInc: false });
           const doc = documents.find(d => d.source === 'camera' && d.docNumber === serial && d.pages && d.pages[0] && d.pages[0].dataUrl === url);
@@ -2493,6 +2532,7 @@
           else { ssAdvanceSerial(1); if (SS.voiceRead) speakArabicText(`سند ${serial}`); }
         } else {
           const doc = SS.docs[SS.order === 'reverse' ? SS.docs.length - 1 - SS.ptr : SS.ptr];
+          if (!doc) { showToast('لا يوجد سند أمامي متبقٍّ لإرفاق هذا الظهر — انتهت السندات المصوّرة', 'warning'); return false; }
           if (!manualTrigger && ssEl('ssBlankChk')?.checked && ssBlank(out)) { SS.log.push({ doc, added: false }); SS.ptr++; thumbOk = false; showToast(`ظهر السند ${doc.docNumber} فارغ، تم تخطيه`, 'info'); }
           else if (doc) { doc.pages.push(page(2)); doc.size = (doc.size || 0) + size; SS.log.push({ doc, added: true }); SS.ptr++; safeSetStorage(STORAGE_DOCS_KEY, documents); await ssWriteDocToDiskIfConnected(doc); refreshAllUI(); }
         }
@@ -2885,7 +2925,7 @@
             ssApplyVideoTransform();
           };
 
-          ssEl('ssSerialInput').oninput = e => { const val = parseInt(e.target.value, 10); if (!isNaN(val) && val >= 1) { SS.serial = val; ssHud('تم تحديث رقم السند الحالي'); } };
+          ssEl('ssSerialInput').oninput = e => { const val = parseInt(e.target.value, 10); if (!isNaN(val) && val >= 1) { SS.serial = val; ssAdvanceSerial(0); ssHud('تم تحديث رقم السند الحالي'); } };
           ssEl('ssStepDirSelect').onchange = e => { SS.stepDir = e.target.value; ssHud(SS.stepDir === 'desc' ? 'تم تفعيل الترتيب التنازلي (-1)' : 'تم تفعيل الترتيب التصاعدي (+1)'); };
           ssEl('ssMode').onchange = e => { SS.mode = e.target.value; SS.awaitingImmediateBack = null; SS.targetAttachBackDoc = null; ssRenderThumbs(); ssHud('تم تحديث نمط أوجه السند'); };
           ssEl('ssCropModeSelect').onchange = e => {
@@ -3052,6 +3092,13 @@
           document.getElementById('confirmOkBtn').onclick = () => cleanup(true);
           document.getElementById('confirmCancelBtn').onclick = () => cleanup(false);
         });
+      }
+      // أول رقم سند غير مستخدم بدءاً من start (يتجنب التصادم مع السندات الموجودة أو المضافة في نفس الدفعة)
+      function nextFreeDocNumber(start, used) {
+        const set = used || new Set(documents.map(d => String(d.docNumber)));
+        let n = parseInt(start, 10); if (!(n >= 1)) n = 1001;
+        while (set.has(String(n))) n++;
+        return n;
       }
       function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
       function formatBytes(bytes) { if (!bytes || bytes <= 0) return '0 KB'; if (bytes < 1024) return bytes + ' B'; if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'; return (bytes / (1024 * 1024)).toFixed(2) + ' MB'; }
@@ -3363,6 +3410,7 @@
         await mcKeepAwake();
         let okCount = 0, failCount = 0, warnCount = 0, doneBytes = 0;
         const totalBytes = validItems.reduce((acc, x) => acc + (x.file.size || 0), 0), startTime = performance.now();
+        const mcUsedNums = new Set(documents.map(d => String(d.docNumber)));
         const applyScanToPicked = document.getElementById('mcApplyPickedCheck')?.checked, filterMode = document.getElementById('mcFilterSelect')?.value || 'color', enhanceOn = document.getElementById('mcEnhanceCheck')?.checked !== false, warnBlurOn = document.getElementById('mcWarnBlurCheck')?.checked;
         try {
           for (let i = 0; i < validItems.length; i++) {
@@ -3383,8 +3431,9 @@
                 if (applyScanToPicked) { if (warnBlurOn && measureCanvasSharpness(c) < 38) { warnMsg = '⚠️ تنبيه: الصورة قد تكون ضبابية قليلاً'; warnCount++; } applyMobileCapturePixelFilter(c, filterMode, enhanceOn); }
                 const dataUrl = c.toDataURL('image/jpeg', 0.88);
                 const serialInput = document.getElementById('camNextSerial');
-                const serialNum = String(serialInput?.value || (1000 + documents.length + 1));
-                if (serialInput && document.getElementById('camAutoIncrementCheck')?.checked) serialInput.value = (parseInt(serialNum, 10) || 1000) + 1;
+                const autoInc = !!document.getElementById('camAutoIncrementCheck')?.checked, wanted = serialInput?.value || (1000 + documents.length + 1);
+                const serialNum = autoInc ? String(nextFreeDocNumber(wanted, mcUsedNums)) : String(wanted); mcUsedNums.add(serialNum);
+                if (serialInput && autoInc) serialInput.value = nextFreeDocNumber((parseInt(serialNum, 10) || 1000) + 1, mcUsedNums);
                 const cleanTitle = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
                 const newDoc = { id: 'mc-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), title: cleanTitle || `مستند جوال رقم ${serialNum}`, docNumber: serialNum, folder: item.folderPath || baseFolder, category: guessCategory(display), date: new Date(f.lastModified || Date.now()).toISOString().slice(0, 10), priority: 'normal', source: 'camera', ocrText: '', pages: [{ name: f.name, type: 'image/jpeg', dataUrl }], size: f.size || Math.round((dataUrl.length * 3) / 4) };
                 documents.unshift(newDoc); camSessionCapturedCount++;
@@ -3625,12 +3674,12 @@
         } else if (groupingMode === 'pairs-dual') {
           const mediaList = allEntries.filter(e => supportedMediaExt.test(e.file.name));
           mediaList.sort((a, b) => a.file.name.localeCompare(b.file.name, undefined, { numeric: true }));
-          let pairIdx = 1;
+          let pairIdx = 1; const pairUsed = new Set(documents.map(d => String(d.docNumber)));
           for (let i = 0; i < mediaList.length; i += 2) {
             const front = mediaList[i], back = mediaList[i + 1], pages = []; let totalSize = front.file.size;
             const frontUrl = await readOptimizedMediaDataUrl(front.file, compressImages); pages.push({ name: 'page-1.jpg', type: front.file.type || 'image/jpeg', dataUrl: frontUrl }); updateProg(`استيراد الوجه الأمامي: ${front.file.name}`);
             if (back) { totalSize += back.file.size; const backUrl = await readOptimizedMediaDataUrl(back.file, compressImages); pages.push({ name: 'page-2.jpg', type: back.file.type || 'image/jpeg', dataUrl: backUrl }); updateProg(`استيراد الوجه الخلفي: ${back.file.name}`); }
-            const serialNum = String(1000 + documents.length + pairIdx);
+            const serialNum = String(nextFreeDocNumber(1000 + documents.length + 1, pairUsed)); pairUsed.add(serialNum);
             newDocs.push({ id: 'pair-' + Date.now() + '-' + pairIdx, title: `سند مزدوج رقم ${serialNum}`, docNumber: serialNum, folder: front.folderPath || rootFolderName, category: customCategory || guessCategory(rootFolderName), date: new Date(front.file.lastModified || Date.now()).toISOString().slice(0, 10), priority: 'normal', source: 'upload', ocrText: '', pages, size: totalSize }); pairIdx++;
           }
         } else {
@@ -3708,7 +3757,7 @@
         if (typeof window.pdfjsLib === 'undefined') return null;
         try {
           if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = window.__pdfLocal ? 'libs/pdf.worker.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
           }
           const u8 = dataUrlToUint8Array(dataUrl);
           if (!u8) return null;
@@ -4339,7 +4388,7 @@
               if (!payload || payload.type !== 'voucher-image') return;
               bridgeReceivedCount++;
               const cntEl = document.getElementById('bridgeReceivedCounter'); if (cntEl) cntEl.textContent = `السندات المستلمة من الجوال: ${bridgeReceivedCount}`;
-              const serial = String(payload.serial || (1000 + documents.length + 1)), prefix = payload.prefix || 'سند مالي';
+              const serial = String(nextFreeDocNumber(payload.serial || (1000 + documents.length + 1))), prefix = payload.prefix || 'سند مالي';
               await finalizeCameraDocument({ title: `${prefix} رقم ${serial}`, docNumber: serial, category: categories[0] ? categories[0].name : 'سندات مالية', priority: 'normal', pages: [{ name: `mobile-${serial}.jpg`, type: 'image/jpeg', dataUrl: payload.dataUrl }], size: payload.size || Math.round((payload.dataUrl.length * 3) / 4), autoOcr: document.getElementById('camAutoOcrCheck')?.checked !== false, autoInc: true });
               try { conn.send({ type: 'ack', serial }); } catch (_) {}
             });
@@ -5409,7 +5458,7 @@
         const worker = async (lang, o) => {
           wlog = o && o.logger;
           const arm = () => { clearTimeout(wt); wt = setTimeout(() => { const w = wk; wk = null; if (w) w.terminate().catch(() => {}); }, 180000); };
-          if (!wk || wl !== lang) { if (wk) { try { await wk.terminate(); } catch (_) {} } wk = await Tesseract.createWorker(lang, 1, { logger: m => { arm(); if (wlog) wlog(m); } }); wl = lang; }
+          if (!wk || wl !== lang) { if (wk) { try { await wk.terminate(); } catch (_) {} } wk = await Tesseract.createWorker(lang, 1, { ...(window.__tessLocal ? { workerPath: new URL('libs/tesseract/worker.min.js', location.href).href, corePath: new URL('libs/tesseract/core', location.href).href, langPath: new URL('libs/tesseract/lang', location.href).href } : {}), logger: m => { arm(); if (wlog) wlog(m); } }); wl = lang; }
           arm(); return wk;
         };
         const batchOcr = async ids => {
