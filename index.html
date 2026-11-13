@@ -23,15 +23,14 @@
   <title>أرشيف الكمالي برو | Alkamaly Pro Archive Luxe v12</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="libs/fonts/fonts.css" onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap'" />
-  <script src="libs/tailwind.js"></script>
-  <script>window.tailwind||document.write('<script src="https://cdn.tailwindcss.com/3.4.17"><\/script>')</script>
-  <script defer src="libs/chart.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';document.head.appendChild(s)"></script>
-  <script defer src="libs/tesseract.min.js" onload="window.__tessLocal=true" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';document.head.appendChild(s)"></script>
-  <script defer src="libs/qrious.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';document.head.appendChild(s)"></script>
-  <script defer src="libs/jszip.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';document.head.appendChild(s)"></script>
-  <script defer src="libs/peerjs.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';document.head.appendChild(s)"></script>
-  <script defer src="libs/pdf.min.js" onload="window.__pdfLocal=true" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';document.head.appendChild(s)"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
       --bg-primary: #070d1b;
@@ -369,7 +368,9 @@
     [data-theme="light"] .text-emerald-300:not(#ssModal *), [data-theme="light"] .text-emerald-400:not(#ssModal *) { color: #047857 !important; }
     [data-theme="light"] .text-sky-300:not(#ssModal *), [data-theme="light"] .text-sky-400:not(#ssModal *), [data-theme="light"] .text-blue-300:not(#ssModal *), [data-theme="light"] .text-blue-400:not(#ssModal *) { color: #1d4ed8 !important; }
     [data-theme="light"] .text-rose-300:not(#ssModal *), [data-theme="light"] .text-rose-400:not(#ssModal *), [data-theme="light"] .text-red-300:not(#ssModal *), [data-theme="light"] .text-red-400:not(#ssModal *) { color: #b91c1c !important; }
-    [data-theme="light"] .text-slate-300:not(#ssModal *), [data-theme="light"] .text-slate-400:not(#ssModal *) { color: #475569 !important; }
+    [data-theme="light"] .text-slate-200:not(#ssModal *), [data-theme="light"] .text-slate-300:not(#ssModal *), [data-theme="light"] .text-slate-400:not(#ssModal *) { color: #334155 !important; }
+    [data-theme="light"] .text-purple-300:not(#ssModal *), [data-theme="light"] .text-purple-400:not(#ssModal *) { color: #6d28d9 !important; }
+    #docViewerModal #viewerMainToolbarRow button, #docViewerModal #viewerOcrPane button { min-height: 30px; white-space: nowrap; }
     [data-theme="light"] .text-white:not(#ssModal *):not(.btn-luxe-gold):not([class*="bg-"]) { color: var(--text-primary) !important; }
     /* v12: الشريط الجانبي يبقى ثابتاً في الكمبيوتر عند تمرير الصفحة (يتمرر داخلياً فقط إن طال) */
     @media (min-width: 1024px) {
@@ -1351,7 +1352,7 @@
           <div><label class="block text-xs font-semibold mb-1" style="color: var(--text-secondary);">التاريخ</label><input type="date" id="docDateInput" class="luxe-input w-full" required /></div>
           <div><label class="block text-xs font-semibold mb-1" style="color: var(--text-secondary);">الأولوية</label><select id="docPriorityInput" class="luxe-input w-full"><option value="normal">عادي (مؤرشف)</option><option value="important">هام جداً ⭐</option></select></div>
         </div>
-        <div><label class="block text-xs font-semibold mb-1" style="color: var(--text-secondary);">إرفاق صور المستند (أو الالتقاط بالكاميرا) أو ملف PDF</label><input type="file" id="docFilesInput" multiple accept="image/*,.pdf,.txt,.csv,.json,.docx,.xlsx,audio/*,video/*" class="luxe-input w-full text-xs" /></div>
+        <div><label class="block text-xs font-semibold mb-1" style="color: var(--text-secondary);">إرفاق صور المستند (أو الالتقاط بالكاميرا) أو ملف PDF</label><input type="file" id="docFilesInput" multiple accept="image/*,.pdf,.txt" capture="environment" class="luxe-input w-full text-xs" /></div>
         <div class="flex items-center justify-between p-3 rounded-xl border" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
           <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="docRunOcrCheck" checked class="accent-amber-400 w-4 h-4" /><span>استخراج النص تلقائياً عبر OCR بعد الإضافة</span></label>
           <span class="text-[11px] text-amber-400 font-en">Tesseract OCR</span>
@@ -1400,22 +1401,26 @@
       <div id="viewerBodyGrid" class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-y-auto lg:overflow-hidden viewer-scroll-area">
         <!-- Media Pane -->
         <div id="viewerMediaPane" class="lg:col-span-7 flex flex-col border-b lg:border-b-0 lg:border-l min-h-[340px] sm:min-h-[420px] lg:min-h-0 lg:h-full shrink-0 overflow-hidden" style="border-color: var(--border-subtle);">
-          <div class="px-2.5 sm:px-4 py-1.5 border-b flex flex-col gap-1.5 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
-            <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
-              <button type="button" id="zoomOutBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تصغير">➖</button>
-              <span id="zoomLevelText" class="font-mono-code px-1.5 font-bold text-amber-400 shrink-0">100%</span>
-              <button type="button" id="zoomInBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تكبير">➕</button>
-              <button type="button" id="zoomResetBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="إعادة ضبط (0)">1:1</button>
-              <button type="button" id="rotateDocBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تدوير 90 درجة">↻ تدوير</button>
-              <button type="button" id="enhanceScanBtn" class="btn-luxe-outline !py-1 !px-2 shrink-0" title="تحسين وضوح المسح الضوئي">✨ تباين</button>
-              <button type="button" id="zonalOcrModeBtn" class="btn-luxe-outline !py-1 !px-2 !border-amber-400/50 !text-amber-300 shrink-0" title="تحديد منطقة على المستند لقراءتها بـ OCR">🎯 قراءة منطقة</button>
-              <button type="button" id="viewerStampModalBtn" class="btn-luxe-outline !py-1 !px-2 !border-emerald-400/50 !text-emerald-300 shrink-0" title="ختم رسمي أو توقيع إلكتروني">✒️ ختم وتوقيع</button>
-              <button type="button" id="viewerExportSinglePdfBtn" class="btn-luxe-outline !py-1 !px-2 !border-sky-400/50 !text-sky-300 shrink-0" title="تصدير هذا المستند كملف PDF">📕 PDF</button>
+          <div class="px-2.5 sm:px-3.5 py-2 border-b flex flex-col gap-1.5 text-xs shrink-0" style="background-color: var(--bg-input); border-color: var(--border-subtle);">
+            <div id="viewerMainToolbarRow" class="flex flex-wrap items-center gap-1.5">
+              <div class="inline-flex items-center gap-0.5 rounded-lg p-0.5 border" style="background-color: var(--bg-card); border-color: var(--border-subtle);">
+                <button type="button" id="zoomOutBtn" class="btn-luxe-outline !py-0.5 !px-2 !border-0 text-xs shrink-0" title="تصغير">➖</button>
+                <span id="zoomLevelText" class="font-mono-code px-1.5 font-extrabold text-amber-400 text-[11px] shrink-0">100%</span>
+                <button type="button" id="zoomInBtn" class="btn-luxe-outline !py-0.5 !px-2 !border-0 text-xs shrink-0" title="تكبير">➕</button>
+                <button type="button" id="zoomResetBtn" class="btn-luxe-outline !py-0.5 !px-2 !border-0 text-[11px] shrink-0" title="إعادة ضبط (0)">1:1</button>
+              </div>
+              <button type="button" id="rotateDocBtn" class="btn-luxe-outline !py-1 !px-2 text-xs shrink-0" title="تدوير 90 درجة">↻ تدوير</button>
+              <button type="button" id="enhanceScanBtn" class="btn-luxe-outline !py-1 !px-2 text-xs shrink-0" title="تحسين وضوح المسح الضوئي">✨ تباين</button>
+              <button type="button" id="zonalOcrModeBtn" class="btn-luxe-outline !py-1 !px-2 text-xs !border-amber-400/50 !text-amber-300 shrink-0" title="تحديد منطقة على المستند لقراءتها بـ OCR">🎯 قراءة منطقة</button>
+              <button type="button" id="viewerStampModalBtn" class="btn-luxe-outline !py-1 !px-2 text-xs !border-emerald-400/50 !text-emerald-300 shrink-0" title="ختم رسمي أو توقيع إلكتروني">✒️ ختم وتوقيع</button>
+              <button type="button" id="viewerExportSinglePdfBtn" class="btn-luxe-outline !py-1 !px-2 text-xs !border-sky-400/50 !text-sky-300 shrink-0" title="تصدير هذا المستند كملف PDF">📕 PDF</button>
               <button type="button" id="viewerOpenRawPdfBtn" class="hidden btn-luxe-gold !py-1 !px-2.5 text-xs shrink-0" title="فتح أو مشاركة ملف PDF الأصلي">📄 فتح PDF الأصلي</button>
             </div>
-            <div id="viewerPagesBar" class="hidden flex items-center justify-between gap-2 pt-1 border-t" style="border-color: var(--border-subtle);">
-              <span class="text-[11px] shrink-0" style="color: var(--text-secondary);">الصفحة / الوجه:</span>
-              <div id="viewerPageButtons" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
+            <div id="viewerPagesBar" class="flex flex-wrap items-center justify-between gap-1.5 pt-1.5 border-t" style="border-color: var(--border-subtle);">
+              <div class="flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
+                <span class="text-[11px] font-bold shrink-0" style="color: var(--text-secondary);">📑 الصفحات:</span>
+                <div id="viewerPageButtons" class="flex flex-wrap items-center gap-1 max-h-20 overflow-y-auto py-0.5"></div>
+              </div>
             </div>
           </div>
 
@@ -4112,22 +4117,44 @@
         const pagesBar = document.getElementById('viewerPagesBar');
         const pageBtns = document.getElementById('viewerPageButtons');
         if (!pagesBar || !pageBtns) return;
+        pagesBar.classList.remove('hidden');
         const hasMultipleDocPages = pages.length > 1;
         const hasMultiplePdfPages = pdfRenderedInfo && pdfRenderedInfo.pages && pdfRenderedInfo.pages.length > 1;
-        if (!hasMultipleDocPages && !hasMultiplePdfPages) {
-          pagesBar.classList.add('hidden');
-          pageBtns.innerHTML = '';
-          return;
-        }
-        pagesBar.classList.remove('hidden');
         let htmlBtns = '';
+
+        if (pages.length === 1 && !hasMultiplePdfPages) {
+          htmlBtns += `<span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-500/15 text-amber-400 border border-amber-400/30">صفحة 1 / 1</span>`;
+        }
+
         if (hasMultipleDocPages) {
-          htmlBtns += pages.map((p, idx) => `<button type="button" class="px-2.5 py-0.5 rounded text-xs font-bold shrink-0 viewer-page-switch ${idx === currentViewerPageIdx ? 'bg-amber-400 text-slate-950' : 'bg-white/10 text-slate-200'}" data-idx="${idx}">${idx === 0 ? '1 (أمامي)' : idx === 1 ? '2 (خلفي)' : idx + 1}</button>`).join('');
+          htmlBtns += pages.map((p, idx) => {
+            const active = idx === currentViewerPageIdx;
+            const cls = active
+              ? 'px-2.5 py-0.5 rounded-md text-xs font-extrabold shrink-0 viewer-page-switch bg-amber-400 text-slate-950 shadow-sm'
+              : 'btn-luxe-outline !py-0.5 !px-2.5 !rounded-md !text-xs font-bold shrink-0 viewer-page-switch';
+            return `<button type="button" class="${cls}" data-idx="${idx}">${idx === 0 ? 'وجه 1 (أمامي)' : idx === 1 ? 'وجه 2 (خلفي)' : 'صفحة ' + (idx + 1)}</button>`;
+          }).join('');
         }
+
         if (hasMultiplePdfPages) {
+          const totalPdf = pdfRenderedInfo.pages.length;
           if (hasMultipleDocPages) htmlBtns += `<span class="mx-1 opacity-40">|</span>`;
-          htmlBtns += pdfRenderedInfo.pages.map((rp, sIdx) => `<button type="button" class="px-2.5 py-0.5 rounded text-xs font-bold shrink-0 viewer-pdf-subpage-switch ${sIdx === currentPdfSubPageIdx ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-slate-200'}" data-subidx="${sIdx}">صفحة PDF ${sIdx + 1}/${pdfRenderedInfo.pages.length}</button>`).join('');
+          if (totalPdf > 5) {
+            htmlBtns += `<button type="button" id="viewerPdfPrevSubBtn" class="btn-luxe-outline !py-0.5 !px-2 !rounded-md !text-xs font-bold shrink-0" ${currentPdfSubPageIdx <= 0 ? 'disabled style="opacity:0.45"' : ''} title="صفحة PDF السابقة">◀</button>`;
+            htmlBtns += `<select id="viewerPdfSubSelect" class="luxe-input !py-0.5 !px-2 text-xs font-bold shrink-0" style="min-height:28px">
+              ${pdfRenderedInfo.pages.map((rp, sIdx) => `<option value="${sIdx}" ${sIdx === currentPdfSubPageIdx ? 'selected' : ''}>صفحة PDF ${sIdx + 1} من ${totalPdf}</option>`).join('')}
+            </select>`;
+            htmlBtns += `<button type="button" id="viewerPdfNextSubBtn" class="btn-luxe-outline !py-0.5 !px-2 !rounded-md !text-xs font-bold shrink-0" ${currentPdfSubPageIdx >= totalPdf - 1 ? 'disabled style="opacity:0.45"' : ''} title="صفحة PDF التالية">▶</button>`;
+          }
+          htmlBtns += pdfRenderedInfo.pages.map((rp, sIdx) => {
+            const active = sIdx === currentPdfSubPageIdx;
+            const cls = active
+              ? 'px-2.5 py-0.5 rounded-md text-xs font-extrabold shrink-0 viewer-pdf-subpage-switch bg-sky-500 text-white shadow-sm'
+              : 'btn-luxe-outline !py-0.5 !px-2 !rounded-md !text-[11px] font-bold shrink-0 viewer-pdf-subpage-switch';
+            return `<button type="button" class="${cls}" data-subidx="${sIdx}">${totalPdf > 5 ? (sIdx + 1) : `صفحة PDF ${sIdx + 1}/${totalPdf}`}</button>`;
+          }).join('');
         }
+
         pageBtns.innerHTML = htmlBtns;
         pageBtns.querySelectorAll('.viewer-page-switch').forEach(b => b.addEventListener('click', () => {
           currentViewerPageIdx = Number(b.getAttribute('data-idx'));
@@ -4140,6 +4167,12 @@
           viewerZoom = 1; viewerPanX = viewerPanY = 0;
           renderViewerMedia();
         }));
+        const prevSub = document.getElementById('viewerPdfPrevSubBtn');
+        const nextSub = document.getElementById('viewerPdfNextSubBtn');
+        const selSub = document.getElementById('viewerPdfSubSelect');
+        if (prevSub) prevSub.onclick = () => { if (currentPdfSubPageIdx > 0) { currentPdfSubPageIdx--; viewerZoom = 1; viewerPanX = viewerPanY = 0; renderViewerMedia(); } };
+        if (nextSub && pdfRenderedInfo) nextSub.onclick = () => { if (currentPdfSubPageIdx < pdfRenderedInfo.pages.length - 1) { currentPdfSubPageIdx++; viewerZoom = 1; viewerPanX = viewerPanY = 0; renderViewerMedia(); } };
+        if (selSub) selSub.onchange = e => { currentPdfSubPageIdx = Number(e.target.value) || 0; viewerZoom = 1; viewerPanX = viewerPanY = 0; renderViewerMedia(); };
       }
 
       async function renderViewerMedia() {
@@ -5771,201 +5804,698 @@
       window.addEventListener('DOMContentLoaded', initApp);
       window.addEventListener('DOMContentLoaded', () => setTimeout(V9.adapt, 50));
 
-      // ==================== v12: تعديل بيانات السند + محرر الصور + معاينة كل الأنواع ====================
+      // ==================== v13 PRO: استوديو وشاشة استعراض السندات المتقدمة + محرر الصور الذكي + التعديل المباشر ====================
       const v12$ = id => document.getElementById(id);
       function v12Cur() { const doc = documents.find(d => d.id === currentViewerDocId); return { doc, page: doc ? (doc.pages || [])[currentViewerPageIdx] : null }; }
-      function v12Modal(id, html) { const m = document.createElement('div'); m.id = id; m.className = 'fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.innerHTML = html; m.addEventListener('keydown', e => e.stopPropagation()); document.body.appendChild(m); return m; }
+      function v12Modal(id, html) { const m = document.createElement('div'); m.id = id; m.className = 'fixed inset-0 z-[6500] hidden items-center justify-center bg-black/85 backdrop-blur-sm p-2 sm:p-4'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.innerHTML = html; m.addEventListener('keydown', e => e.stopPropagation()); document.body.appendChild(m); return m; }
       function v12Show(m, on) { m.classList.toggle('hidden', !on); m.classList.toggle('flex', on); }
       function v12Ext(p) { const m = /\.[a-z0-9]{2,5}$/i.exec(p.name || ''); return (/^data:image/.test(p.dataUrl || '') || !m) ? '.jpg' : m[0]; }
 
-      // ---------- 1) تعديل بيانات المستند ----------
-      const v12InfoM = v12Modal('v12InfoModal', `<div class="luxe-card-gold w-full max-w-lg p-4 sm:p-5 space-y-3">
-        <div class="flex items-center justify-between gap-2"><h3 class="font-extrabold text-base text-amber-400">✏️ تعديل بيانات المستند</h3><button type="button" id="v12InfoX" class="btn-luxe-outline !py-1 !px-2 text-xs" aria-label="إغلاق">✕</button></div>
-        <label class="block text-xs font-semibold">اسم المستند<input id="v12Title" class="luxe-input w-full mt-1" maxlength="200" /></label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label class="block text-xs font-semibold">رقم المستند<input id="v12Num" class="luxe-input w-full mt-1 font-mono-code" dir="ltr" maxlength="60" /></label>
-          <label class="block text-xs font-semibold">التاريخ<input id="v12Date" type="date" class="luxe-input w-full mt-1" /></label>
-          <label class="block text-xs font-semibold">التصنيف<select id="v12Cat" class="luxe-input w-full mt-1"></select></label>
-          <label class="block text-xs font-semibold">الأهمية<select id="v12Prio" class="luxe-input w-full mt-1"></select></label>
+      // قائمة أنواع السندات والمستندات الشاملة
+      const VOUCHER_SUBTYPES = [
+        { id: 'receipt', label: 'سند قبض نقدي / شيك', icon: '📥', color: '#10b981' },
+        { id: 'payment', label: 'سند صرف مالي', icon: '📤', color: '#f43f5e' },
+        { id: 'journal', label: 'سند قيد يومية مزدوج', icon: '⚖️', color: '#8b5cf6' },
+        { id: 'remittance', label: 'إشعار حوالة مالية / صرافة', icon: '💸', color: '#f59e0b' },
+        { id: 'deposit', label: 'سند إيداع بنكي / توريد', icon: '🏦', color: '#0ea5e9' },
+        { id: 'zakat_tax', label: 'إقرار زكوي / ضريبي رسمي', icon: '🏛️', color: '#14b8a6' },
+        { id: 'invoice', label: 'فاتورة مبيعات / مشتريات ضريبية', icon: '🧾', color: '#ec4899' },
+        { id: 'statement', label: 'كشف حساب / مطابقة رصيد', icon: '📊', color: '#6366f1' },
+        { id: 'contract', label: 'عقد / اتفاقية رسمية', icon: '📜', color: '#d4af37' },
+        { id: 'other', label: 'وثيقة عامة / مرفق أرشيف', icon: '📄', color: '#64748b' }
+      ];
+
+      function detectVoucherSubType(doc) {
+        if (doc && doc.voucherSubType) {
+          const found = VOUCHER_SUBTYPES.find(v => v.id === doc.voucherSubType || v.label === doc.voucherSubType);
+          if (found) return found;
+        }
+        const hay = `${(doc && doc.title) || ''} ${(doc && doc.category) || ''} ${(doc && doc.ocrText) || ''}`;
+        if (/زكو|زكاة|ضريب|إقرار/.test(hay)) return VOUCHER_SUBTYPES[5];
+        if (/قبض|استلمنا/.test(hay)) return VOUCHER_SUBTYPES[0];
+        if (/صرف|ادفعوا/.test(hay)) return VOUCHER_SUBTYPES[1];
+        if (/قيد/.test(hay)) return VOUCHER_SUBTYPES[2];
+        if (/حوال[ةه]|صراف[ةه]|الأعرج|داديه|النجم/.test(hay)) return VOUCHER_SUBTYPES[3];
+        if (/إيداع|ايداع|بنك/.test(hay)) return VOUCHER_SUBTYPES[4];
+        if (/فاتور/.test(hay)) return VOUCHER_SUBTYPES[6];
+        if (/كشف|مطابق|تقرير/.test(hay)) return VOUCHER_SUBTYPES[7];
+        if (/عقد|اتفاق/.test(hay)) return VOUCHER_SUBTYPES[8];
+        return VOUCHER_SUBTYPES[0];
+      }
+
+      // ---------- 1) التعديل المباشر والسريع لرقم واسم المستند وكافة بيانات السند ----------
+      const v12InfoM = v12Modal('v12InfoModal', `<div class="luxe-card-gold w-full max-w-xl p-4 sm:p-6 space-y-3.5 max-h-[94dvh] overflow-y-auto">
+        <div class="flex items-center justify-between gap-2 pb-2 border-b" style="border-color:var(--border-subtle)">
+          <h3 class="font-extrabold text-base text-amber-400">✏️ تعديل رقم واسم المستند وكافة بيانات السند</h3>
+          <button type="button" id="v12InfoX" class="btn-luxe-outline !py-1 !px-2.5 text-xs" aria-label="إغلاق">✕</button>
         </div>
-        <button type="button" id="v12UseDetected" class="hidden text-[11px] text-amber-400 underline"></button>
-        <label class="block text-xs font-semibold">ملاحظات<textarea id="v12Notes" rows="2" class="luxe-input w-full mt-1"></textarea></label>
-        <div class="flex gap-2 justify-end pt-1"><button type="button" id="v12InfoCancel" class="btn-luxe-outline text-xs px-3 py-2">إلغاء</button><button type="button" id="v12InfoSave" class="btn-luxe-gold text-xs px-4 py-2">💾 حفظ التعديلات</button></div></div>`);
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="block text-xs font-bold sm:col-span-2">📄 اسم / عنوان المستند *
+            <input id="v12Title" class="luxe-input w-full mt-1 font-bold" placeholder="مثال: إقرار زكوي أو سند قبض..." maxlength="200" />
+          </label>
+          <label class="block text-xs font-bold text-amber-400">🔢 رقم المستند / السند
+            <input id="v12Num" class="luxe-input w-full mt-1 font-mono-code font-bold text-amber-400" dir="ltr" placeholder="مثال: 1045" maxlength="60" />
+          </label>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="block text-xs font-semibold">📑 نوع السند التفصيلي
+            <select id="v12SubType" class="luxe-input w-full mt-1 text-xs font-bold"></select>
+          </label>
+          <label class="block text-xs font-semibold">🏷️ التصنيف الرئيسي
+            <select id="v12Cat" class="luxe-input w-full mt-1 text-xs"></select>
+          </label>
+          <label class="block text-xs font-semibold">📅 تاريخ السند
+            <input id="v12Date" type="date" class="luxe-input w-full mt-1 text-xs font-mono-code" />
+          </label>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="block text-xs font-semibold text-emerald-400">💰 المبلغ الرقمي
+            <input id="v12AmountNum" type="text" dir="ltr" class="luxe-input w-full mt-1 font-mono-code font-bold text-emerald-400" placeholder="مثال: 2,500,000" />
+          </label>
+          <label class="block text-xs font-semibold">💱 العملة
+            <select id="v12Currency" class="luxe-input w-full mt-1 text-xs font-bold">
+              <option value="ريال يمني">ريال يمني (YER)</option>
+              <option value="ريال سعودي">ريال سعودي (SAR)</option>
+              <option value="دولار أمريكي">دولار أمريكي (USD)</option>
+              <option value="درهم إماراتي">درهم إماراتي (AED)</option>
+            </select>
+          </label>
+          <label class="block text-xs font-semibold">⭐ الأولوية والأهمية
+            <select id="v12Prio" class="luxe-input w-full mt-1 text-xs">
+              <option value="normal">عادي (مؤرشف)</option>
+              <option value="important">⭐ هام جداً</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block text-xs font-semibold">👤 المرسل / الدافع / المكلف
+            <input id="v12Sender" class="luxe-input w-full mt-1 text-xs" placeholder="اسم الجهة أو الشخص الدافع..." />
+          </label>
+          <label class="block text-xs font-semibold">🏢 المستلم / المستفيد / الجهة
+            <input id="v12Receiver" class="luxe-input w-full mt-1 text-xs" placeholder="اسم المستفيد أو الصندوق..." />
+          </label>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block text-xs font-semibold">📂 المجلد الحافظ
+            <input id="v12Folder" class="luxe-input w-full mt-1 text-xs font-mono-code" placeholder="اسم المجلد..." />
+          </label>
+          <label class="block text-xs font-semibold">✍️ المبلغ بالحروف (التفقيط)
+            <input id="v12AmountWords" class="luxe-input w-full mt-1 text-xs" placeholder="مثال: مليونان وخمسمائة ألف ريال..." />
+          </label>
+        </div>
+        <button type="button" id="v12UseDetected" class="hidden text-xs text-amber-400 underline font-bold"></button>
+        <label class="block text-xs font-semibold">📝 ملاحظات التدقيق والأرشفة
+          <textarea id="v12Notes" rows="2" class="luxe-input w-full mt-1 text-xs" placeholder="أي شروحات أو ملاحظات إضافية على السند..."></textarea>
+        </label>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t" style="border-color:var(--border-subtle)">
+          <span class="text-[11px]" style="color:var(--text-secondary)">💡 يمكنك أيضاً تعديل الرقم والاسم والبيانات مباشرة من الشريط العلوي وبطاقات السند في العارض</span>
+          <div class="flex gap-2">
+            <button type="button" id="v12InfoCancel" class="btn-luxe-outline text-xs px-3 py-2">إلغاء</button>
+            <button type="button" id="v12InfoSave" class="btn-luxe-gold text-xs px-5 py-2">💾 حفظ كافة التعديلات</button>
+          </div>
+        </div>
+      </div>`);
+
       function v12OpenInfo() {
         const { doc } = v12Cur(); if (!doc) return;
-        const cat = v12$('v12Cat'), srcCat = v12$('docCategoryInput'), srcPrio = v12$('docPriorityInput');
+        const cat = v12$('v12Cat'), srcCat = v12$('docCategoryInput');
         cat.innerHTML = srcCat && srcCat.options.length ? srcCat.innerHTML : (categories || []).map(c => `<option>${escapeHtml(typeof c === 'string' ? c : (c.name || c.title || ''))}</option>`).join('');
         if (doc.category && ![...cat.options].some(o => o.value === doc.category)) cat.add(new Option(doc.category, doc.category));
         cat.value = doc.category || cat.value;
-        v12$('v12Prio').innerHTML = srcPrio && srcPrio.options.length ? srcPrio.innerHTML : '<option value="normal">عادي</option><option value="important">⭐ هام</option>';
+
+        const subSel = v12$('v12SubType');
+        subSel.innerHTML = VOUCHER_SUBTYPES.map(v => `<option value="${v.id}">${v.icon} ${v.label}</option>`).join('');
+        subSel.value = detectVoucherSubType(doc).id;
+
+        const ent = extractSmartEntities(doc.ocrText || '');
+        const custom = doc.customFields || {};
+
         v12$('v12Prio').value = doc.priority || 'normal';
-        v12$('v12Title').value = doc.title || ''; v12$('v12Num').value = doc.docNumber || ''; v12$('v12Date').value = doc.date || ''; v12$('v12Notes').value = doc.notes || '';
+        v12$('v12Title').value = doc.title || '';
+        v12$('v12Num').value = doc.docNumber || (ent.voucherNumber !== '—' ? ent.voucherNumber : '');
+        v12$('v12Date').value = doc.date || '';
+        v12$('v12Folder').value = doc.folder || activeFolderName || 'دفعة_الجوال';
+        v12$('v12AmountNum').value = custom.amountNum !== undefined ? custom.amountNum : (ent.numericAmount ? ent.numericAmount.toLocaleString('en-US') : '');
+        v12$('v12Currency').value = custom.currency || (ent.currency === 'USD' ? 'دولار أمريكي' : ent.currency === 'SAR' ? 'ريال سعودي' : 'ريال يمني');
+        v12$('v12Sender').value = custom.sender !== undefined ? custom.sender : (ent.sender !== '—' ? ent.sender : '');
+        v12$('v12Receiver').value = custom.receiver !== undefined ? custom.receiver : (ent.receiver !== '—' ? ent.receiver : '');
+        v12$('v12AmountWords').value = custom.amountWords !== undefined ? custom.amountWords : (ent.amountInWords !== '—' ? ent.amountInWords : '');
+        v12$('v12Notes').value = doc.notes || '';
+
         const det = (v12$('entityVoucherNum') || {}).textContent, ub = v12$('v12UseDetected');
-        if (det && det !== '—' && det !== String(doc.docNumber)) { ub.textContent = `استخدام الرقم المكتشف بالـ OCR: ${det}`; ub.dataset.n = det; ub.classList.remove('hidden'); } else ub.classList.add('hidden');
-        v12Show(v12InfoM, true); setTimeout(() => v12$('v12Title').focus(), 50);
+        if (det && det !== '—' && det !== String(doc.docNumber)) {
+          ub.textContent = `✨ استخدام الرقم المكتشف بالـ OCR: ${det}`;
+          ub.dataset.n = det;
+          ub.classList.remove('hidden');
+        } else ub.classList.add('hidden');
+
+        v12Show(v12InfoM, true);
+        setTimeout(() => v12$('v12Title').focus(), 50);
       }
+
       function v12SaveInfo() {
         const { doc } = v12Cur(); if (!doc) return;
         const title = v12$('v12Title').value.trim(), num = v12$('v12Num').value.trim();
         if (!title) { showToast('اسم المستند مطلوب', 'error'); return; }
         const dup = num && documents.some(d => d.id !== doc.id && String(d.docNumber) === num && d.title === title);
-        Object.assign(doc, { title, docNumber: num, category: v12$('v12Cat').value, date: v12$('v12Date').value, priority: v12$('v12Prio').value, notes: v12$('v12Notes').value.trim() });
-        safeSetStorage(STORAGE_DOCS_KEY, documents); refreshAllUI(); v12Show(v12InfoM, false);
-        v12$('viewerDocTitle').textContent = getReadableDocTitle(doc); v12$('viewerDocCategory').textContent = doc.category;
-        v12$('viewerDocImportantBadge').classList.toggle('hidden', doc.priority !== 'important');
-        try { logActivity(`تعديل بيانات: ${doc.title}`); } catch (_) {}
-        showToast(dup ? 'تم الحفظ — تنبيه: يوجد مستند آخر بنفس الاسم والرقم' : 'تم حفظ بيانات المستند ✔', dup ? 'warning' : 'success');
+        const subType = v12$('v12SubType').value;
+        const amountNum = v12$('v12AmountNum').value.trim();
+        const currency = v12$('v12Currency').value;
+        const sender = v12$('v12Sender').value.trim();
+        const receiver = v12$('v12Receiver').value.trim();
+        const amountWords = v12$('v12AmountWords').value.trim();
+
+        doc.customFields = { amountNum, currency, sender, receiver, amountWords };
+        Object.assign(doc, {
+          title,
+          docNumber: num,
+          voucherSubType: subType,
+          category: v12$('v12Cat').value,
+          date: v12$('v12Date').value,
+          folder: v12$('v12Folder').value.trim() || doc.folder,
+          priority: v12$('v12Prio').value,
+          notes: v12$('v12Notes').value.trim()
+        });
+
+        safeSetStorage(STORAGE_DOCS_KEY, documents);
+        refreshAllUI();
+        v12Show(v12InfoM, false);
+        v13SyncViewerHeaderAndEntities(doc);
+        try { logActivity(`تعديل بيانات: ${doc.title} (#${doc.docNumber || '—'})`); } catch (_) {}
+        showToast(dup ? 'تم الحفظ — تنبيه: يوجد مستند آخر بنفس الاسم والرقم' : '✔ تم حفظ وتحديث رقم واسم وبيانات السند بنجاح', dup ? 'warning' : 'success');
       }
       v12$('v12InfoX').onclick = v12$('v12InfoCancel').onclick = () => v12Show(v12InfoM, false);
       v12$('v12InfoSave').onclick = v12SaveInfo;
       v12$('v12UseDetected').onclick = e => { v12$('v12Num').value = e.currentTarget.dataset.n; };
       v12InfoM.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); v12SaveInfo(); } });
 
-      // ---------- 2) محرر الصور ----------
-      const IE = { work: null, orig: null, hist: [], sel: null, mode: 'color', br: 0, ct: 0, sharp: false, ratio: 0, doc: null, page: null, pv: null, drag: null };
-      const ieM = v12Modal('v12ImgModal', `<style>#ieView{max-width:100%;max-height:calc(100dvh - 17rem);touch-action:none;cursor:crosshair;background:#fff}@media(min-width:1024px){#ieView{max-height:calc(100dvh - 7rem)}}</style>
+      // ---------- 2) استوديو تحرير وإصلاح الصور المتقدم (توضيح + قص حر أو بـ 4 نقاط منظور + إزالة ظلال + فلاتر سريعة) ----------
+      const IE = {
+        work: null, orig: null, hist: [], sel: null,
+        cropType: 'rect', // 'rect' | 'quad'
+        quadPts: [{ x: 0.06, y: 0.06 }, { x: 0.94, y: 0.06 }, { x: 0.94, y: 0.94 }, { x: 0.06, y: 0.94 }],
+        dragQuadIdx: -1,
+        mode: 'color', br: 0, ct: 0, sharp: false, denoise: false, autoDeskew: false,
+        ratio: 0, doc: null, page: null, pv: null, drag: null, compareHold: false
+      };
+
+      const ieM = v12Modal('v12ImgModal', `<style>
+        #ieView{max-width:100%;max-height:calc(100dvh - 16rem);touch-action:none;cursor:crosshair;background:#fff;box-shadow:0 12px 32px rgba(0,0,0,0.55);border-radius:8px}
+        @media(min-width:1024px){#ieView{max-height:calc(100dvh - 7.5rem)}}
+      </style>
         <div class="luxe-card-gold w-full max-w-6xl h-[96dvh] flex flex-col overflow-hidden">
-          <div class="flex flex-wrap items-center gap-1.5 p-2 border-b shrink-0" style="border-color:var(--border-subtle)">
-            <h3 class="font-extrabold text-sm text-amber-400 ml-auto">✂️ تحرير الصورة <span id="ieInfo" class="font-mono-code text-[10px] font-normal opacity-70"></span></h3>
-            <button type="button" id="ieUndo" class="btn-luxe-outline !py-1 !px-2 text-xs">↶ تراجع</button>
-            <button type="button" id="ieReset" class="btn-luxe-outline !py-1 !px-2 text-xs">⟲ الأصل</button>
-            <button type="button" id="ieDl" class="btn-luxe-outline !py-1 !px-2 text-xs">⬇️ تنزيل</button>
-            <button type="button" id="ieCancel" class="btn-luxe-outline !py-1 !px-2 text-xs !border-rose-500/40 !text-rose-400">✕ إلغاء</button>
-            <button type="button" id="ieSave" class="btn-luxe-gold !py-1 !px-3 text-xs">💾 حفظ على المستند</button>
+          <div class="flex flex-wrap items-center gap-1.5 p-2.5 border-b shrink-0" style="border-color:var(--border-subtle);background:var(--bg-secondary)">
+            <h3 class="font-extrabold text-sm text-amber-400 ml-auto flex items-center gap-2">
+              <span>✂️ استوديو إصلاح وتوضيح وقص السندات</span>
+              <span id="ieInfo" class="font-mono-code text-[11px] font-normal px-2 py-0.5 rounded bg-white/5 text-slate-300"></span>
+            </h3>
+            <button type="button" id="ieCompareBtn" class="btn-luxe-outline !py-1 !px-2.5 text-xs !border-sky-400/40 !text-sky-300" title="اضغط مطولاً لمقارنة الصورة قبل وبعد التوضيح">👁️ قارن بالأصل</button>
+            <button type="button" id="ieUndo" class="btn-luxe-outline !py-1 !px-2.5 text-xs">↶ تراجع</button>
+            <button type="button" id="ieReset" class="btn-luxe-outline !py-1 !px-2.5 text-xs">⟲ استعادة الأصل</button>
+            <button type="button" id="ieDl" class="btn-luxe-outline !py-1 !px-2.5 text-xs">⬇️ تنزيل</button>
+            <button type="button" id="ieCancel" class="btn-luxe-outline !py-1 !px-2.5 text-xs !border-rose-500/40 !text-rose-400">✕ إغلاق</button>
+            <button type="button" id="ieSaveAndOcr" class="btn-luxe-outline !py-1 !px-3 text-xs !border-emerald-400/60 !text-emerald-300 font-bold" title="حفظ التعديلات وتشغيل OCR فوراً">✨ حفظ + OCR</button>
+            <button type="button" id="ieSave" class="btn-luxe-gold !py-1 !px-3.5 text-xs">💾 حفظ الصورة</button>
           </div>
           <div class="flex-1 min-h-0 flex flex-col lg:flex-row">
-            <div class="flex-1 min-h-0 min-w-0 flex items-center justify-center p-2 overflow-auto"><canvas id="ieView"></canvas></div>
-            <aside class="w-full lg:w-80 max-h-[40dvh] lg:max-h-none overflow-y-auto p-3 space-y-3 border-t lg:border-t-0 lg:border-r text-xs" style="border-color:var(--border-subtle)">
-              <div class="font-bold text-amber-400">القص والتدوير <span class="font-normal opacity-70">(اسحب على الصورة لتحديد منطقة)</span></div>
-              <div class="flex flex-wrap gap-1.5">
-                <button type="button" id="ieAuto" class="btn-luxe-gold !py-1 !px-2">🪄 قص تلقائي</button>
-                <button type="button" id="ieCropBtn" class="btn-luxe-outline !py-1 !px-2 !border-emerald-400/50 !text-emerald-300">✂️ تطبيق القص</button>
-                <button type="button" id="ieClear" class="btn-luxe-outline !py-1 !px-2">إلغاء التحديد</button>
-                <select id="ieRatio" class="luxe-input !py-1 !px-2 !w-auto" aria-label="نسبة القص"><option value="0">نسبة حرة</option><option value="0.7071">A4 عمودي</option><option value="1.4142">A4 أفقي</option><option value="1">1:1</option></select>
+            <div class="flex-1 min-h-0 min-w-0 flex flex-col items-center justify-center p-2.5 overflow-auto doc-viewer-stage relative">
+              <canvas id="ieView"></canvas>
+              <div id="ieHintBanner" class="mt-2 text-[11px] px-3 py-1 rounded-full bg-slate-950/85 border border-amber-400/30 text-amber-300 font-semibold">
+                💡 اسحب على الصورة لتحديد مستطيل القص، أو اختر «📐 قص منظور بـ 4 نقاط» لتعديل السندات المائلة
               </div>
-              <div class="flex flex-wrap items-center gap-1.5">
-                <button type="button" id="ieRotL" class="btn-luxe-outline !py-1 !px-2">↺ 90°</button><button type="button" id="ieRotR" class="btn-luxe-outline !py-1 !px-2">↻ 90°</button>
-                <button type="button" id="ieFlipH" class="btn-luxe-outline !py-1 !px-2">⇋ قلب</button><button type="button" id="ieFlipV" class="btn-luxe-outline !py-1 !px-2">⇅ قلب</button>
+            </div>
+            <aside class="w-full lg:w-84 max-h-[44dvh] lg:max-h-none overflow-y-auto p-3.5 space-y-3 border-t lg:border-t-0 lg:border-r text-xs" style="border-color:var(--border-subtle);background:var(--bg-card)">
+              <div class="p-2.5 rounded-xl border space-y-2" style="background:var(--bg-input);border-color:var(--border-gold)">
+                <div class="font-extrabold text-amber-400 flex items-center justify-between">
+                  <span>⚡ إصلاح ذكي شامل بضغطة واحدة</span>
+                  <span class="text-[10px] text-emerald-400">موصى به</span>
+                </div>
+                <button type="button" id="ieOneClickSuperFix" class="btn-luxe-gold w-full !py-2 text-xs font-extrabold">
+                  🪄 إصلاح شامل (قص الحواف + إزالة الظلال + توضيح الحروف)
+                </button>
               </div>
-              <div class="flex items-center gap-1.5"><span>تعديل الميل</span><input id="ieAngle" type="number" step="0.1" min="-15" max="15" value="0" dir="ltr" class="luxe-input !py-1 !px-2 !w-20" /><span>°</span><button type="button" id="ieAngleBtn" class="btn-luxe-outline !py-1 !px-2">تطبيق</button></div>
-              <div class="font-bold text-amber-400 pt-1">التحسين</div>
-              <div class="grid grid-cols-2 gap-1.5">
-                <button type="button" data-ie-mode="color" class="!py-1 !px-2">🎨 ألوان أصلية</button><button type="button" data-ie-mode="magic" class="!py-1 !px-2">✨ تنظيف الظلال</button>
-                <button type="button" data-ie-mode="gray" class="!py-1 !px-2">⬜ رمادي</button><button type="button" data-ie-mode="bw" class="!py-1 !px-2">◼️ أبيض وأسود</button>
+
+              <div class="space-y-1.5">
+                <div class="font-bold text-amber-400">✂️ نظام القص وتصحيح الميلان</div>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" id="ieCropModeRectBtn" class="btn-luxe-gold !py-1 !px-2 text-xs">▭ قص مستطيل حر</button>
+                  <button type="button" id="ieCropModeQuadBtn" class="btn-luxe-outline !py-1 !px-2 text-xs">📐 قص منظور (4 زوايا)</button>
+                </div>
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                  <button type="button" id="ieAuto" class="btn-luxe-outline !py-1 !px-2 !border-amber-400/50 !text-amber-300">🎯 كشف حواف الورقة</button>
+                  <button type="button" id="ieCropBtn" class="btn-luxe-outline !py-1 !px-2.5 !border-emerald-400/60 !text-emerald-300 font-bold">✂️ تنفيذ القص</button>
+                  <button type="button" id="ieClear" class="btn-luxe-outline !py-1 !px-2">إلغاء التحديد</button>
+                </div>
+                <div class="flex items-center justify-between gap-1.5 pt-1">
+                  <span class="text-[11px]" style="color:var(--text-secondary)">نسبة الأبعاد:</span>
+                  <select id="ieRatio" class="luxe-input !py-1 !px-2 text-xs flex-1" aria-label="نسبة القص">
+                    <option value="0">حرة (أي مقاس سند)</option>
+                    <option value="0.7071">A4 عمودي (وثيقة رسمية)</option>
+                    <option value="1.4142">A4 أفقي (شيك / سند عرضي)</option>
+                    <option value="2.1">سند قبض / صرف مستطيل</option>
+                    <option value="1">مربع 1:1</option>
+                  </select>
+                </div>
               </div>
-              <label class="block">السطوع <span id="ieBrV" class="font-mono-code opacity-70">0</span><input id="ieBr" type="range" min="-100" max="100" value="0" class="w-full" /></label>
-              <label class="block">التباين <span id="ieCtV" class="font-mono-code opacity-70">0</span><input id="ieCt" type="range" min="-100" max="100" value="0" class="w-full" /></label>
-              <label class="flex items-center gap-2"><input id="ieSharp" type="checkbox" /> زيادة حدّة النص</label>
-              <p class="opacity-60 leading-relaxed">بعد الحفظ أعد استخراج OCR ليتطابق النص مع الصورة المحسّنة.</p>
+
+              <div class="space-y-1.5 pt-1 border-t" style="border-color:var(--border-subtle)">
+                <div class="font-bold text-amber-400">↻ التدوير وتعديل الميل الدقيق</div>
+                <div class="grid grid-cols-4 gap-1.5">
+                  <button type="button" id="ieRotL" class="btn-luxe-outline !py-1 !px-2">↺ 90°</button>
+                  <button type="button" id="ieRotR" class="btn-luxe-outline !py-1 !px-2">↻ 90°</button>
+                  <button type="button" id="ieFlipH" class="btn-luxe-outline !py-1 !px-2">⇋ أفقي</button>
+                  <button type="button" id="ieFlipV" class="btn-luxe-outline !py-1 !px-2">⇅ عمودي</button>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="shrink-0 text-[11px]">زاوية الميل:</span>
+                  <input id="ieAngle" type="range" step="0.2" min="-12" max="12" value="0" dir="ltr" class="flex-1 accent-amber-400" />
+                  <span id="ieAngleVal" class="font-mono-code text-[11px] w-9 text-center">0°</span>
+                  <button type="button" id="ieAngleBtn" class="btn-luxe-outline !py-1 !px-2 text-[11px]">تطبيق</button>
+                </div>
+              </div>
+
+              <div class="space-y-1.5 pt-1 border-t" style="border-color:var(--border-subtle)">
+                <div class="font-bold text-amber-400">✨ فلاتر التوضيح وإصلاح السندات</div>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" data-ie-mode="color" class="!py-1.5 !px-2 text-xs">🎨 ألوان أصلية</button>
+                  <button type="button" data-ie-mode="magic" class="!py-1.5 !px-2 text-xs">✨ تبييض الورق وإزالة الظل</button>
+                  <button type="button" data-ie-mode="inkboost" class="!py-1.5 !px-2 text-xs">🖋️ إبراز الحبر والأختام</button>
+                  <button type="button" data-ie-mode="gray" class="!py-1.5 !px-2 text-xs">⬜ رمادي رسمي</button>
+                  <button type="button" data-ie-mode="bw" class="!py-1.5 !px-2 text-xs col-span-2">◼️ أبيض وأسود حاد (مثالي للـ OCR والطباعة)</button>
+                </div>
+                <label class="block pt-1">☀️ السطوع والإضاءة (<span id="ieBrV" class="font-mono-code text-amber-400">0</span>)
+                  <input id="ieBr" type="range" min="-100" max="100" value="0" class="w-full accent-amber-400" />
+                </label>
+                <label class="block">◐ التباين ووضوح النص (<span id="ieCtV" class="font-mono-code text-amber-400">0</span>)
+                  <input id="ieCt" type="range" min="-100" max="100" value="0" class="w-full accent-amber-400" />
+                </label>
+                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                  <label class="flex items-center gap-1.5 p-1.5 rounded-lg border cursor-pointer" style="border-color:var(--border-subtle)">
+                    <input id="ieSharp" type="checkbox" class="accent-amber-400" />
+                    <span>🔍 حدّة الحروف (Sharpen)</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-1.5 rounded-lg border cursor-pointer" style="border-color:var(--border-subtle)">
+                    <input id="ieDenoise" type="checkbox" class="accent-amber-400" />
+                    <span>🧹 تنقية الشوائب</span>
+                  </label>
+                </div>
+              </div>
             </aside>
           </div>
         </div>`);
+
       const ieC = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
       function ieScale(src, max) { const s = Math.min(1, max / Math.max(src.width, src.height)); if (s >= 1) return src; const c = ieC(src.width * s, src.height * s), x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, c.width, c.height); return c; }
+
       function ieProcess(src) {
-        const w = src.width, h = src.height, out = ieC(w, h), ctx = out.getContext('2d', { willReadFrequently: true }); ctx.drawImage(src, 0, 0);
+        if (IE.compareHold && IE.orig) return ieScale(IE.orig, Math.max(src.width, src.height));
+        const w = src.width, h = src.height, out = ieC(w, h), ctx = out.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(src, 0, 0);
         const img = ctx.getImageData(0, 0, w, h), d = img.data, mode = IE.mode;
-        if (mode === 'magic') { // إزالة الظلال: قسمة كل بكسل على تقدير لون الورق المحلي
+
+        if (IE.denoise) {
+          const copy = new Uint8ClampedArray(d);
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const p = (y * w + x) * 4;
+              for (let k = 0; k < 3; k++) {
+                d[p + k] = (copy[p + k] * 4 + copy[p - 4 + k] + copy[p + 4 + k] + copy[p - w * 4 + k] + copy[p + w * 4 + k]) >> 3;
+              }
+            }
+          }
+        }
+
+        if (mode === 'magic' || mode === 'inkboost') {
           const cs = Math.max(6, Math.round(Math.max(w, h) / 40)), gw = Math.ceil(w / cs), gh = Math.ceil(h / cs), g = new Uint8ClampedArray(gw * gh * 4);
           for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
             let mr = 0, mg = 0, mb = 0;
-            for (let y = gy * cs, ye = Math.min(h, y + cs); y < ye; y++) for (let x = gx * cs, xe = Math.min(w, x + cs), p = (y * w + x) * 4; x < xe; x++, p += 4) { if (d[p] > mr) mr = d[p]; if (d[p + 1] > mg) mg = d[p + 1]; if (d[p + 2] > mb) mb = d[p + 2]; }
+            for (let y = gy * cs, ye = Math.min(h, y + cs); y < ye; y++) for (let x = gx * cs, xe = Math.min(w, x + cs), p = (y * w + x) * 4; x < xe; x++, p += 4) {
+              if (d[p] > mr) mr = d[p]; if (d[p + 1] > mg) mg = d[p + 1]; if (d[p + 2] > mb) mb = d[p + 2];
+            }
             const o = (gy * gw + gx) * 4; g[o] = mr; g[o + 1] = mg; g[o + 2] = mb; g[o + 3] = 255;
           }
           const sm = ieC(gw, gh); sm.getContext('2d').putImageData(new ImageData(g, gw, gh), 0, 0);
-          const bgc = ieC(w, h), bx = bgc.getContext('2d', { willReadFrequently: true }); bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = 'high'; bx.drawImage(sm, 0, 0, w, h);
+          const bgc = ieC(w, h), bx = bgc.getContext('2d', { willReadFrequently: true });
+          bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = 'high'; bx.drawImage(sm, 0, 0, w, h);
           const b = bx.getImageData(0, 0, w, h).data;
-          for (let i = 0; i < d.length; i += 4) for (let k = 0; k < 3; k++) d[i + k] = Math.min(255, d[i + k] * 250 / Math.max(40, b[i + k]));
+          for (let i = 0; i < d.length; i += 4) {
+            for (let k = 0; k < 3; k++) {
+              let v = Math.min(255, d[i + k] * 252 / Math.max(40, b[i + k]));
+              if (mode === 'inkboost') {
+                v = v < 210 ? Math.max(0, (v - 135) * 1.45 + 115) : 255;
+              }
+              d[i + k] = v;
+            }
+          }
         }
-        const f = IE.ct >= 0 ? 1 + IE.ct / 50 : 1 + IE.ct / 125, add = mode === 'bw' ? 0 : IE.br * 1.5, gray = mode === 'gray' || mode === 'bw';
+
+        const f = IE.ct >= 0 ? 1 + IE.ct / 45 : 1 + IE.ct / 125, add = mode === 'bw' ? 0 : IE.br * 1.5, gray = mode === 'gray' || mode === 'bw';
         for (let i = 0; i < d.length; i += 4) {
           let r = d[i], g1 = d[i + 1], b1 = d[i + 2];
           if (gray) r = g1 = b1 = 0.299 * r + 0.587 * g1 + 0.114 * b1;
-          d[i] = (r - 128) * f + 128 + add; d[i + 1] = (g1 - 128) * f + 128 + add; d[i + 2] = (b1 - 128) * f + 128 + add;
+          d[i] = Math.max(0, Math.min(255, (r - 128) * f + 128 + add));
+          d[i + 1] = Math.max(0, Math.min(255, (g1 - 128) * f + 128 + add));
+          d[i + 2] = Math.max(0, Math.min(255, (b1 - 128) * f + 128 + add));
         }
-        if (mode === 'bw') { // عتبة تكيّفية بالصورة التكاملية
+
+        if (mode === 'bw') {
           const W1 = w + 1, I = new Float64Array(W1 * (h + 1)), R = Math.max(7, Math.round(Math.min(w, h) / 24)), bias = 0.9 + IE.br / 400;
           for (let y = 0; y < h; y++) { let row = 0; for (let x = 0; x < w; x++) { row += d[(y * w + x) * 4]; I[(y + 1) * W1 + x + 1] = I[y * W1 + x + 1] + row; } }
-          for (let y = 0; y < h; y++) { const y0 = Math.max(0, y - R), y1 = Math.min(h, y + R + 1); for (let x = 0; x < w; x++) { const x0 = Math.max(0, x - R), x1 = Math.min(w, x + R + 1), m = (I[y1 * W1 + x1] - I[y0 * W1 + x1] - I[y1 * W1 + x0] + I[y0 * W1 + x0]) / ((x1 - x0) * (y1 - y0)), p = (y * w + x) * 4, v = d[p] > m * bias ? 255 : 0; d[p] = d[p + 1] = d[p + 2] = v; } }
+          for (let y = 0; y < h; y++) {
+            const y0 = Math.max(0, y - R), y1 = Math.min(h, y + R + 1);
+            for (let x = 0; x < w; x++) {
+              const x0 = Math.max(0, x - R), x1 = Math.min(w, x + R + 1), m = (I[y1 * W1 + x1] - I[y0 * W1 + x1] - I[y1 * W1 + x0] + I[y0 * W1 + x0]) / ((x1 - x0) * (y1 - y0));
+              const p = (y * w + x) * 4, v = d[p] > m * bias ? 255 : 0;
+              d[p] = d[p + 1] = d[p + 2] = v;
+            }
+          }
         }
-        if (IE.sharp) { const s = new Uint8ClampedArray(d); for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const p = (y * w + x) * 4; for (let k = 0; k < 3; k++) { const q = p + k; d[q] = s[q] * 1.8 - 0.2 * (s[q - 4] + s[q + 4] + s[q - w * 4] + s[q + w * 4]); } } }
-        ctx.putImageData(img, 0, 0); return out;
+
+        if (IE.sharp) {
+          const s = new Uint8ClampedArray(d);
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const p = (y * w + x) * 4;
+              for (let k = 0; k < 3; k++) {
+                const q = p + k;
+                d[q] = Math.max(0, Math.min(255, s[q] * 1.95 - 0.2375 * (s[q - 4] + s[q + 4] + s[q - w * 4] + s[q + w * 4])));
+              }
+            }
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+        return out;
       }
+
       function ieDraw() {
         const v = v12$('ieView'), pv = IE.pv; if (!v || !pv) return;
         if (v.width !== pv.width || v.height !== pv.height) { v.width = pv.width; v.height = pv.height; }
-        const x = v.getContext('2d'), s = IE.sel; x.drawImage(pv, 0, 0);
-        if (s) { const rx = s.x * v.width, ry = s.y * v.height, rw = s.w * v.width, rh = s.h * v.height; x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(0, 0, v.width, ry); x.fillRect(0, ry + rh, v.width, v.height - ry - rh); x.fillRect(0, ry, rx, rh); x.fillRect(rx + rw, ry, v.width - rx - rw, rh); x.strokeStyle = '#d4af37'; x.lineWidth = Math.max(2, v.width / 400); x.strokeRect(rx, ry, rw, rh); }
-        v12$('ieInfo').textContent = `${IE.work.width}×${IE.work.height}px` + (s ? ` • التحديد ${Math.round(s.w * IE.work.width)}×${Math.round(s.h * IE.work.height)}` : '');
+        const x = v.getContext('2d'), s = IE.sel;
+        x.drawImage(pv, 0, 0);
+
+        if (IE.cropType === 'quad') {
+          const pts = IE.quadPts.map(p => ({ x: p.x * v.width, y: p.y * v.height }));
+          x.save();
+          x.fillStyle = 'rgba(4, 8, 18, 0.5)';
+          x.beginPath(); x.rect(0, 0, v.width, v.height);
+          x.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < 4; i++) x.lineTo(pts[i].x, pts[i].y);
+          x.closePath(); x.fill('evenodd');
+          x.restore();
+
+          x.beginPath();
+          pts.forEach((p, i) => i ? x.lineTo(p.x, p.y) : x.moveTo(p.x, p.y));
+          x.closePath();
+          x.lineWidth = Math.max(2.5, v.width / 350);
+          x.strokeStyle = '#38bdf8';
+          x.stroke();
+
+          pts.forEach((p, idx) => {
+            x.beginPath();
+            x.arc(p.x, p.y, Math.max(10, v.width / 65), 0, Math.PI * 2);
+            x.fillStyle = idx === IE.dragQuadIdx ? '#fbbf24' : '#d4af37';
+            x.fill();
+            x.lineWidth = 2.5;
+            x.strokeStyle = '#ffffff';
+            x.stroke();
+          });
+          v12$('ieInfo').textContent = `${IE.work.width}×${IE.work.height}px • وضع منظور 4 نقاط`;
+        } else if (s) {
+          const rx = s.x * v.width, ry = s.y * v.height, rw = s.w * v.width, rh = s.h * v.height;
+          x.fillStyle = 'rgba(0,0,0,.55)';
+          x.fillRect(0, 0, v.width, ry);
+          x.fillRect(0, ry + rh, v.width, v.height - ry - rh);
+          x.fillRect(0, ry, rx, rh);
+          x.fillRect(rx + rw, ry, v.width - rx - rw, rh);
+          x.strokeStyle = '#d4af37';
+          x.lineWidth = Math.max(2, v.width / 400);
+          x.strokeRect(rx, ry, rw, rh);
+          v12$('ieInfo').textContent = `${IE.work.width}×${IE.work.height}px • القص ${Math.round(s.w * IE.work.width)}×${Math.round(s.h * IE.work.height)}`;
+        } else {
+          v12$('ieInfo').textContent = `${IE.work.width}×${IE.work.height}px`;
+        }
       }
-      function ieRender() { IE.pv = ieProcess(ieScale(IE.work, 1400)); ieDraw(); }
+
+      function ieRender() { if (!IE.work) return; IE.pv = ieProcess(ieScale(IE.work, 1450)); ieDraw(); }
       let ieRaf = 0; const ieLive = () => { cancelAnimationFrame(ieRaf); ieRaf = requestAnimationFrame(ieRender); };
-      function ieSet(c) { IE.hist.push(IE.work); if (IE.hist.length > 6) IE.hist.shift(); IE.work = c; IE.sel = null; ieRender(); }
-      function ieModeUI() { ieM.querySelectorAll('[data-ie-mode]').forEach(b => { b.className = (b.dataset.ieMode === IE.mode ? 'btn-luxe-gold' : 'btn-luxe-outline') + ' !py-1 !px-2'; }); v12$('ieBrV').textContent = IE.br; v12$('ieCtV').textContent = IE.ct; }
-      function ieResetCtl() { Object.assign(IE, { mode: 'color', br: 0, ct: 0, sharp: false, sel: null }); v12$('ieBr').value = 0; v12$('ieCt').value = 0; v12$('ieSharp').checked = false; v12$('ieAngle').value = 0; ieModeUI(); }
+      function ieSet(c) { IE.hist.push(IE.work); if (IE.hist.length > 8) IE.hist.shift(); IE.work = c; IE.sel = null; ieRender(); }
+
+      function ieModeUI() {
+        ieM.querySelectorAll('[data-ie-mode]').forEach(b => {
+          const on = b.dataset.ieMode === IE.mode;
+          b.className = (on ? 'btn-luxe-gold' : 'btn-luxe-outline') + ' !py-1.5 !px-2 text-xs ' + (b.dataset.ieMode === 'bw' ? 'col-span-2' : '');
+        });
+        v12$('ieCropModeRectBtn').className = (IE.cropType === 'rect' ? 'btn-luxe-gold' : 'btn-luxe-outline') + ' !py-1 !px-2 text-xs';
+        v12$('ieCropModeQuadBtn').className = (IE.cropType === 'quad' ? 'btn-luxe-gold' : 'btn-luxe-outline') + ' !py-1 !px-2 text-xs';
+        v12$('ieBrV').textContent = IE.br;
+        v12$('ieCtV').textContent = IE.ct;
+      }
+
+      function ieResetCtl() {
+        Object.assign(IE, {
+          mode: 'color', br: 0, ct: 0, sharp: false, denoise: false, sel: null, cropType: 'rect',
+          quadPts: [{ x: 0.06, y: 0.06 }, { x: 0.94, y: 0.06 }, { x: 0.94, y: 0.94 }, { x: 0.06, y: 0.94 }]
+        });
+        v12$('ieBr').value = 0; v12$('ieCt').value = 0;
+        v12$('ieSharp').checked = false; v12$('ieDenoise').checked = false;
+        v12$('ieAngle').value = 0; v12$('ieAngleVal').textContent = '0°';
+        ieModeUI();
+      }
+
       async function ieOpen() {
         const { doc, page } = v12Cur(); if (!doc || !page) return;
-        if (!page.dataUrl || !page.dataUrl.startsWith('data:image')) { showToast('تحرير الصور متاح لصفحات الصور فقط', 'warning'); return; }
-        const im = new Image(); await new Promise(ok => { im.onload = ok; im.onerror = ok; im.src = page.dataUrl; });
+        let targetDataUrl = page.dataUrl;
+        if (isPdfPageObj(page) && page.dataUrl) {
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          if (rendered && rendered.pages && rendered.pages.length) {
+            const sub = rendered.pages[Math.min(currentPdfSubPageIdx, rendered.pages.length - 1)] || rendered.pages[0];
+            targetDataUrl = sub.dataUrl;
+          }
+        }
+        if (!targetDataUrl || !targetDataUrl.startsWith('data:image')) {
+          showToast('تحرير الصور متاح لصفحات الصور والـ PDF المصورة فقط', 'warning');
+          return;
+        }
+        const im = new Image();
+        await new Promise(ok => { im.onload = ok; im.onerror = ok; im.src = targetDataUrl; });
         if (!im.naturalWidth) { showToast('تعذر تحميل الصورة للتحرير', 'error'); return; }
-        const c = ieC(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0);
-        IE.doc = doc; IE.page = page; IE.work = IE.orig = ieScale(c, 3200); IE.hist = []; IE.ratio = 0; v12$('ieRatio').value = '0'; ieResetCtl();
-        v12Show(ieM, true); ieRender();
+        const c = ieC(im.naturalWidth, im.naturalHeight);
+        c.getContext('2d').drawImage(im, 0, 0);
+        IE.doc = doc; IE.page = page; IE.work = IE.orig = ieScale(c, 3200);
+        IE.hist = []; IE.ratio = 0; v12$('ieRatio').value = '0';
+        ieResetCtl();
+        v12Show(ieM, true);
+        ieRender();
       }
-      function ieClose(force) { if (!force && IE.hist.length && !confirm('تجاهل التعديلات غير المحفوظة؟')) return; v12Show(ieM, false); IE.work = IE.orig = IE.pv = null; IE.hist = []; }
-      function ieSave() {
+
+      async function ieClose(force) {
+        if (!force && IE.hist.length) {
+          const ok = await showConfirmDialog('تجاهل التعديلات غير المحفوظة؟', 'لديك تعديلات على الصورة لم يتم حفظها بعد. هل تريد إغلاق المحرر؟');
+          if (!ok) return;
+        }
+        v12Show(ieM, false);
+        IE.work = IE.orig = IE.pv = null; IE.hist = [];
+      }
+
+      async function ieSave(runOcrAfter = false) {
         const { doc, page } = IE; if (!doc || !page || !IE.work) return;
-        page.dataUrl = ieProcess(IE.work).toDataURL('image/jpeg', 0.92); page.type = 'image/jpeg'; page.size = Math.round(page.dataUrl.length * 0.75);
-        if (page.file) page.file = ''; // لإعادة كتابة الملف على مجلد الأرشيف
+        page.dataUrl = ieProcess(IE.work).toDataURL('image/jpeg', 0.92);
+        page.type = 'image/jpeg';
+        page.size = Math.round(page.dataUrl.length * 0.75);
+        if (page.file) page.file = '';
         if ((doc.pages || []).every(p => p.size)) doc.size = doc.pages.reduce((a, p) => a + p.size, 0);
-        pdfRenderCache.delete(`${doc.id}_${currentViewerPageIdx}`); safeSetStorage(STORAGE_DOCS_KEY, documents);
-        ieClose(true); renderViewerMedia(); refreshAllUI();
-        try { logActivity(`تحرير صورة: ${doc.title}`); } catch (_) {}
-        showToast('تم حفظ الصورة المحسّنة على المستند ✔ — أعد استخراج OCR للنص', 'success');
+        pdfRenderCache.delete(`${doc.id}_${currentViewerPageIdx}`);
+        safeSetStorage(STORAGE_DOCS_KEY, documents);
+        await ieClose(true);
+        await renderViewerMedia();
+        refreshAllUI();
+        try { logActivity(`تحرير وتوضيح صورة: ${doc.title}`); } catch (_) {}
+        if (runOcrAfter) {
+          showToast('✔ تم حفظ الصورة المحسّنة — جارٍ استخراج نص OCR الآن...', 'info');
+          await runOcrOnDocument(doc.id, true);
+        } else {
+          showToast('✔ تم حفظ الصورة المحسّنة على المستند بنجاح', 'success');
+        }
       }
-      function iePt(e) { const r = v12$('ieView').getBoundingClientRect(); return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)) }; }
+
+      function iePt(e) {
+        const r = v12$('ieView').getBoundingClientRect();
+        return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / Math.max(1, r.width))), y: Math.min(1, Math.max(0, (e.clientY - r.top) / Math.max(1, r.height))) };
+      }
+
       (function () {
         const v = v12$('ieView');
-        v.addEventListener('pointerdown', e => { IE.drag = iePt(e); IE.sel = null; v.setPointerCapture(e.pointerId); });
-        v.addEventListener('pointermove', e => {
-          if (!IE.drag) return; const p = iePt(e), W = IE.work.width, H = IE.work.height; let dx = p.x - IE.drag.x, dy = p.y - IE.drag.y;
-          if (IE.ratio) { dy = Math.abs(dx) * W / IE.ratio / H * (dy < 0 ? -1 : 1); dy = Math.max(-IE.drag.y, Math.min(1 - IE.drag.y, dy)); }
-          IE.sel = { x: Math.min(IE.drag.x, IE.drag.x + dx), y: Math.min(IE.drag.y, IE.drag.y + dy), w: Math.abs(dx), h: Math.abs(dy) }; ieDraw();
+        v.addEventListener('pointerdown', e => {
+          const pt = iePt(e);
+          if (IE.cropType === 'quad') {
+            let best = -1, bestD = 0.12;
+            IE.quadPts.forEach((q, idx) => {
+              const d = Math.hypot(q.x - pt.x, q.y - pt.y);
+              if (d < bestD) { bestD = d; best = idx; }
+            });
+            if (best >= 0) {
+              IE.dragQuadIdx = best;
+              try { v.setPointerCapture(e.pointerId); } catch (_) {}
+              e.preventDefault();
+              ieDraw();
+            }
+            return;
+          }
+          IE.drag = pt; IE.sel = null;
+          try { v.setPointerCapture(e.pointerId); } catch (_) {}
         });
-        const end = () => { IE.drag = null; if (IE.sel && (IE.sel.w < 0.01 || IE.sel.h < 0.01)) IE.sel = null; ieDraw(); };
-        v.addEventListener('pointerup', end); v.addEventListener('pointercancel', end);
-        const on = (id, fn) => { v12$(id).onclick = fn; };
+
+        v.addEventListener('pointermove', e => {
+          const p = iePt(e);
+          if (IE.cropType === 'quad') {
+            if (IE.dragQuadIdx < 0) return;
+            IE.quadPts[IE.dragQuadIdx] = p;
+            e.preventDefault();
+            ieDraw();
+            return;
+          }
+          if (!IE.drag) return;
+          const W = IE.work.width, H = IE.work.height;
+          let dx = p.x - IE.drag.x, dy = p.y - IE.drag.y;
+          if (IE.ratio) {
+            dy = Math.abs(dx) * W / IE.ratio / H * (dy < 0 ? -1 : 1);
+            dy = Math.max(-IE.drag.y, Math.min(1 - IE.drag.y, dy));
+          }
+          IE.sel = { x: Math.min(IE.drag.x, IE.drag.x + dx), y: Math.min(IE.drag.y, IE.drag.y + dy), w: Math.abs(dx), h: Math.abs(dy) };
+          ieDraw();
+        });
+
+        const end = () => {
+          IE.drag = null; IE.dragQuadIdx = -1;
+          if (IE.sel && (IE.sel.w < 0.01 || IE.sel.h < 0.01)) IE.sel = null;
+          ieDraw();
+        };
+        v.addEventListener('pointerup', end);
+        v.addEventListener('pointercancel', end);
+
+        const on = (id, fn) => { const el = v12$(id); if (el) el.onclick = fn; };
         on('ieUndo', () => { if (IE.hist.length) { IE.work = IE.hist.pop(); IE.sel = null; ieRender(); } });
         on('ieReset', () => { IE.work = IE.orig; IE.hist = []; ieResetCtl(); ieRender(); });
-        on('ieCancel', () => ieClose()); on('ieSave', ieSave);
-        on('ieDl', () => { ieProcess(IE.work).toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${(IE.doc.title || 'doc').replace(/[\\/:*?"<>|]+/g, '_')}_edited.jpg`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/jpeg', 0.92); });
+        on('ieCancel', () => ieClose(false));
+        on('ieSave', () => ieSave(false));
+        on('ieSaveAndOcr', () => ieSave(true));
+
+        const cmpBtn = v12$('ieCompareBtn');
+        if (cmpBtn) {
+          cmpBtn.addEventListener('pointerdown', () => { IE.compareHold = true; ieRender(); });
+          ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => cmpBtn.addEventListener(ev, () => { if (IE.compareHold) { IE.compareHold = false; ieRender(); } }));
+        }
+
+        on('ieCropModeRectBtn', () => { IE.cropType = 'rect'; ieModeUI(); ieDraw(); });
+        on('ieCropModeQuadBtn', () => {
+          IE.cropType = 'quad';
+          if (IE.work) {
+            const det = scDetectQuad(ieScale(IE.work, 360));
+            const sm = ieScale(IE.work, 360);
+            IE.quadPts = det.map(p => ({ x: Math.max(0.02, Math.min(0.98, p.x / sm.width)), y: Math.max(0.02, Math.min(0.98, p.y / sm.height)) }));
+          }
+          ieModeUI();
+          ieDraw();
+          showToast('📐 اسحب النقاط الأربع إلى زوايا السند ثم اضغط «✂️ تنفيذ القص»', 'info');
+        });
+
+        on('ieOneClickSuperFix', () => {
+          if (!IE.work) return;
+          const sm = ieScale(IE.work, 360);
+          const q = scDetectQuad(sm);
+          const isFallback = Math.abs(q[0].x - sm.width * 0.05) < 1 && Math.abs(q[0].y - sm.height * 0.05) < 1;
+          if (!isFallback) {
+            const scaledPts = q.map(pt => ({ x: (pt.x / sm.width) * IE.work.width, y: (pt.y / sm.height) * IE.work.height }));
+            IE.hist.push(IE.work);
+            IE.work = scWarp(IE.work, scaledPts);
+          }
+          IE.mode = 'magic';
+          IE.ct = 18;
+          IE.br = 6;
+          IE.sharp = true;
+          v12$('ieCt').value = 18;
+          v12$('ieBr').value = 6;
+          v12$('ieSharp').checked = true;
+          ieModeUI();
+          ieRender();
+          showToast('🪄 تم تطبيق الإصلاح الشامل (قص الحواف + إزالة الظلال + توضيح النص)', 'success');
+        });
+
+        on('ieDl', () => {
+          ieProcess(IE.work).toBlob(b => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = `${(IE.doc.title || 'doc').replace(/[\\/:*?"<>|]+/g, '_')}_edited.jpg`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+          }, 'image/jpeg', 0.92);
+        });
+
         const rot = dir => { const w = IE.work, c = ieC(w.height, w.width), x = c.getContext('2d'); x.translate(c.width / 2, c.height / 2); x.rotate(dir * Math.PI / 2); x.drawImage(w, -w.width / 2, -w.height / 2); ieSet(c); };
         const flip = h => { const w = IE.work, c = ieC(w.width, w.height), x = c.getContext('2d'); if (h) { x.translate(w.width, 0); x.scale(-1, 1); } else { x.translate(0, w.height); x.scale(1, -1); } x.drawImage(w, 0, 0); ieSet(c); };
         on('ieRotL', () => rot(-1)); on('ieRotR', () => rot(1)); on('ieFlipH', () => flip(true)); on('ieFlipV', () => flip(false));
-        on('ieAngleBtn', () => { const a = parseFloat(v12$('ieAngle').value) || 0; if (!a) return; const w = IE.work, c = ieC(w.width, w.height), x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.translate(c.width / 2, c.height / 2); x.rotate(a * Math.PI / 180); x.drawImage(w, -w.width / 2, -w.height / 2); v12$('ieAngle').value = 0; ieSet(c); });
-        on('ieClear', () => { IE.sel = null; ieDraw(); });
-        on('ieCropBtn', () => { const s = IE.sel, w = IE.work; if (!s) { showToast('حدّد منطقة القص بالسحب على الصورة أولاً', 'warning'); return; } const sx = Math.round(s.x * w.width), sy = Math.round(s.y * w.height), sw = Math.max(1, Math.round(s.w * w.width)), sh = Math.max(1, Math.round(s.h * w.height)), c = ieC(sw, sh); c.getContext('2d').drawImage(w, sx, sy, sw, sh, 0, 0, sw, sh); ieSet(c); });
+        v12$('ieAngle').oninput = e => { v12$('ieAngleVal').textContent = `${e.target.value}°`; };
+        on('ieAngleBtn', () => {
+          const a = parseFloat(v12$('ieAngle').value) || 0; if (!a) return;
+          const w = IE.work, c = ieC(w.width, w.height), x = c.getContext('2d');
+          x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+          x.translate(c.width / 2, c.height / 2); x.rotate(a * Math.PI / 180);
+          x.drawImage(w, -w.width / 2, -w.height / 2);
+          v12$('ieAngle').value = 0; v12$('ieAngleVal').textContent = '0°';
+          ieSet(c);
+        });
+        on('ieClear', () => { IE.sel = null; IE.cropType = 'rect'; ieModeUI(); ieDraw(); });
+        on('ieCropBtn', () => {
+          const w = IE.work; if (!w) return;
+          if (IE.cropType === 'quad') {
+            const pts = IE.quadPts.map(p => ({ x: p.x * w.width, y: p.y * w.height }));
+            const warped = scWarp(w, pts);
+            IE.cropType = 'rect';
+            ieModeUI();
+            ieSet(warped);
+            showToast('✂️ تم قص السند وتصحيح المنظور بنجاح', 'success');
+            return;
+          }
+          const s = IE.sel;
+          if (!s) { showToast('حدّد منطقة القص بالسحب على الصورة أولاً أو استخدم «🎯 كشف حواف الورقة»', 'warning'); return; }
+          const sx = Math.round(s.x * w.width), sy = Math.round(s.y * w.height), sw = Math.max(1, Math.round(s.w * w.width)), sh = Math.max(1, Math.round(s.h * w.height)), c = ieC(sw, sh);
+          c.getContext('2d').drawImage(w, sx, sy, sw, sh, 0, 0, sw, sh);
+          ieSet(c);
+          showToast('✂️ تم تطبيق القص بنجاح', 'success');
+        });
         v12$('ieRatio').onchange = e => { IE.ratio = parseFloat(e.target.value) || 0; };
-        on('ieAuto', () => { // قص تلقائي: كشف حدود المستند عن لون الخلفية المحيطة
-          const sm = ieScale(IE.work, 400), W = sm.width, H = sm.height, d = sm.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data; let r0 = 0, g0 = 0, b0 = 0, n = 0;
+        on('ieAuto', () => {
+          const sm = ieScale(IE.work, 400), W = sm.width, H = sm.height, d = sm.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+          let r0 = 0, g0 = 0, b0 = 0, n = 0;
           const add = (x, y) => { const p = (y * W + x) * 4; r0 += d[p]; g0 += d[p + 1]; b0 += d[p + 2]; n++; };
-          for (let x = 0; x < W; x++) { add(x, 0); add(x, H - 1); } for (let y = 0; y < H; y++) { add(0, y); add(W - 1, y); }
-          r0 /= n; g0 /= n; b0 /= n; const rows = new Array(H).fill(0), cols = new Array(W).fill(0);
-          for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const p = (y * W + x) * 4; if (Math.abs(d[p] - r0) + Math.abs(d[p + 1] - g0) + Math.abs(d[p + 2] - b0) > 90) { rows[y]++; cols[x]++; } }
+          for (let x = 0; x < W; x++) { add(x, 0); add(x, H - 1); }
+          for (let y = 0; y < H; y++) { add(0, y); add(W - 1, y); }
+          r0 /= n; g0 /= n; b0 /= n;
+          const rows = new Array(H).fill(0), cols = new Array(W).fill(0);
+          for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const p = (y * W + x) * 4; if (Math.abs(d[p] - r0) + Math.abs(d[p + 1] - g0) + Math.abs(d[p + 2] - b0) > 85) { rows[y]++; cols[x]++; } }
           const rt = Math.max(2, W * 0.02), ct = Math.max(2, H * 0.02), y0 = rows.findIndex(q => q > rt), x0 = cols.findIndex(q => q > ct), y1 = H - 1 - [...rows].reverse().findIndex(q => q > rt), x1 = W - 1 - [...cols].reverse().findIndex(q => q > ct);
-          if (y0 < 0 || x0 < 0 || x1 <= x0 || y1 <= y0) { showToast('لم يُكتشف إطار واضح للمستند', 'warning'); return; }
+          if (y0 < 0 || x0 < 0 || x1 <= x0 || y1 <= y0) { showToast('لم يُكتشف إطار خارجي مختلف — يمكنك السحب يدوياً للقص', 'warning'); return; }
           const m = 0.01, sx = Math.max(0, x0 / W - m), sy = Math.max(0, y0 / H - m), ex = Math.min(1, (x1 + 1) / W + m), ey = Math.min(1, (y1 + 1) / H + m);
-          if ((ex - sx) * (ey - sy) > 0.97) { showToast('المستند يملأ الصورة بالفعل — لا حاجة للقص', 'info'); return; }
-          IE.sel = { x: sx, y: sy, w: ex - sx, h: ey - sy }; ieDraw(); showToast('تم تحديد حدود المستند — اضغط «تطبيق القص» أو عدّل التحديد', 'success');
+          IE.cropType = 'rect'; ieModeUI();
+          IE.sel = { x: sx, y: sy, w: ex - sx, h: ey - sy };
+          ieDraw();
+          showToast('🎯 تم تحديد حواف السند — اضغط «✂️ تنفيذ القص» لاعتماده', 'success');
         });
         ieM.querySelectorAll('[data-ie-mode]').forEach(b => b.onclick = () => { IE.mode = b.dataset.ieMode; ieModeUI(); ieLive(); });
-        v12$('ieBr').oninput = e => { IE.br = +e.target.value; ieModeUI(); ieLive(); }; v12$('ieCt').oninput = e => { IE.ct = +e.target.value; ieModeUI(); ieLive(); };
+        v12$('ieBr').oninput = e => { IE.br = +e.target.value; ieModeUI(); ieLive(); };
+        v12$('ieCt').oninput = e => { IE.ct = +e.target.value; ieModeUI(); ieLive(); };
         v12$('ieSharp').onchange = e => { IE.sharp = e.target.checked; ieLive(); };
+        v12$('ieDenoise').onchange = e => { IE.denoise = e.target.checked; ieLive(); };
         ieM.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && IE.hist.length) { e.preventDefault(); v12$('ieUndo').click(); } });
       })();
-      document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (!ieM.classList.contains('hidden')) { e.stopImmediatePropagation(); ieClose(); } else if (!v12InfoM.classList.contains('hidden')) { e.stopImmediatePropagation(); v12Show(v12InfoM, false); } }, true);
 
-      // ---------- 3) معاينة كل أنواع الملفات ----------
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (!ieM.classList.contains('hidden')) { e.stopImmediatePropagation(); ieClose(false); }
+        else if (!v12InfoM.classList.contains('hidden')) { e.stopImmediatePropagation(); v12Show(v12InfoM, false); }
+      }, true);
+
+      // ---------- 3) استعراض كل أنواع السندات والمستندات والجداول ----------
       function v12Kind(p) {
         const m = ((p.dataUrl || '').match(/^data:([^;,]+)/) || [])[1] || p.type || '', n = (p.name || p.file || '').toLowerCase();
         if (/^image\//.test(m) || /pdf/.test(m) || /\.pdf$/.test(n)) return '';
@@ -5999,16 +6529,104 @@
         }
         if (!sheets.length) throw new Error('لا توجد أوراق قابلة للعرض'); return sheets;
       }
-      const v12Pane = () => { let p = v12$('v12Other'); if (!p) { p = document.createElement('div'); p.id = 'v12Other'; p.className = 'hidden w-full h-full overflow-auto rounded-lg border p-3 text-sm'; p.style.cssText = 'background:var(--bg-card);border-color:var(--border-subtle);color:var(--text-primary)'; v12$('viewerMediaContainer').appendChild(p); } return p; };
+
+      // بطاقة السند الرقمية التفاعلية لاستعراض أي سند بوضوح تام حتى لو كان بدون صورة أو للاطلاع على هيكله المحاسبي
+      function v13RenderStructuredVoucherSheet(doc) {
+        const ent = extractSmartEntities(doc.ocrText || '');
+        const custom = doc.customFields || {};
+        const sub = detectVoucherSubType(doc);
+        const num = doc.docNumber || (ent.voucherNumber !== '—' ? ent.voucherNumber : 'غير محدد');
+        const amt = custom.amountNum ? `${custom.amountNum} ${custom.currency || ''}` : ent.amount;
+        const words = custom.amountWords || ent.amountInWords;
+        const sender = custom.sender || ent.sender;
+        const receiver = custom.receiver || ent.receiver;
+        const dateStr = doc.date || ent.date || '—';
+
+        const lines = (doc.ocrText || '').split('\n').map(l => l.trim()).filter(Boolean);
+        return `<div class="max-w-2xl mx-auto rounded-2xl border-2 p-5 sm:p-6 space-y-4 shadow-2xl" style="background:var(--bg-card);border-color:${sub.color}88">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b-2" style="border-color:${sub.color}44">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold" style="background:${sub.color}22;color:${sub.color};border:1px solid ${sub.color}66">${sub.icon}</div>
+              <div>
+                <div class="text-xs font-extrabold uppercase tracking-wider" style="color:${sub.color}">${escapeHtml(sub.label)}</div>
+                <h4 class="text-base sm:text-lg font-extrabold mt-0.5">${escapeHtml(getReadableDocTitle(doc))}</h4>
+              </div>
+            </div>
+            <div class="text-left font-mono-code">
+              <div class="text-xs px-3 py-1 rounded-lg font-extrabold bg-amber-500/15 text-amber-400 border border-amber-400/30">NO: #${escapeHtml(String(num))}</div>
+              <div class="text-[11px] mt-1" style="color:var(--text-secondary)">التاريخ: ${escapeHtml(dateStr)}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl border" style="background:var(--bg-input);border-color:var(--border-subtle)">
+              <div class="text-[11px]" style="color:var(--text-secondary)">المبلغ الإجمالي رقماً</div>
+              <div class="text-lg font-extrabold font-mono-code text-emerald-400 mt-0.5">${escapeHtml(amt)}</div>
+            </div>
+            <div class="p-3 rounded-xl border" style="background:var(--bg-input);border-color:var(--border-subtle)">
+              <div class="text-[11px]" style="color:var(--text-secondary)">المبلغ بالحروف (التفقيط)</div>
+              <div class="text-xs font-bold mt-1 leading-relaxed">${escapeHtml(words)}</div>
+            </div>
+            <div class="p-3 rounded-xl border" style="background:var(--bg-input);border-color:var(--border-subtle)">
+              <div class="text-[11px]" style="color:var(--text-secondary)">المرسل / الدافع / المكلف</div>
+              <div class="text-xs font-extrabold mt-0.5">${escapeHtml(sender)}</div>
+            </div>
+            <div class="p-3 rounded-xl border" style="background:var(--bg-input);border-color:var(--border-subtle)">
+              <div class="text-[11px]" style="color:var(--text-secondary)">المستلم / المستفيد / الجهة</div>
+              <div class="text-xs font-extrabold mt-0.5">${escapeHtml(receiver)}</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl border space-y-1.5" style="background:var(--bg-input);border-color:var(--border-subtle)">
+            <div class="flex items-center justify-between text-xs font-bold text-amber-400">
+              <span>📑 البيان وتفاصيل السند المستخرجة (${lines.length} سطر)</span>
+              <span class="font-mono-code text-[11px]">${escapeHtml(ent.fingerprint)}</span>
+            </div>
+            <div class="text-xs leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto pt-1">${lines.length ? escapeHtml(doc.ocrText) : 'لا يوجد نص مستخرج بعد — اضغط «✨ استخراج OCR» أو أدخل البيان في حقل النص.'}</div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-[11px]" style="border-color:var(--border-subtle);color:var(--text-secondary)">
+            <span>📂 المجلد: ${escapeHtml(doc.folder || 'رئيسي')} • التصنيف: ${escapeHtml(doc.category || 'عام')}</span>
+            <span class="text-emerald-400 font-bold">✔ وثيقة معتمدة في أرشيف الكمالي برو</span>
+          </div>
+        </div>`;
+      }
+
+      const v12Pane = () => {
+        let p = v12$('v12Other');
+        if (!p) {
+          p = document.createElement('div');
+          p.id = 'v12Other';
+          p.className = 'hidden w-full h-full overflow-auto rounded-lg border p-3 text-sm';
+          p.style.cssText = 'background:var(--bg-card);border-color:var(--border-subtle);color:var(--text-primary)';
+          v12$('viewerMediaContainer').appendChild(p);
+        }
+        return p;
+      };
+
+      let v13ShowStructuredCardMode = false;
       const v12RenderMedia = renderViewerMedia;
       renderViewerMedia = async function () {
-        const { doc, page } = v12Cur(), pane = v12Pane(), eb = v12$('v12EditImgBtn'), kind = doc && page && page.dataUrl ? v12Kind(page) : '';
+        const { doc, page } = v12Cur(), pane = v12Pane(), eb = v12$('v12EditImgBtn');
+        const hasImageOrPdf = page && page.dataUrl && (page.dataUrl.startsWith('data:image') || isPdfPageObj(page));
+        if (eb) eb.style.display = hasImageOrPdf ? '' : 'none';
+
+        if (v13ShowStructuredCardMode && doc) {
+          ['viewerImageEl', 'viewerPdfEl', 'viewerNoMediaEl', 'viewerPdfFallbackCard', 'viewerPdfLoadingBadge', 'viewerOpenRawPdfBtn'].forEach(id => v12$(id) && v12$(id).classList.add('hidden'));
+          pane.classList.remove('hidden');
+          pane.innerHTML = v13RenderStructuredVoucherSheet(doc);
+          return;
+        }
+
+        const kind = doc && page && page.dataUrl ? v12Kind(page) : '';
         pane.classList.add('hidden');
-        if (eb) eb.style.display = (!kind && page && page.dataUrl && page.dataUrl.startsWith('data:image')) ? '' : 'none';
         if (!kind) return v12RenderMedia.apply(this, arguments);
+
         ['viewerImageEl', 'viewerPdfEl', 'viewerNoMediaEl', 'viewerPdfFallbackCard', 'viewerPdfLoadingBadge', 'viewerOpenRawPdfBtn'].forEach(id => v12$(id) && v12$(id).classList.add('hidden'));
         try { buildViewerPageSwitchButtons(doc, null); } catch (_) {}
-        pane.classList.remove('hidden'); pane.innerHTML = '<div class="text-center opacity-70 py-8">⏳ جارٍ تجهيز المعاينة…</div>'; let text = '';
+        pane.classList.remove('hidden');
+        pane.innerHTML = '<div class="text-center opacity-70 py-8">⏳ جارٍ تجهيز المعاينة…</div>';
+        let text = '';
         try {
           if (kind === 'audio') pane.innerHTML = `<div class="h-full flex items-center justify-center"><audio controls class="w-full max-w-xl" src="${page.dataUrl}"></audio></div>`;
           else if (kind === 'video') pane.innerHTML = `<video controls playsinline class="max-w-full max-h-full mx-auto rounded-lg" src="${page.dataUrl}"></video>`;
@@ -6025,15 +6643,362 @@
         if (text.trim() && !(doc.ocrText || '').trim()) { doc.ocrText = text.slice(0, 20000); v12$('viewerOcrTextarea').value = doc.ocrText; updateViewerOcrMetadata(doc.ocrText); safeSetStorage(STORAGE_DOCS_KEY, documents); }
       };
 
-      // ---------- ربط الأزرار بالواجهة ----------
+      // ---------- 4) شريط التعديل المباشر في أعلى العارض + فلاتر التوضيح الفوري + عدسة المكبر + طباعة السند ----------
+      let v13LoupeActive = false;
+
+      function v13SyncViewerHeaderAndEntities(doc) {
+        if (!doc) return;
+        const cleanTitle = getReadableDocTitle(doc);
+        v12$('viewerDocTitle').textContent = cleanTitle;
+        v12$('viewerDocCategory').textContent = doc.category;
+        const sub = detectVoucherSubType(doc);
+        const subBadge = v12$('v13ViewerSubTypeBadge');
+        if (subBadge) {
+          subBadge.textContent = `${sub.icon} ${sub.label}`;
+          subBadge.style.backgroundColor = `${sub.color}22`;
+          subBadge.style.color = sub.color;
+          subBadge.style.borderColor = `${sub.color}55`;
+        }
+        const quickNumInp = v12$('v13QuickDocNumInput');
+        const quickTitleInp = v12$('v13QuickDocTitleInput');
+        const quickSubSel = v12$('v13QuickSubTypeSelect');
+        if (quickNumInp) quickNumInp.value = doc.docNumber || '';
+        if (quickTitleInp) quickTitleInp.value = doc.title || '';
+        if (quickSubSel) quickSubSel.value = sub.id;
+
+        const shortFolder = (doc.folder || 'رئيسي').split('/').map(s => s.replace(/_[a-z0-9]{5,7}$/i, '')).join('/');
+        v12$('viewerDocMeta').textContent = `🔢 رقم: #${doc.docNumber || '—'}  •  📂 ${shortFolder}  •  📅 ${doc.date || '—'}  •  💾 ${formatBytes(doc.size)}`;
+        v12$('viewerDocImportantBadge').classList.toggle('hidden', doc.priority !== 'important');
+
+        updateViewerOcrMetadata(doc.ocrText || '');
+        const custom = doc.customFields || {};
+        if (doc.docNumber) v12$('entityVoucherNum').textContent = doc.docNumber;
+        if (custom.amountNum) v12$('entityAmount').textContent = `${custom.amountNum} ${custom.currency || ''}`;
+        if (doc.date) v12$('entityDate').textContent = doc.date;
+        if (custom.sender) v12$('entitySender').textContent = custom.sender;
+        if (custom.receiver) v12$('entityReceiver').textContent = custom.receiver;
+      }
+
+      // تطبيق إصلاح مباشر سريع على صورة المستند المعروضة بضغطة زر واحدة من شريط العارض
+      async function v13QuickImageFixInViewer(fixType) {
+        const { doc, page } = v12Cur();
+        if (!doc || !page) return;
+        let srcUrl = page.dataUrl;
+        if (isPdfPageObj(page) && page.dataUrl) {
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          if (rendered && rendered.pages && rendered.pages.length) {
+            const sub = rendered.pages[Math.min(currentPdfSubPageIdx, rendered.pages.length - 1)] || rendered.pages[0];
+            srcUrl = sub.dataUrl;
+          }
+        }
+        if (!srcUrl || !srcUrl.startsWith('data:image')) {
+          showToast('هذا الإجراء يتطلب صورة مستند معروضة', 'warning');
+          return;
+        }
+        const im = new Image();
+        await new Promise(ok => { im.onload = ok; im.onerror = ok; im.src = srcUrl; });
+        if (!im.naturalWidth) return;
+
+        let workC = ieC(im.naturalWidth, im.naturalHeight);
+        workC.getContext('2d').drawImage(im, 0, 0);
+        workC = ieScale(workC, 2600);
+
+        // حفظ نسخة احتياطية للتراجع السريع داخل العارض
+        page._prevDataUrl = page.dataUrl;
+
+        if (fixType === 'autocrop') {
+          const sm = ieScale(workC, 360);
+          const q = scDetectQuad(sm);
+          const isFallback = Math.abs(q[0].x - sm.width * 0.05) < 1 && Math.abs(q[0].y - sm.height * 0.05) < 1;
+          if (!isFallback) {
+            const scaledPts = q.map(pt => ({ x: (pt.x / sm.width) * workC.width, y: (pt.y / sm.height) * workC.height }));
+            workC = scWarp(workC, scaledPts);
+          } else {
+            // كشف الحواف المستطيل الاحتياطي
+            const W = sm.width, H = sm.height, d = sm.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+            let r0 = 0, g0 = 0, b0 = 0, n = 0;
+            const add = (x, y) => { const p = (y * W + x) * 4; r0 += d[p]; g0 += d[p + 1]; b0 += d[p + 2]; n++; };
+            for (let x = 0; x < W; x++) { add(x, 0); add(x, H - 1); }
+            for (let y = 0; y < H; y++) { add(0, y); add(W - 1, y); }
+            r0 /= n; g0 /= n; b0 /= n;
+            const rows = new Array(H).fill(0), cols = new Array(W).fill(0);
+            for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const p = (y * W + x) * 4; if (Math.abs(d[p] - r0) + Math.abs(d[p + 1] - g0) + Math.abs(d[p + 2] - b0) > 80) { rows[y]++; cols[x]++; } }
+            const rt = Math.max(2, W * 0.02), ct = Math.max(2, H * 0.02), y0 = rows.findIndex(q => q > rt), x0 = cols.findIndex(q => q > ct), y1 = H - 1 - [...rows].reverse().findIndex(q => q > rt), x1 = W - 1 - [...cols].reverse().findIndex(q => q > ct);
+            if (y0 >= 0 && x0 >= 0 && x1 > x0 && y1 > y0) {
+              const sx = Math.round((x0 / W) * workC.width), sy = Math.round((y0 / H) * workC.height);
+              const sw = Math.max(20, Math.round(((x1 - x0) / W) * workC.width)), sh = Math.max(20, Math.round(((y1 - y0) / H) * workC.height));
+              const cc = ieC(sw, sh);
+              cc.getContext('2d').drawImage(workC, sx, sy, sw, sh, 0, 0, sw, sh);
+              workC = cc;
+            }
+          }
+          showToast('✂️ تم قص الحواف الزائدة وتصحيح منظور السند تلقائياً', 'success');
+        } else if (fixType === 'clarify') {
+          const prevState = { mode: IE.mode, ct: IE.ct, br: IE.br, sharp: IE.sharp, denoise: IE.denoise, compareHold: IE.compareHold };
+          Object.assign(IE, { mode: 'magic', ct: 22, br: 8, sharp: true, denoise: false, compareHold: false });
+          workC = ieProcess(workC);
+          Object.assign(IE, prevState);
+          showToast('🪄 تم تبييض الورق وتوضيح الحروف والأرقام وإزالة الظلال', 'success');
+        } else if (fixType === 'bw_ocr') {
+          const prevState = { mode: IE.mode, ct: IE.ct, br: IE.br, sharp: IE.sharp, denoise: IE.denoise, compareHold: IE.compareHold };
+          Object.assign(IE, { mode: 'bw', ct: 25, br: 0, sharp: true, denoise: false, compareHold: false });
+          workC = ieProcess(workC);
+          Object.assign(IE, prevState);
+          showToast('◼️ تم تحويل السند إلى أبيض وأسود حاد جاهز للـ OCR والطباعة', 'success');
+        } else if (fixType === 'undo') {
+          if (!page._prevDataUrl) { showToast('لا يوجد تعديل سريع سابق للتراجع عنه', 'info'); return; }
+          page.dataUrl = page._prevDataUrl;
+          delete page._prevDataUrl;
+          safeSetStorage(STORAGE_DOCS_KEY, documents);
+          await renderViewerMedia();
+          refreshAllUI();
+          showToast('↶ تمت استعادة الصورة السابقة', 'info');
+          return;
+        }
+
+        page.dataUrl = workC.toDataURL('image/jpeg', 0.92);
+        page.type = 'image/jpeg';
+        page.size = Math.round(page.dataUrl.length * 0.75);
+        if (page.file) page.file = '';
+        safeSetStorage(STORAGE_DOCS_KEY, documents);
+        await renderViewerMedia();
+        refreshAllUI();
+      }
+
+      // طباعة السند الحالي مباشرة بتنسيق رسمي أنيق
+      function v13PrintCurrentDocument() {
+        const { doc, page } = v12Cur();
+        if (!doc) return;
+        const ent = extractSmartEntities(doc.ocrText || '');
+        const custom = doc.customFields || {};
+        const sub = detectVoucherSubType(doc);
+        const num = doc.docNumber || (ent.voucherNumber !== '—' ? ent.voucherNumber : '—');
+        const amt = custom.amountNum ? `${custom.amountNum} ${custom.currency || ''}` : ent.amount;
+        const sender = custom.sender || ent.sender;
+        const receiver = custom.receiver || ent.receiver;
+        const imgTag = (page && page.dataUrl && page.dataUrl.startsWith('data:image'))
+          ? `<div style="text-align:center;margin:16px 0"><img src="${page.dataUrl}" style="max-width:100%;max-height:520px;border:1px solid #cbd5e1;border-radius:8px" /></div>`
+          : '';
+        const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>طباعة سند — ${escapeHtml(doc.title)}</title>
+          <style>body{font-family:Tahoma,Arial,sans-serif;padding:24px;color:#0f172a} .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #d4af37;padding-bottom:12px;margin-bottom:14px} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px} .ocr{white-space:pre-wrap;border:1px solid #e2e8f0;padding:12px;border-radius:8px;margin-top:12px;font-size:13px;line-height:1.8}</style>
+          </head><body>
+          <div class="hdr">
+            <div><h2 style="margin:0;color:#8e6b19">${escapeHtml(sub.label)}: ${escapeHtml(doc.title)}</h2><div style="font-size:12px;color:#475569">التصنيف: ${escapeHtml(doc.category)} • المجلد: ${escapeHtml(doc.folder || 'رئيسي')}</div></div>
+            <div style="text-align:left;font-family:monospace"><strong>NO: #${escapeHtml(String(num))}</strong><br>التاريخ: ${escapeHtml(doc.date || ent.date)}</div>
+          </div>
+          <div class="grid">
+            <div><strong>المبلغ والعملة:</strong> ${escapeHtml(amt)}</div>
+            <div><strong>التفقيط:</strong> ${escapeHtml(custom.amountWords || ent.amountInWords)}</div>
+            <div><strong>المرسل / الدافع:</strong> ${escapeHtml(sender)}</div>
+            <div><strong>المستلم / المستفيد:</strong> ${escapeHtml(receiver)}</div>
+          </div>
+          ${imgTag}
+          ${doc.ocrText ? `<div class="ocr"><strong>النص المستخرج (OCR):</strong>\n${escapeHtml(doc.ocrText)}</div>` : ''}
+          ${typeof v10ReportFooter === 'function' ? v10ReportFooter() : ''}
+          </body></html>`;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+        a.download = `${(doc.title || 'Voucher').replace(/[\\/:*?"<>|]+/g, '_')}_Print.html`;
+        document.body.appendChild(a); a.click(); a.remove();
+        showToast('🖨️ تم تجهيز وتنزيل بطاقة السند الرسمية للطباعة ✔', 'success');
+      }
+
+      // ---------- ربط كافة الأزرار والشرائط الذكية بواجهة العارض ----------
       (function () {
         const mk = (id, txt, title, cls) => { const b = document.createElement('button'); b.type = 'button'; b.id = id; b.textContent = txt; b.title = title; b.className = cls; return b; };
-        const b1 = mk('v12EditInfoBtn', '✏️ تعديل', 'تعديل الاسم والرقم والتصنيف والتاريخ', 'btn-luxe-outline !py-1 !px-2.5 text-xs flex-1 sm:flex-initial !border-amber-400/50 !text-amber-300');
-        v12$('viewerPrevDocBtn').insertAdjacentElement('beforebegin', b1); b1.onclick = v12OpenInfo;
-        const b2 = mk('v12EditImgBtn', '✂️ تحرير الصورة', 'قص وتدوير وتحسين وتنظيف الظلال', 'btn-luxe-outline !py-1 !px-2 !border-emerald-400/50 !text-emerald-300 shrink-0'); b2.style.display = 'none';
-        v12$('viewerExportSinglePdfBtn').insertAdjacentElement('beforebegin', b2); b2.onclick = ieOpen;
-        const t = v12$('viewerDocTitle'); t.style.cursor = 'pointer'; t.title = 'انقر مرتين لتعديل الاسم والرقم'; t.addEventListener('dblclick', v12OpenInfo);
-        const acc = v12$('docFilesInput'); if (acc) acc.setAttribute('accept', 'image/*,.pdf,.txt,.csv,.json,.docx,.xlsx,audio/*,video/*');
+
+        // شارة نوع السند بجانب التصنيف في الهيدر
+        const catBadge = v12$('viewerDocCategory');
+        if (catBadge && !v12$('v13ViewerSubTypeBadge')) {
+          const sb = document.createElement('span');
+          sb.id = 'v13ViewerSubTypeBadge';
+          sb.className = 'text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full border font-bold shrink-0 cursor-pointer';
+          sb.title = 'انقر لتغيير نوع السند أو تعديل بياناته';
+          sb.onclick = v12OpenInfo;
+          catBadge.insertAdjacentElement('afterend', sb);
+        }
+
+        // زر تعديل البيانات الشامل في الهيدر
+        const b1 = mk('v12EditInfoBtn', '✏️ تعديل الرقم والاسم', 'تعديل رقم المستند واسم المستند ونوع السند وكافة البيانات', 'btn-luxe-gold !py-1 !px-2.5 text-xs flex-1 sm:flex-initial');
+        v12$('viewerPrevDocBtn').insertAdjacentElement('beforebegin', b1);
+        b1.onclick = v12OpenInfo;
+
+        // زر طباعة السند في الهيدر
+        const bPrint = mk('v13PrintVoucherBtn', '🖨️ طباعة', 'تصدير وطباعة بطاقة السند الرسمية', 'btn-luxe-outline !py-1 !px-2.5 text-xs flex-1 sm:flex-initial');
+        v12$('viewerDownloadBtn').insertAdjacentElement('beforebegin', bPrint);
+        bPrint.onclick = v13PrintCurrentDocument;
+
+        // شريط التعديل السريع المباشر لرقم المستند واسم المستند ونوع السند أسفل ترويسة العارض مباشرة
+        const headerEl = v12$('viewerDocTitle').closest('.border-b');
+        if (headerEl && !v12$('v13QuickEditBar')) {
+          const qBar = document.createElement('div');
+          qBar.id = 'v13QuickEditBar';
+          qBar.className = 'px-3 sm:px-5 py-1.5 border-b flex flex-wrap items-center gap-2 text-xs shrink-0';
+          qBar.style.cssText = 'background-color: var(--bg-input); border-color: var(--border-subtle);';
+          qBar.innerHTML = `
+            <div class="flex items-center gap-1.5 min-w-[140px]">
+              <span class="text-[11px] font-bold text-amber-400 shrink-0">🔢 رقم السند:</span>
+              <input id="v13QuickDocNumInput" type="text" dir="ltr" class="luxe-input !py-0.5 !px-2 text-xs font-mono-code font-bold text-amber-400 w-28" placeholder="رقم السند..." />
+            </div>
+            <div class="flex items-center gap-1.5 flex-1 min-w-[180px]">
+              <span class="text-[11px] font-bold shrink-0" style="color:var(--text-secondary)">📄 اسم المستند:</span>
+              <input id="v13QuickDocTitleInput" type="text" class="luxe-input !py-0.5 !px-2.5 text-xs font-bold flex-1" placeholder="اسم المستند..." />
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-bold shrink-0 hidden sm:inline" style="color:var(--text-secondary)">📑 نوع السند:</span>
+              <select id="v13QuickSubTypeSelect" class="luxe-input !py-0.5 !px-2 text-xs font-semibold">
+                ${VOUCHER_SUBTYPES.map(v => `<option value="${v.id}">${v.icon} ${v.label}</option>`).join('')}
+              </select>
+            </div>
+            <button type="button" id="v13QuickSaveInlineBtn" class="btn-luxe-gold !py-1 !px-3 text-xs shrink-0">✔ حفظ فوري</button>
+          `;
+          headerEl.insertAdjacentElement('afterend', qBar);
+
+          const saveQuickInline = () => {
+            const { doc } = v12Cur(); if (!doc) return;
+            const newNum = v12$('v13QuickDocNumInput').value.trim();
+            const newTitle = v12$('v13QuickDocTitleInput').value.trim();
+            const newSub = v12$('v13QuickSubTypeSelect').value;
+            if (!newTitle) { showToast('اسم المستند لا يمكن أن يكون فارغاً', 'warning'); return; }
+            doc.docNumber = newNum;
+            doc.title = newTitle;
+            doc.voucherSubType = newSub;
+            safeSetStorage(STORAGE_DOCS_KEY, documents);
+            v13SyncViewerHeaderAndEntities(doc);
+            refreshAllUI();
+            showToast(`✔ تم تحديث المستند إلى «${newTitle}» — رقم #${newNum || '—'}`, 'success');
+          };
+          v12$('v13QuickSaveInlineBtn').onclick = saveQuickInline;
+          v12$('v13QuickDocNumInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveQuickInline(); } });
+          v12$('v13QuickDocTitleInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveQuickInline(); } });
+          v12$('v13QuickSubTypeSelect').addEventListener('change', saveQuickInline);
+        }
+
+        // أزرار إصلاح وتوضيح وقص الصور المتقدمة في شريط أدوات الصورة
+        const b2 = mk('v12EditImgBtn', '✂️ استوديو القص والتوضيح', 'فتح محرر الصور المتقدم (قص حر أو بـ 4 نقاط، إزالة ظلال، تبييض، وتعديل الميل)', 'btn-luxe-gold !py-1 !px-2.5 text-xs shrink-0');
+        v12$('enhanceScanBtn').insertAdjacentElement('afterend', b2);
+        b2.onclick = ieOpen;
+
+        const bClarify = mk('v13QuickClarifyBtn', '🪄 توضيح فوري', 'إزالة الظلال وتبييض الورق وتوضيح الخط بضغطة واحدة', 'btn-luxe-outline !py-1 !px-2 text-xs !border-amber-400/50 !text-amber-300 shrink-0');
+        b2.insertAdjacentElement('afterend', bClarify);
+        bClarify.onclick = () => v13QuickImageFixInViewer('clarify');
+
+        const bAutoCrop = mk('v13QuickAutoCropBtn', '📐 قص تلقائي', 'كشف حواف الورقة وقص الهوامش الزائدة وتعديل الميلان تلقائياً', 'btn-luxe-outline !py-1 !px-2 text-xs !border-emerald-400/50 !text-emerald-300 shrink-0');
+        bClarify.insertAdjacentElement('afterend', bAutoCrop);
+        bAutoCrop.onclick = () => v13QuickImageFixInViewer('autocrop');
+
+        const bLoupe = mk('v13LoupeToggleBtn', '🔍 مكبر تدقيق', 'تفعيل عدسة المكبر لقراءة الأرقام والأختام الدقيقة عند تمرير المؤشر', 'btn-luxe-outline !py-1 !px-2 text-xs !border-purple-400/50 !text-purple-300 shrink-0');
+        bAutoCrop.insertAdjacentElement('afterend', bLoupe);
+
+        const bCardMode = mk('v13StructuredSheetBtn', '🧾 بطاقة السند', 'التبديل بين عرض الصورة الأصلية وعرض بطاقة السند المحاسبية المنظمة', 'btn-luxe-outline !py-1 !px-2 text-xs !border-sky-400/50 !text-sky-300 shrink-0');
+        v12$('viewerExportSinglePdfBtn').insertAdjacentElement('beforebegin', bCardMode);
+        bCardMode.onclick = () => {
+          v13ShowStructuredCardMode = !v13ShowStructuredCardMode;
+          bCardMode.className = (v13ShowStructuredCardMode ? 'btn-luxe-gold' : 'btn-luxe-outline !border-sky-400/50 !text-sky-300') + ' !py-1 !px-2 text-xs shrink-0';
+          renderViewerMedia();
+        };
+
+        // زر إضافة صفحة / وجه جديد للمستند المفتوح مباشرة من شريط الصفحات
+        const pagesBar = v12$('viewerPagesBar');
+        if (pagesBar && !v12$('v13AddPageToDocInput')) {
+          const addPageWrap = document.createElement('div');
+          addPageWrap.className = 'flex items-center gap-1 shrink-0';
+          addPageWrap.innerHTML = `
+            <input type="file" id="v13AddPageToDocInput" accept="image/*,.pdf" multiple class="hidden" />
+            <button type="button" id="v13AddPageToDocBtn" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[11px] font-bold hover:bg-emerald-500/30" title="إرفاق وجه خلفي أو صفحة إضافية لهذا السند">＋ إرفاق صفحة</button>
+          `;
+          pagesBar.appendChild(addPageWrap);
+          v12$('v13AddPageToDocBtn').onclick = () => v12$('v13AddPageToDocInput').click();
+          v12$('v13AddPageToDocInput').onchange = async e => {
+            const { doc } = v12Cur(); if (!doc) return;
+            const files = Array.from(e.target.files || []); e.target.value = '';
+            if (!files.length) return;
+            doc.pages = doc.pages || [];
+            for (const f of files) {
+              const dataUrl = await readOptimizedMediaDataUrl(f, true);
+              doc.pages.push({ name: f.name, type: f.type || 'image/jpeg', dataUrl, size: f.size || Math.round(dataUrl.length * 0.75) });
+              doc.size = (doc.size || 0) + (f.size || Math.round(dataUrl.length * 0.75));
+            }
+            currentViewerPageIdx = doc.pages.length - 1;
+            safeSetStorage(STORAGE_DOCS_KEY, documents);
+            await renderViewerMedia();
+            refreshAllUI();
+            showToast(`✔ تمت إضافة ${files.length} صفحة إلى المستند بنجاح`, 'success');
+          };
+        }
+
+        // عدسة المكبر الذكية (Inspection Loupe) على صورة المستند
+        const stage = v12$('viewerMediaContainer'), imgEl = v12$('viewerImageEl');
+        const loupe = document.createElement('div');
+        loupe.id = 'v13InspectorLoupe';
+        loupe.className = 'hidden pointer-events-none absolute z-30 w-44 h-44 rounded-full border-2 border-amber-400 shadow-2xl overflow-hidden bg-no-repeat';
+        loupe.style.boxShadow = '0 10px 30px rgba(0,0,0,0.75), inset 0 0 12px rgba(212,175,55,0.35)';
+        stage.appendChild(loupe);
+
+        bLoupe.onclick = () => {
+          v13LoupeActive = !v13LoupeActive;
+          bLoupe.className = (v13LoupeActive ? 'btn-luxe-gold' : 'btn-luxe-outline !border-purple-400/50 !text-purple-300') + ' !py-1 !px-2 text-xs shrink-0';
+          if (!v13LoupeActive) loupe.classList.add('hidden');
+          else showToast('🔍 مرّر الماوس أو الإصبع فوق صورة السند لتكبير الأرقام الدقيقة (3x)', 'info');
+        };
+
+        stage.addEventListener('pointermove', e => {
+          if (!v13LoupeActive || imgEl.classList.contains('hidden') || !imgEl.src) {
+            loupe.classList.add('hidden');
+            return;
+          }
+          const iRect = imgEl.getBoundingClientRect(), sRect = stage.getBoundingClientRect();
+          if (e.clientX < iRect.left || e.clientX > iRect.right || e.clientY < iRect.top || e.clientY > iRect.bottom) {
+            loupe.classList.add('hidden');
+            return;
+          }
+          loupe.classList.remove('hidden');
+          const relX = (e.clientX - iRect.left) / Math.max(1, iRect.width);
+          const relY = (e.clientY - iRect.top) / Math.max(1, iRect.height);
+          const zoomMult = 3.2;
+          loupe.style.backgroundImage = `url("${imgEl.src}")`;
+          loupe.style.backgroundSize = `${iRect.width * zoomMult}px ${iRect.height * zoomMult}px`;
+          loupe.style.backgroundPosition = `${Math.max(0, Math.min(100, relX * 100))}% ${Math.max(0, Math.min(100, relY * 100))}%`;
+          loupe.style.left = `${e.clientX - sRect.left + stage.scrollLeft - 88}px`;
+          loupe.style.top = `${e.clientY - sRect.top + stage.scrollTop - 88}px`;
+        });
+        stage.addEventListener('pointerleave', () => loupe.classList.add('hidden'));
+
+        // جعل بطاقات البيانات الـ 6 في لوحة OCR قابلة للنقر للتعديل المباشر الفوري
+        ['entityVoucherNum', 'entityAmount', 'entityDate', 'entitySender', 'entityReceiver'].forEach(id => {
+          const el = v12$(id);
+          if (el && el.parentElement) {
+            el.parentElement.style.cursor = 'pointer';
+            el.parentElement.title = 'انقر لتعديل هذا الحقل مباشرة';
+            el.parentElement.addEventListener('click', e => {
+              if (e.target && e.target.id === 'applyDetectedNumBtn') return;
+              v12OpenInfo();
+            });
+          }
+        });
+
+        const t = v12$('viewerDocTitle');
+        t.style.cursor = 'pointer';
+        t.title = 'انقر لتعديل الاسم والرقم وكافة بيانات السند';
+        t.addEventListener('click', v12OpenInfo);
+
+        const acc = v12$('docFilesInput');
+        if (acc) acc.setAttribute('accept', 'image/*,.pdf,.txt,.csv,.json,.docx,.xlsx,audio/*,video/*');
+
+        // تحديث الهيدر والبيانات عند فتح أي مستند في العارض
+        const origOpenRaw = openDocumentViewerRaw;
+        openDocumentViewerRaw = function (docId) {
+          v13ShowStructuredCardMode = false;
+          const bCard = v12$('v13StructuredSheetBtn');
+          if (bCard) bCard.className = 'btn-luxe-outline !border-sky-400/50 !text-sky-300 !py-1 !px-2 text-xs shrink-0';
+          origOpenRaw.apply(this, arguments);
+          const doc = documents.find(d => d.id === docId);
+          if (doc) {
+            v13SyncViewerHeaderAndEntities(doc);
+            const pagesBarEl = v12$('viewerPagesBar');
+            if (pagesBarEl) pagesBarEl.classList.remove('hidden');
+          }
+        };
       })();
     })();
   </script>
