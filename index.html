@@ -371,6 +371,10 @@
     [data-theme="light"] .text-slate-200:not(#ssModal *), [data-theme="light"] .text-slate-300:not(#ssModal *), [data-theme="light"] .text-slate-400:not(#ssModal *) { color: #334155 !important; }
     [data-theme="light"] .text-purple-300:not(#ssModal *), [data-theme="light"] .text-purple-400:not(#ssModal *) { color: #6d28d9 !important; }
     #docViewerModal #viewerMainToolbarRow button, #docViewerModal #viewerOcrPane button { min-height: 30px; white-space: nowrap; }
+    .doc-card-thumb-stage { background: linear-gradient(145deg, #0b1326 0%, #15223e 100%); }
+    [data-theme="light"] .doc-card-thumb-stage { background: linear-gradient(145deg, #f3efe6 0%, #e5dec9 100%) !important; }
+    [data-theme="light"] #mainStickyHeader { background-color: rgba(236, 231, 220, 0.94) !important; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06); }
+    [data-theme="light"] #mobileBottomNav { background-color: rgba(236, 231, 220, 0.96) !important; }
     [data-theme="light"] .text-white:not(#ssModal *):not(.btn-luxe-gold):not([class*="bg-"]) { color: var(--text-primary) !important; }
     /* v12: الشريط الجانبي يبقى ثابتاً في الكمبيوتر عند تمرير الصفحة (يتمرر داخلياً فقط إن طال) */
     @media (min-width: 1024px) {
@@ -490,7 +494,7 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0">
-      <header class="sticky top-0 z-20 px-4 md:px-7 py-3.5 border-b backdrop-blur-md flex flex-wrap items-center justify-between gap-3" style="background-color: rgba(7, 13, 27, 0.88); border-color: var(--border-subtle);">
+      <header id="mainStickyHeader" class="sticky top-0 z-20 px-4 md:px-7 py-3.5 border-b backdrop-blur-md flex flex-wrap items-center justify-between gap-3" style="background-color: var(--bg-secondary); border-color: var(--border-subtle);">
         <div class="flex items-center gap-3">
           <button id="openSidebarBtn" class="lg:hidden btn-luxe-outline !p-2" aria-label="فتح القائمة">☰</button>
           <div>
@@ -1328,7 +1332,7 @@
   </div>
 
   <!-- Mobile Bottom Bar -->
-  <div class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t px-3 py-2 flex items-center justify-around backdrop-blur-md" style="background-color: rgba(7, 13, 27, 0.94); border-color: var(--border-gold);">
+  <div id="mobileBottomNav" class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t px-3 py-2 flex items-center justify-around backdrop-blur-md" style="background-color: var(--bg-secondary); border-color: var(--border-gold);">
     <button type="button" id="mobileBarDashBtn" class="flex flex-col items-center text-[11px] font-bold text-slate-300"><span class="text-base">📊</span><span>الأرشيف</span></button>
     <button type="button" id="mobileBarCamBtn" class="btn-luxe-gold !py-2 !px-4 text-xs shadow-xl"><span>📱</span><span>تصوير مستند</span></button>
     <button type="button" id="mobileBarFolderBtn" class="flex flex-col items-center text-[11px] font-bold text-slate-300"><span class="text-base">📂</span><span>المجلد</span></button>
@@ -3761,43 +3765,135 @@
         for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
         return u8;
       }
-      async function renderPdfPageDataUrlToImages(dataUrl, cacheKey = '', maxPages = 12) {
-        if (cacheKey && pdfRenderCache.has(cacheKey)) return pdfRenderCache.get(cacheKey);
-        if (typeof window.pdfjsLib === 'undefined') return null;
+      const pdfDocInstanceCache = new Map();
+      const pdfThumbGenQueue = new Set();
+
+      function ensurePdfWorkerConfigured() {
+        if (typeof window.pdfjsLib === 'undefined') return false;
+        if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = window.__pdfLocal ? 'libs/pdf.worker.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+        return true;
+      }
+
+      async function getOrLoadPdfDoc(dataUrl, cacheKey = '') {
+        if (!ensurePdfWorkerConfigured()) return null;
+        if (cacheKey && pdfDocInstanceCache.has(cacheKey)) return pdfDocInstanceCache.get(cacheKey);
+        const u8 = dataUrlToUint8Array(dataUrl);
+        if (!u8) return null;
+        const pdfDoc = await window.pdfjsLib.getDocument({ data: u8 }).promise;
+        if (cacheKey) {
+          if (pdfDocInstanceCache.size > 12) {
+            const firstK = pdfDocInstanceCache.keys().next().value;
+            pdfDocInstanceCache.delete(firstK);
+          }
+          pdfDocInstanceCache.set(cacheKey, pdfDoc);
+        }
+        return pdfDoc;
+      }
+
+      async function renderSinglePdfPageObj(pdfDoc, pNum, maxPixelDim = 1600, jpegQuality = 0.91) {
+        const pdfPage = await pdfDoc.getPage(pNum);
+        const vp1 = pdfPage.getViewport({ scale: 1 });
+        const targetScale = Math.min(2.2, Math.max(1.1, maxPixelDim / Math.max(vp1.width, vp1.height, 1)));
+        const viewport = pdfPage.getViewport({ scale: targetScale });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(viewport.width));
+        canvas.height = Math.max(1, Math.round(viewport.height));
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+        let embeddedText = '';
         try {
-          if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = window.__pdfLocal ? 'libs/pdf.worker.min.js' : 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const tc = await pdfPage.getTextContent();
+          embeddedText = (tc.items || []).map(it => it.str || '').join(' ').trim();
+        } catch (_) {}
+        return { pageNumber: pNum, totalPages: pdfDoc.numPages, dataUrl: canvas.toDataURL('image/jpeg', jpegQuality), embeddedText };
+      }
+
+      // توليد مصغرة الصفحة الأولى لأي مستند PDF تلقائياً حتى لا يظهر كمربع أسود في البطاقات أو الجدول
+      async function ensurePdfFirstPageThumb(doc) {
+        if (!doc || doc._thumbUrl || pdfThumbGenQueue.has(doc.id)) return;
+        const pages = doc.pages || [];
+        const imgPage = pages.find(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
+        if (imgPage) { doc._thumbUrl = imgPage.dataUrl; return; }
+        const pdfPage = pages.find(p => isPdfPageObj(p));
+        if (!pdfPage) return;
+        pdfThumbGenQueue.add(doc.id);
+        try {
+          if (!pdfPage.dataUrl && pdfPage.file && Store.ready) {
+            await V9.need(doc, true);
           }
-          const u8 = dataUrlToUint8Array(dataUrl);
-          if (!u8) return null;
-          const pdfDoc = await window.pdfjsLib.getDocument({ data: u8 }).promise;
-          const count = Math.min(pdfDoc.numPages || 1, maxPages);
-          const pagesOut = [];
+          if (!pdfPage.dataUrl) return;
+          const pdfDoc = await getOrLoadPdfDoc(pdfPage.dataUrl, `thumb_${doc.id}`);
+          if (!pdfDoc) return;
+          doc._pdfPageCount = pdfDoc.numPages || 1;
+          const p1 = await renderSinglePdfPageObj(pdfDoc, 1, 560, 0.80);
+          if (p1 && p1.dataUrl) {
+            doc._thumbUrl = p1.dataUrl;
+            pdfPage.thumbUrl = p1.dataUrl;
+            document.querySelectorAll(`[data-doc-thumb="${doc.id}"]`).forEach(container => {
+              container.innerHTML = `<img src="${p1.dataUrl}" alt="${escapeHtml(doc.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />`;
+            });
+            document.querySelectorAll(`[data-doc-pdfcount="${doc.id}"]`).forEach(badge => {
+              badge.textContent = `📕 PDF (${doc._pdfPageCount} ص)`;
+              badge.classList.remove('hidden');
+            });
+          }
+        } catch (_) {
+        } finally {
+          pdfThumbGenQueue.delete(doc.id);
+        }
+      }
+
+      // دالة عرض صفحات PDF بدون أي حد أقصى (تدعم 20 أو 50 أو 200 صفحة كاملة بكفاءة وسرعة عالية)
+      async function renderPdfPageDataUrlToImages(dataUrl, cacheKey = '', maxPages = 500, targetPageIdx = null) {
+        if (!ensurePdfWorkerConfigured()) return null;
+        try {
+          let cached = cacheKey ? pdfRenderCache.get(cacheKey) : null;
+          const pdfDoc = await getOrLoadPdfDoc(dataUrl, cacheKey || '');
+          if (!pdfDoc) return null;
+          const totalPages = pdfDoc.numPages || 1;
+          if (!cached || cached.numPages !== totalPages) {
+            cached = {
+              numPages: totalPages,
+              pages: Array.from({ length: totalPages }, (_, i) => ({
+                pageNumber: i + 1,
+                totalPages,
+                dataUrl: '',
+                embeddedText: ''
+              }))
+            };
+            if (cacheKey) {
+              if (pdfRenderCache.size > 20) {
+                const oldestKey = pdfRenderCache.keys().next().value;
+                pdfRenderCache.delete(oldestKey);
+              }
+              pdfRenderCache.set(cacheKey, cached);
+            }
+          }
+
+          // إذا طُلبت صفحة محددة للعرض في العارض، نجهزها فوراً (مع الصفحة الأولى والصفحة التالية لتسريع التصفح)
+          if (targetPageIdx !== null && targetPageIdx >= 0 && targetPageIdx < totalPages) {
+            const toRenderNow = [targetPageIdx];
+            if (targetPageIdx === 0 && totalPages > 1) toRenderNow.push(1);
+            for (const idx of toRenderNow) {
+              if (!cached.pages[idx].dataUrl) {
+                cached.pages[idx] = await renderSinglePdfPageObj(pdfDoc, idx + 1, 1650, 0.91);
+              }
+            }
+            return cached;
+          }
+
+          // عند طلب استخراج OCR أو جميع الصفحات (حتى maxPages، الافتراضي 500 صفحة أي كامل المستند)
+          const count = Math.min(totalPages, maxPages || 500);
           for (let pNum = 1; pNum <= count; pNum++) {
-            const pdfPage = await pdfDoc.getPage(pNum);
-            const vp1 = pdfPage.getViewport({ scale: 1 });
-            const targetScale = Math.min(2.2, Math.max(1.4, 1600 / Math.max(vp1.width, vp1.height, 1)));
-            const viewport = pdfPage.getViewport({ scale: targetScale });
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(viewport.width));
-            canvas.height = Math.max(1, Math.round(viewport.height));
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            await pdfPage.render({ canvasContext: ctx, viewport }).promise;
-            let embeddedText = '';
-            try {
-              const tc = await pdfPage.getTextContent();
-              embeddedText = (tc.items || []).map(it => it.str || '').join(' ').trim();
-            } catch (_) {}
-            pagesOut.push({ pageNumber: pNum, totalPages: pdfDoc.numPages, dataUrl: canvas.toDataURL('image/jpeg', 0.91), embeddedText });
+            if (!cached.pages[pNum - 1].dataUrl) {
+              cached.pages[pNum - 1] = await renderSinglePdfPageObj(pdfDoc, pNum, 1550, 0.89);
+            }
           }
-          const res = { numPages: pdfDoc.numPages, pages: pagesOut };
-          if (cacheKey) {
-            if (pdfRenderCache.size > 25) pdfRenderCache.clear();
-            pdfRenderCache.set(cacheKey, res);
-          }
-          return res;
+          return cached;
         } catch (err) {
           return null;
         }
@@ -3816,7 +3912,7 @@
             ocrTargets.push(p.dataUrl);
           } else if (isPdfPageObj(p) && p.dataUrl) {
             if (showProgress) showToast('📄 جارٍ تحويل صفحات PDF لاستخراج النص منها...', 'info');
-            const rendered = await renderPdfPageDataUrlToImages(p.dataUrl, `${doc.id}_${idx}`, 10);
+            const rendered = await renderPdfPageDataUrlToImages(p.dataUrl, `${doc.id}_${idx}`, 500);
             if (rendered && rendered.pages && rendered.pages.length) {
               rendered.pages.forEach(rp => {
                 if (rp.dataUrl) ocrTargets.push(rp.dataUrl);
@@ -3907,15 +4003,26 @@
         else { tableWrap.classList.add('hidden'); grid.classList.remove('hidden'); }
 
         tbody.innerHTML = list.map(doc => { getReadableDocTitle(doc);
-          const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image')), isPdf = (doc.pages || []).some(p => p.type === 'application/pdf'), hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
+          const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
+          const pdfPage = (doc.pages || []).find(p => isPdfPageObj(p));
+          const isPdf = Boolean(pdfPage);
+          const thumbSrc = (thumbPage && thumbPage.dataUrl) || doc._thumbUrl || (pdfPage && pdfPage.thumbUrl) || '';
+          if (isPdf && !thumbSrc) setTimeout(() => ensurePdfFirstPageThumb(doc), 10);
+          const hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
           const snippet = hasOcr ? escapeHtml(doc.ocrText.replace(/\s+/g, ' ').slice(0, 72)) + '...' : '<span class="opacity-50">بانتظار OCR</span>';
           const checked = selectedDocIds.has(doc.id) ? 'checked' : '', catObj = categories.find(c => c.name === doc.category), badgeColor = catObj ? catObj.color : '#d4af37';
-          return `<tr class="hover:bg-amber-500/5 transition-colors cursor-pointer" data-doc-row="${doc.id}"><td class="p-3.5" onclick="event.stopPropagation()"><input type="checkbox" class="doc-select-cb rounded accent-amber-400" data-id="${doc.id}" ${checked} /></td><td class="p-3.5"><div class="w-12 h-12 rounded-lg overflow-hidden border flex items-center justify-center bg-slate-900" style="border-color: var(--border-subtle);">${thumbPage ? `<img src="${thumbPage.dataUrl}" alt="" class="w-full h-full object-cover" />` : `<span class="text-xl">${isPdf ? '📕' : '📄'}</span>`}</div></td><td class="p-3.5"><div class="font-bold flex items-center gap-1.5"><span>${escapeHtml(doc.title)}</span>${doc.priority === 'important' ? '<span title="هام">⭐</span>' : ''}${doc.source === 'camera' ? '<span title="مُلتقط بكاميرا الجوال" class="text-xs">📱</span>' : ''}${(doc.pages && doc.pages.length > 1) ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-400 font-mono-code">${doc.pages.length} وجه</span>` : ''}</div><div class="text-xs font-mono-code mt-0.5" style="color: var(--text-secondary);">${doc.docNumber ? `#${escapeHtml(doc.docNumber)} • ` : ''}${formatBytes(doc.size)}</div></td><td class="p-3.5 text-xs"><span class="px-2 py-1 rounded-md bg-white/5 font-mono-code text-[11px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span></td><td class="p-3.5"><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}44;">${catObj ? catObj.icon + ' ' : ''}${escapeHtml(doc.category)}</span></td><td class="p-3.5 max-w-xs"><div class="text-xs leading-relaxed" style="color: var(--text-secondary);">${snippet}</div></td><td class="p-3.5 text-xs font-mono-code" style="color: var(--text-secondary);">${escapeHtml(doc.date || '—')}</td><td class="p-3.5 text-center" onclick="event.stopPropagation()"><div class="inline-flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}" title="عرض المستند ونص OCR">👁️ عرض</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}" title="حذف">🗑️</button></div></td></tr>`;
+          return `<tr class="hover:bg-amber-500/5 transition-colors cursor-pointer" data-doc-row="${doc.id}"><td class="p-3.5" onclick="event.stopPropagation()"><input type="checkbox" class="doc-select-cb rounded accent-amber-400" data-id="${doc.id}" ${checked} /></td><td class="p-3.5"><div data-doc-thumb="${doc.id}" class="w-12 h-12 rounded-lg overflow-hidden border flex items-center justify-center doc-card-thumb-stage" style="border-color: var(--border-subtle);">${thumbSrc ? `<img src="${thumbSrc}" alt="" class="w-full h-full object-cover" />` : `<span class="text-xl">${isPdf ? '📕' : '📄'}</span>`}</div></td><td class="p-3.5"><div class="font-bold flex items-center gap-1.5"><span>${escapeHtml(doc.title)}</span>${doc.priority === 'important' ? '<span title="هام">⭐</span>' : ''}${doc.source === 'camera' ? '<span title="مُلتقط بكاميرا الجوال" class="text-xs">📱</span>' : ''}${isPdf ? `<span data-doc-pdfcount="${doc.id}" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-400 font-mono-code">📕 PDF${doc._pdfPageCount ? ' (' + doc._pdfPageCount + ' ص)' : ''}</span>` : ''}${(doc.pages && doc.pages.length > 1) ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-400 font-mono-code">${doc.pages.length} وجه</span>` : ''}</div><div class="text-xs font-mono-code mt-0.5" style="color: var(--text-secondary);">${doc.docNumber ? `#${escapeHtml(doc.docNumber)} • ` : ''}${formatBytes(doc.size)}</div></td><td class="p-3.5 text-xs"><span class="px-2 py-1 rounded-md bg-white/5 font-mono-code text-[11px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span></td><td class="p-3.5"><span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}44;">${catObj ? catObj.icon + ' ' : ''}${escapeHtml(doc.category)}</span></td><td class="p-3.5 max-w-xs"><div class="text-xs leading-relaxed" style="color: var(--text-secondary);">${snippet}</div></td><td class="p-3.5 text-xs font-mono-code" style="color: var(--text-secondary);">${escapeHtml(doc.date || '—')}</td><td class="p-3.5 text-center" onclick="event.stopPropagation()"><div class="inline-flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}" title="عرض المستند ونص OCR">👁️ عرض</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}" title="حذف">🗑️</button></div></td></tr>`;
         }).join('');
 
         grid.innerHTML = list.map(doc => { getReadableDocTitle(doc);
-          const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image')), isPdf = (doc.pages || []).some(p => p.type === 'application/pdf'), hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
-          return `<div class="luxe-card overflow-hidden flex flex-col justify-between group cursor-pointer hover:border-amber-400/50" data-doc-card="${doc.id}"><div><div class="h-44 bg-slate-950 relative overflow-hidden flex items-center justify-center border-b" style="border-color: var(--border-subtle);">${thumbPage ? `<img src="${thumbPage.dataUrl}" alt="${escapeHtml(doc.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />` : `<span class="text-5xl">${isPdf ? '📕' : '📄'}</span>`}<div class="absolute top-2.5 right-2.5 flex items-center gap-1">${hasOcr ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/90 text-slate-950 font-bold">OCR ✔</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900/90 text-amber-400 border border-amber-400/30">بدون OCR</span>'}${doc.source === 'camera' ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-bold">📱 كاميرا</span>' : ''}</div></div><div class="p-4"><div class="flex items-center justify-between text-[11px] mb-1" style="color: var(--text-secondary);"><span>${escapeHtml(doc.category)}</span><span class="font-mono-code">${escapeHtml(doc.date || '')}</span></div><h4 class="font-bold text-sm truncate mb-1.5">${escapeHtml(doc.title)}</h4><p class="text-xs line-clamp-2 leading-relaxed" style="color: var(--text-secondary);">${hasOcr ? escapeHtml(doc.ocrText.slice(0, 110)) : 'اضغط لفتح العارض واستخراج النص عبر OCR'}</p></div></div><div class="px-4 py-2.5 border-t flex items-center justify-between" style="border-color: var(--border-subtle); background-color: rgba(0,0,0,0.12);" onclick="event.stopPropagation()"><span class="text-[11px] font-mono-code truncate max-w-[120px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span><div class="flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}">عرض OCR</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}">🗑️</button></div></div></div>`;
+          const thumbPage = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
+          const pdfPage = (doc.pages || []).find(p => isPdfPageObj(p));
+          const isPdf = Boolean(pdfPage);
+          const thumbSrc = (thumbPage && thumbPage.dataUrl) || doc._thumbUrl || (pdfPage && pdfPage.thumbUrl) || '';
+          if (isPdf && !thumbSrc) setTimeout(() => ensurePdfFirstPageThumb(doc), 10);
+          const hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
+          const placeholderHtml = `<div class="flex flex-col items-center justify-center text-center p-4 select-none"><div class="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl mb-2 border shadow-sm" style="background-color: var(--bg-card); border-color: var(--border-gold);">${isPdf ? '📕' : '📄'}</div><span class="text-xs font-extrabold" style="color: var(--text-primary);">${isPdf ? 'مستند PDF متعدد الصفحات' : escapeHtml(doc.category || 'مستند مؤرشف')}</span><span class="text-[10px] mt-0.5 font-mono-code" style="color: var(--text-secondary);">${doc.docNumber ? '#' + escapeHtml(doc.docNumber) + ' • ' : ''}${formatBytes(doc.size)}</span></div>`;
+          return `<div class="luxe-card overflow-hidden flex flex-col justify-between group cursor-pointer hover:border-amber-400/50" data-doc-card="${doc.id}"><div><div class="h-44 doc-card-thumb-stage relative overflow-hidden flex items-center justify-center border-b" style="border-color: var(--border-subtle);"><div data-doc-thumb="${doc.id}" class="w-full h-full flex items-center justify-center">${thumbSrc ? `<img src="${thumbSrc}" alt="${escapeHtml(doc.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />` : placeholderHtml}</div><div class="absolute top-2.5 right-2.5 flex items-center gap-1 flex-wrap">${hasOcr ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/95 text-slate-950 font-bold shadow">OCR ✔</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-bold shadow">بدون OCR</span>'}${isPdf ? `<span data-doc-pdfcount="${doc.id}" class="text-[10px] px-2 py-0.5 rounded-full bg-rose-600 text-white font-bold shadow">📕 PDF${doc._pdfPageCount ? ' (' + doc._pdfPageCount + ' ص)' : ''}</span>` : ''}${doc.source === 'camera' ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-400 text-slate-950 font-bold shadow">📱 كاميرا</span>' : ''}</div></div><div class="p-4"><div class="flex items-center justify-between text-[11px] mb-1" style="color: var(--text-secondary);"><span>${escapeHtml(doc.category)}</span><span class="font-mono-code">${escapeHtml(doc.date || '')}</span></div><h4 class="font-bold text-sm truncate mb-1.5">${escapeHtml(doc.title)}</h4><p class="text-xs line-clamp-2 leading-relaxed" style="color: var(--text-secondary);">${hasOcr ? escapeHtml(doc.ocrText.slice(0, 110)) : 'اضغط لفتح العارض واستعراض كافة الصفحات أو استخراج النص عبر OCR'}</p></div></div><div class="px-4 py-2.5 border-t flex items-center justify-between" style="border-color: var(--border-subtle); background-color: rgba(0,0,0,0.06);" onclick="event.stopPropagation()"><span class="text-[11px] font-mono-code truncate max-w-[120px]" style="color: var(--text-secondary);">📂 ${escapeHtml((doc.folder || 'رئيسي').split('/').pop())}</span><div class="flex items-center gap-1"><button type="button" class="btn-luxe-gold !py-1 !px-2.5 text-xs view-doc-btn" data-id="${doc.id}">عرض OCR</button><button type="button" class="btn-luxe-outline !py-1 !px-2 text-xs !text-rose-400 delete-doc-btn" data-id="${doc.id}">🗑️</button></div></div></div>`;
         }).join('');
 
         tbody.querySelectorAll('[data-doc-row]').forEach(row => row.addEventListener('click', () => openDocumentViewer(row.getAttribute('data-doc-row'))));
@@ -3984,8 +4091,12 @@
         statsEl.textContent = `${docsInFolder.length} مستند`;
         if (!docsInFolder.length) { gridEl.innerHTML = `<div class="col-span-full text-center py-10 text-xs" style="color: var(--text-secondary);">لا توجد ملفات في هذا المسار. اضغط «اختيار / تغيير المجلد» لربط مجلد من جهازك.</div>`; return; }
         gridEl.innerHTML = docsInFolder.map(doc => {
-          const thumb = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image')), hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
-          return `<div class="luxe-card p-3.5 flex flex-col justify-between gap-3 cursor-pointer hover:border-amber-400/50 explorer-doc-item" data-id="${doc.id}"><div class="flex items-start gap-3"><div class="w-14 h-14 rounded-lg overflow-hidden bg-slate-950 border shrink-0 flex items-center justify-center" style="border-color: var(--border-subtle);">${thumb ? `<img src="${thumb.dataUrl}" class="w-full h-full object-cover" alt="" />` : '<span class="text-2xl">📄</span>'}</div><div class="min-w-0 flex-1"><div class="font-bold text-xs truncate">${escapeHtml(doc.title)}</div><div class="text-[11px] font-mono-code mt-0.5" style="color: var(--text-secondary);">${formatBytes(doc.size)} • ${doc.pages ? doc.pages.length : 0} ملف</div><div class="mt-1.5">${hasOcr ? '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold">OCR جاهز ✔</span>' : '<span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-400">بانتظار OCR</span>'}</div></div></div><button type="button" class="btn-luxe-outline w-full !py-1.5 text-xs">👁️ فتح المستند والـ OCR</button></div>`;
+          const thumb = (doc.pages || []).find(p => p.dataUrl && p.dataUrl.startsWith('data:image'));
+          const pdfPage = (doc.pages || []).find(p => isPdfPageObj(p));
+          const thumbSrc = (thumb && thumb.dataUrl) || doc._thumbUrl || (pdfPage && pdfPage.thumbUrl) || '';
+          if (pdfPage && !thumbSrc) setTimeout(() => ensurePdfFirstPageThumb(doc), 10);
+          const hasOcr = Boolean(doc.ocrText && doc.ocrText.trim());
+          return `<div class="luxe-card p-3.5 flex flex-col justify-between gap-3 cursor-pointer hover:border-amber-400/50 explorer-doc-item" data-id="${doc.id}"><div class="flex items-start gap-3"><div data-doc-thumb="${doc.id}" class="w-14 h-14 rounded-lg overflow-hidden doc-card-thumb-stage border shrink-0 flex items-center justify-center" style="border-color: var(--border-subtle);">${thumbSrc ? `<img src="${thumbSrc}" class="w-full h-full object-cover" alt="" />` : `<span class="text-2xl">${pdfPage ? '📕' : '📄'}</span>`}</div><div class="min-w-0 flex-1"><div class="font-bold text-xs truncate">${escapeHtml(doc.title)}</div><div class="text-[11px] font-mono-code mt-0.5" style="color: var(--text-secondary);">${formatBytes(doc.size)} • ${doc.pages ? doc.pages.length : 0} ملف</div><div class="mt-1.5">${hasOcr ? '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold">OCR جاهز ✔</span>' : '<span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-400">بانتظار OCR</span>'}</div></div></div><button type="button" class="btn-luxe-outline w-full !py-1.5 text-xs">👁️ فتح المستند والـ OCR</button></div>`;
         }).join('');
         gridEl.querySelectorAll('.explorer-doc-item').forEach(el => el.addEventListener('click', () => openDocumentViewer(el.getAttribute('data-id'))));
       }
@@ -4198,7 +4309,7 @@
           }
           if (pdfLoadingBadge) pdfLoadingBadge.classList.remove('hidden');
           noMediaEl.classList.add('hidden');
-          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 500, currentPdfSubPageIdx);
           if (pdfLoadingBadge) pdfLoadingBadge.classList.add('hidden');
           if (currentViewerDocId !== doc.id) return;
           if (rendered && rendered.pages && rendered.pages.length > 0) {
@@ -6266,7 +6377,7 @@
         const { doc, page } = v12Cur(); if (!doc || !page) return;
         let targetDataUrl = page.dataUrl;
         if (isPdfPageObj(page) && page.dataUrl) {
-          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 500, currentPdfSubPageIdx);
           if (rendered && rendered.pages && rendered.pages.length) {
             const sub = rendered.pages[Math.min(currentPdfSubPageIdx, rendered.pages.length - 1)] || rendered.pages[0];
             targetDataUrl = sub.dataUrl;
@@ -6685,7 +6796,7 @@
         if (!doc || !page) return;
         let srcUrl = page.dataUrl;
         if (isPdfPageObj(page) && page.dataUrl) {
-          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 15);
+          const rendered = await renderPdfPageDataUrlToImages(page.dataUrl, `${doc.id}_${currentViewerPageIdx}`, 500, currentPdfSubPageIdx);
           if (rendered && rendered.pages && rendered.pages.length) {
             const sub = rendered.pages[Math.min(currentPdfSubPageIdx, rendered.pages.length - 1)] || rendered.pages[0];
             srcUrl = sub.dataUrl;
