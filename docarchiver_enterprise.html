@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظام أرشيف المستندات | DocArchiver Enterprise</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#060913',
+            surface: '#0D1322',
+            card: '#121A2F',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #060913;
+      color: #E2E8F0;
+      font-family: 'Cairo', sans-serif;
+    }
+    .hero-glow {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.16), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(6, 182, 212, 0.14), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.08), transparent 50%);
+    }
+    .glass {
+      background: rgba(18, 26, 47, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .glass-hover:hover {
+      border-color: rgba(16, 185, 129, 0.45);
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px -15px rgba(16, 185, 129, 0.22);
+    }
+    .grid-bg {
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-6 z-50 hidden items-center gap-3 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-2xl transition-all duration-300">
+    <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">تم النسخ بنجاح</span>
+  </div>
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/70 bg-obsidian/80 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+      <a href="#top" class="flex items-center gap-3 group">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/20">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+          </svg>
+        </div>
+        <div>
+          <span class="block text-base font-extrabold tracking-tight text-white group-hover:text-emerald-400 transition">أرشيف المستندات</span>
+          <span class="block text-[11px] font-mono text-emerald-400/90">DocArchiver Enterprise</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-300">
+        <a href="#features" class="hover:text-emerald-400 transition">المميزات</a>
+        <a href="#preview" class="hover:text-emerald-400 transition">معاينة النظام</a>
+        <a href="#quickstart" class="hover:text-emerald-400 transition">التشغيل الأول</a>
+        <a href="#download" class="hover:text-emerald-400 transition">التحميل والمتطلبات</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/sma812020/ShareArchiver/releases/latest/download/DocArchiver_Enterprise_v1.exe"
+           class="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-500/25 hover:brightness-110 transition">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3"/></svg>
+          <span>تحميل النسخة</span>
+        </a>
+        <button id="menu-btn" type="button" aria-label="فتح القائمة" class="md:hidden rounded-lg border border-slate-700 p-2 text-slate-300 hover:bg-slate-800">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden border-t border-slate-800/80 bg-surface px-4 py-4 md:hidden">
+      <div class="flex flex-col gap-3 text-sm font-semibold text-slate-300">
+        <a href="#features" class="mobile-link py-1.5 hover:text-emerald-400">المميزات</a>
+        <a href="#preview" class="mobile-link py-1.5 hover:text-emerald-400">معاينة النظام</a>
+        <a href="#quickstart" class="mobile-link py-1.5 hover:text-emerald-400">التشغيل الأول</a>
+        <a href="#download" class="mobile-link py-1.5 hover:text-emerald-400">التحميل والمتطلبات</a>
+        <a href="https://github.com/sma812020/ShareArchiver/releases/latest/download/DocArchiver_Enterprise_v1.exe"
+           class="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 font-bold text-slate-950">
+          تحميل DocArchiver_Enterprise_v1.exe
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="top" class="relative hero-glow grid-bg overflow-hidden pt-14 pb-20 lg:pt-24 lg:pb-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid items-center gap-12 lg:grid-cols-12">
+        <!-- Hero Text -->
+        <div class="lg:col-span-7 text-center lg:text-right">
+          <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold text-emerald-300 mb-6">
+            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>الإصدار المؤسسي المتكامل • Windows x64 (.NET 8+)</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black leading-tight text-white">
+            أرشفة رقمية ذكية
+            <span class="block bg-gradient-to-l from-emerald-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent mt-2">
+              بسرعة فائقة وأمان مؤسسي
+            </span>
+          </h1>
+
+          <p class="mt-6 max-w-2xl mx-auto lg:mx-0 text-base sm:text-lg leading-relaxed text-slate-300">
+            منصة <strong class="text-white">DocArchiver Enterprise</strong> لإدارة وأرشفة المستندات، البحث اللحظي المتقدم،
+            التعرف الضوئي على النصوص (OCR)، ومزامنة التصوير المباشر من الجوال عبر الشبكة المحلية بواجهة عصرية مرنة.
+          </p>
+
+          <!-- Primary CTAs -->
+          <div class="mt-9 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <a href="https://github.com/sma812020/ShareArchiver/releases/latest/download/DocArchiver_Enterprise_v1.exe"
+               class="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-7 py-4 text-base font-extrabold text-slate-950 shadow-xl shadow-emerald-500/25 hover:scale-[1.02] transition">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3"/></svg>
+              <span>تحميل البرنامج مباشرة (125 MB)</span>
+            </a>
+
+            <a href="https://github.com/sma812020/ShareArchiver/releases" target="_blank" rel="noopener noreferrer"
+               class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl border border-slate-700 bg-slate-900/70 px-6 py-4 text-sm font-bold text-slate-200 hover:border-cyan-400/50 hover:text-white transition">
+              <svg class="h-5 w-5 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+              <span>صفحة الإصدارات على GitHub</span>
+            </a>
+          </div>
+
+          <!-- Quick Meta Strip -->
+          <div class="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-slate-400">
+            <span class="flex items-center gap-1.5"><span class="text-emerald-400">✔</span> ملف التثبيت: <code class="font-mono text-slate-200">DocArchiver_Enterprise_v1.exe</code></span>
+            <span class="flex items-center gap-1.5"><span class="text-cyan-400">✔</span> متوافق مع Windows 10 / 11 (64-bit)</span>
+            <span class="flex items-center gap-1.5"><span class="text-amber-400">✔</span> تطوير: م. سمير الكمالي</span>
+          </div>
+        </div>
+
+        <!-- Hero Interactive Card -->
+        <div class="lg:col-span-5">
+          <div class="glass rounded-3xl p-6 shadow-2xl border border-slate-700/60">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-rose-500"></span>
+                <span class="h-3 w-3 rounded-full bg-amber-400"></span>
+                <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+              </div>
+              <span class="font-mono text-xs text-slate-400">Release Asset • v1 Enterprise</span>
+            </div>
+
+            <div class="space-y-4">
+              <div class="rounded-2xl bg-slate-900/90 p-4 border border-slate-800">
+                <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                  <span>اسم الحزمة</span>
+                  <span class="rounded-md bg-emerald-500/15 px-2 py-0.5 text-emerald-300 font-semibold">جاهز للتحميل</span>
+                </div>
+                <div class="font-mono text-sm font-semibold text-white break-all">DocArchiver_Enterprise_v1.exe</div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-2xl bg-slate-900/90 p-4 border border-slate-800">
+                  <div class="text-xs text-slate-400">حجم المثبّت</div>
+                  <div class="mt-1 text-xl font-extrabold text-cyan-300">125 MB</div>
+                </div>
+                <div class="rounded-2xl bg-slate-900/90 p-4 border border-slate-800">
+                  <div class="text-xs text-slate-400">المعمارية</div>
+                  <div class="mt-1 text-xl font-extrabold text-emerald-300">Win x64</div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl bg-slate-900/90 p-4 border border-slate-800">
+                <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                  <span>بصمة التحقق (SHA-256)</span>
+                  <button type="button" onclick="copyText('570531de56f87d5e', 'تم نسخ بادئة SHA-256')" class="text-cyan-400 hover:text-cyan-300 font-semibold">نسخ</button>
+                </div>
+                <div class="font-mono text-xs text-slate-300 truncate" dir="ltr">sha256:570531de56f87d5e...</div>
+              </div>
+
+              <a href="https://github.com/sma812020/ShareArchiver/releases/latest/download/DocArchiver_Enterprise_v1.exe"
+                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500/15 border border-emerald-500/40 py-3 text-sm font-bold text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition">
+                <span>بدء التنزيل الآن</span>
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 border-t border-slate-800/70 bg-surface/50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">قدرات النظام</span>
+        <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-white">كل ما تحتاجه لإدارة أرشيفك باحترافية</h2>
+        <p class="mt-3 text-slate-400">تصميم هندسي متكامل يجمع بين سرعة الوصول، دقة الأمان، وسهولة الربط مع الجوال.</p>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Feature 1 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">البحث السريع المتقدم</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">إمكانية البحث المتقدم للوصول الفوري إلى الوثائق المخزنة عبر العناوين، التصنيفات، والمحتوى النصي.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">إدارة الصلاحيات والمستخدمين</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">تحكم دقيق في مستويات الوصول والتعديل والأمان لحماية السجلات الحساسة ومنع التعديل غير المصرح به.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">واجهة مستخدم مرنة</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">تصميم عملي وبسيط لتسهيل سير العمل اليومي مع تجربة استخدام عربية متكاملة وسلسة.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/15 text-violet-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">مزامنة كاميرا الجوال</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">استقبال المستندات والصور مباشرة من هاتفك عبر الشبكة المحلية مع تهيئة تلقائية لمنافذ الجدار الناري.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">استخراج النصوص (OCR)</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">فهرسة ذكية للمستندات المصورة وملفات PDF لسهولة البحث داخل محتوى الوثائق المؤرشفة.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass glass-hover rounded-2xl p-6 transition duration-300">
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white">حماية بيانات الأرشيف عند الترقية</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">مثبّت ذكي يحتفظ بمجلدات الأرشيف وقواعد البيانات والنسخ الاحتياطية بأمان تام أثناء التحديث أو الإزالة.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive System Preview -->
+  <section id="preview" class="py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">تجربة تفاعلية</span>
+        <h2 class="mt-2 text-3xl font-extrabold text-white">استكشف سير العمل داخل النظام</h2>
+      </div>
+
+      <div class="glass rounded-3xl p-4 sm:p-6 border border-slate-700/70">
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-4 mb-6">
+          <button type="button" data-tab="search" class="tab-btn rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-slate-950 transition">1. البحث الفوري</button>
+          <button type="button" data-tab="mobile" class="tab-btn rounded-xl bg-slate-800/80 px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition">2. استقبال الجوال</button>
+          <button type="button" data-tab="security" class="tab-btn rounded-xl bg-slate-800/80 px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition">3. الصلاحيات والأمان</button>
+        </div>
+
+        <div id="tab-content" class="grid gap-6 md:grid-cols-12 items-center">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quickstart & Default Credentials -->
+  <section id="quickstart" class="py-16 border-t border-slate-800/70 bg-surface/50">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div class="glass rounded-3xl p-6 sm:p-10 border border-amber-500/25">
+        <div class="grid gap-8 md:grid-cols-12 items-center">
+          <div class="md:col-span-7">
+            <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300">
+              <span>🔑</span> بيانات الدخول الافتراضية (عند التشغيل لأول مرة)
+            </span>
+            <h3 class="mt-3 text-2xl font-extrabold text-white">ابدأ العمل خلال ثوانٍ</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-300">
+              بعد تثبيت <code class="font-mono text-emerald-300">DocArchiver_Enterprise_v1.exe</code>، استخدم بيانات المدير الافتراضية للدخول وإعداد حسابات فريقك وتغيير كلمة المرور فوراً.
+            </p>
+          </div>
+
+          <div class="md:col-span-5 space-y-3">
+            <div class="flex items-center justify-between rounded-2xl bg-slate-950/80 px-4 py-3 border border-slate-800">
+              <div>
+                <div class="text-[11px] text-slate-400">اسم المستخدم</div>
+                <div class="font-mono text-base font-bold text-white">admin</div>
+              </div>
+              <button type="button" onclick="copyText('admin', 'تم نسخ اسم المستخدم: admin')" class="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition">نسخ</button>
+            </div>
+
+            <div class="flex items-center justify-between rounded-2xl bg-slate-950/80 px-4 py-3 border border-slate-800">
+              <div>
+                <div class="text-[11px] text-slate-400">كلمة المرور</div>
+                <div class="font-mono text-base font-bold text-white">123</div>
+              </div>
+              <button type="button" onclick="copyText('123', 'تم نسخ كلمة المرور: 123')" class="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition">نسخ</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download & Requirements CTA -->
+  <section id="download" class="py-20">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+      <div class="glass rounded-3xl p-8 sm:p-12 border border-emerald-500/30 bg-gradient-to-b from-card to-obsidian">
+        <h2 class="text-3xl sm:text-4xl font-black text-white">جاهز للانتقال إلى أرشفة أسرع وأكثر أماناً؟</h2>
+        <p class="mt-3 max-w-xl mx-auto text-slate-300 text-sm sm:text-base">
+          حمّل المثبّت الرسمي لنظام ويندوز (x64) الآن، أو تصفح سجل الإصدارات والملفات المصدرية عبر مستودع GitHub.
+        </p>
+
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://github.com/sma812020/ShareArchiver/releases/latest/download/DocArchiver_Enterprise_v1.exe"
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-base font-extrabold text-slate-950 shadow-xl shadow-emerald-500/25 hover:brightness-110 transition">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3"/></svg>
+            <span>تحميل DocArchiver_Enterprise_v1.exe</span>
+          </a>
+
+          <a href="https://github.com/sma812020/ShareArchiver/issues" target="_blank" rel="noopener noreferrer"
+             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/80 px-6 py-4 text-sm font-bold text-slate-200 hover:border-amber-400/50 transition">
+            <span>الإبلاغ عن مشكلة أو طلب ميزة (Issues)</span>
+          </a>
+        </div>
+
+        <div class="mt-8 grid gap-3 sm:grid-cols-3 text-xs text-slate-400 border-t border-slate-800/80 pt-6">
+          <div>النظام المطلوب: <span class="text-slate-200 font-semibold">Windows 10 / 11 (x64)</span></div>
+          <div>بيئة التشغيل: <span class="text-slate-200 font-semibold">.NET 8+ Desktop</span></div>
+          <div>منافذ الجوال: <span class="text-slate-200 font-mono">TCP 8750-8790 / 8080</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-obsidian py-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>© 2026 <strong class="text-slate-200">م. سمير الكمالي</strong> — شركة الكمالي للبرمجيات المتقدمة</div>
+      <div class="flex items-center gap-5">
+        <a href="https://github.com/sma812020/ShareArchiver/releases" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">GitHub Releases</a>
+        <a href="tel:+967776441718" dir="ltr" class="hover:text-emerald-400 transition">+967 776 441 718</a>
+        <a href="mailto:samirakamaly8@gmail.com" class="hover:text-emerald-400 transition">samirakamaly8@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const tabsData = {
+      search: {
+        title: 'محرك بحث فوري داخل آلاف الوثائق',
+        desc: 'ابحث بالرقم المرجعي، اسم الجهة، التاريخ، أو الكلمات المستخرجة بتقنية OCR لتصل إلى المستند المطلوب في أجزاء من الثانية.',
+        bullets: [
+          'فهرسة تلقائية للمستندات المضافة حديثاً',
+          'تصفية ذكية حسب المجلد والتصنيف والحالة',
+          'معاينة فورية لملفات PDF والصور عالية الدقة'
+        ],
+        badge: 'Search & OCR',
+        rows: [
+          { name: 'عقد_توريد_2026.pdf', tag: 'عقود', status: 'مفهرس OCR' },
+          { name: 'سند_قبض_4082.jpg', tag: 'سندات مالية', status: 'متطابق 99%' },
+          { name: 'محضر_اجتماع_Q4.pdf', tag: 'إداري', status: 'مفهرس OCR' }
+        ]
+      },
+      mobile: {
+        title: 'التقاط وإرسال الوثائق من جوالك مباشرة',
+        desc: 'حوّل كاميرا هاتفك إلى ماسح ضوئي متصل بالنظام عبر الشبكة المحلية، مع قص الحواف التلقائي وحفظ المستند في الأرشيف فوراً.',
+        bullets: [
+          'اتصال محلي سريع وآمن عبر المنافذ 8750-8790',
+          'دعم السندات ذات الوجه الواحد أو الوجهين',
+          'ترقيم تسلسلي تلقائي وتصنيف فوري'
+        ],
+        badge: 'Mobile Sync',
+        rows: [
+          { name: 'اتصال الجوال: 192.168.1.45', tag: 'متصل الآن', status: 'TCP 8750' },
+          { name: 'وضع السند المزدوج', tag: 'نشط', status: 'Auto Crop' },
+          { name: 'مجلد الحفظ: ArchiveStorage', tag: 'مؤمّن', status: 'جاهز' }
+        ]
+      },
+      security: {
+        title: 'حوكمة وصلاحيات دقيقة لكل مستخدم',
+        desc: 'أنشئ حسابات متعددة وحدد بدقة من يحق له الإضافة، التعديل، الطباعة، أو الحذف مع سجل متابعة متكامل للعمليات.',
+        bullets: [
+          'توزيع الصلاحيات حسب الدور الوظيفي',
+          'حماية مجلدات الأرشيف وقاعدة البيانات',
+          'سجلات تشغيل دقيقة (Logs) للمراجعة والتدقيق'
+        ],
+        badge: 'Enterprise Security',
+        rows: [
+          { name: 'admin (المدير العام)', tag: 'صلاحيات كاملة', status: 'نشط' },
+          { name: 'archive_entry (مدخل بيانات)', tag: 'إضافة وعرض فقط', status: 'مقيد' },
+          { name: 'auditor (مراجع داخلي)', tag: 'قراءة وتصدير', status: 'مقيد' }
+        ]
+      }
+    };
+
+    function renderTab(key) {
+      const d = tabsData[key];
+      const container = document.getElementById('tab-content');
+      container.innerHTML = `
+        <div class="md:col-span-6 space-y-4">
+          <span class="inline-block rounded-lg bg-cyan-500/15 px-3 py-1 font-mono text-xs font-semibold text-cyan-300">${d.badge}</span>
+          <h3 class="text-2xl font-extrabold text-white">${d.title}</h3>
+          <p class="text-sm leading-relaxed text-slate-300">${d.desc}</p>
+          <ul class="space-y-2 text-sm text-slate-300">
+            ${d.bullets.map(b => `<li class="flex items-center gap-2"><span class="text-emerald-400">✔</span><span>${b}</span></li>`).join('')}
+          </ul>
+        </div>
+        <div class="md:col-span-6 rounded-2xl bg-slate-950/90 border border-slate-800 p-4 space-y-3">
+          ${d.rows.map(r => `
+            <div class="flex items-center justify-between rounded-xl bg-slate-900/90 px-4 py-3 border border-slate-800/80">
+              <div>
+                <div class="text-sm font-bold text-white">${r.name}</div>
+                <div class="text-xs text-slate-400">${r.tag}</div>
+              </div>
+              <span class="rounded-lg bg-emerald-500/15 px-2.5 py-1 font-mono text-xs font-semibold text-emerald-300">${r.status}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === key;
+        btn.className = active
+          ? 'tab-btn rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-slate-950 transition'
+          : 'tab-btn rounded-xl bg-slate-800/80 px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition';
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 2400);
+    }
+
+    function copyText(text, msg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(() => fallbackCopy(text, msg));
+      } else {
+        fallbackCopy(text, msg);
+      }
+    }
+
+    function fallbackCopy(text, msg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      showToast(msg);
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => renderTab(btn.dataset.tab));
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
+
+    renderTab('search');
+  </script>
+</body>
+</html>
